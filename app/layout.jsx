@@ -14,11 +14,11 @@ export default function RootLayout({ children }) {
   const [showPopup, setShowPopup] = useState(false);
   const [showExamPopup, setShowExamPopup] = useState(false);
   const [session, setSession] = useState(null);
+
   const router = useRouter();
   const pathname = usePathname();
-
-  const noNavbarPages = ['/login', '/register', '/auth', '/authDetail', '/signup', '/submit','/inputpage'];
-  const noSidebarPages = ['/', '/login', '/register', '/auth','/authDetail','/signup', '/submit','/inputpage'];
+  const noNavbarPages = ['/login', '/register', '/auth', '/authDetail', '/signup', '/submit', '/inputpage'];
+  const noSidebarPages = ['/', '/login', '/register', '/auth', '/authDetail', '/signup', '/submit', '/inputpage'];
   const restrictedPages = ['/home', '/video', '/apply', '/dashboard', '/grade'];
   const checkExamPages = ['/apply', '/dashboard', '/grade'];
 
@@ -31,8 +31,8 @@ export default function RootLayout({ children }) {
     setIsClient(true);
 
     const checkUserSession = async () => {
-      if (pathname === '/') return;
-      if (pathname === '/signup') return;
+      if (pathname === '/' || pathname === '/signup') return;
+
       const supabase = createClient();
       const { data: sessionData } = await supabase.auth.getSession();
 
@@ -43,8 +43,6 @@ export default function RootLayout({ children }) {
           .select("image_url")
           .eq("id", sessionData.session.user.id)
           .single();
-
-        setUserProfile(profile);
 
         if (isRestrictedPage && (!profile || !profile.image_url)) {
           setShowPopup(true);
@@ -59,11 +57,7 @@ export default function RootLayout({ children }) {
             .eq('user_id', sessionData.session.user.id)
             .single();
 
-          if (!examResult || !examResult.korean || examResult.pass === null) {
-            setShowExamPopup(true);
-          } else {
-            setShowExamPopup(false);
-          }
+          setShowExamPopup(!examResult || !examResult.korean || examResult.pass === null);
         } else {
           setShowExamPopup(false);
         }
@@ -76,7 +70,7 @@ export default function RootLayout({ children }) {
   }, [pathname, isRestrictedPage, isCheckExamPage, router]);
 
   if (!isClient) {
-    return null; // Ensure rendering only on client
+    return null;
   }
 
   const handleConfirm = () => {
@@ -86,6 +80,15 @@ export default function RootLayout({ children }) {
 
   return (
     <html lang="en" suppressHydrationWarning>
+
+      <head>
+      <meta name="naver-site-verification" content="577bbbbae74a4290a4dcbb58e770025cd09464b9" />
+      <meta name='description' content='농어촌 전형, 기회균형 전형, 고른기회 전형, 특성화고 전형 전문으로 컨설팅을 하고 있는 개천용 입시 컨설팅입니다. 정시 컨설팅과 수시 컨설팅, 생기부 컨설팅까지 모두 진행하고 있습니다.'/>
+      <meta name='keywords' content='개천용입시컨설팅 농어촌전형 기회균형전형 고른기회전형 고른기회전형컨설팅 기회균형전형컨설팅 특성화고전형' />
+      <meta name="robots" content="index, follow"/>
+
+
+      </head>
       <body className={`h-full ${showPopup || showExamPopup ? 'blur-effect' : ''}`}>
         <QueryProvider>
           <div className="flex h-screen">
