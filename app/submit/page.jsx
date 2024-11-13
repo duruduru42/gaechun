@@ -8,10 +8,10 @@ import sungjuk from "@/components/sungjuk.svg";
 import { useRouter } from 'next/navigation';
 
 export default function Submit() {
-    const [file, setFile] = useState<File | null>(null);
-    const [preview, setPreview] = useState<string | null>(null);
-    const [user, setUser] = useState<any>(null);
-    const inputRef = useRef<HTMLInputElement>(null);
+    const [file, setFile] = useState(null);
+    const [preview, setPreview] = useState(null);
+    const [user, setUser] = useState(null);
+    const inputRef = useRef(null);
     const supabase = createClient();
     const router = useRouter(); // useRouter 훅 사용
 
@@ -44,7 +44,7 @@ export default function Submit() {
         fetchUser();
     }, []);
 
-    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleImageChange = (e) => {
         const selectedFile = e.target.files?.[0] || null;
         if (selectedFile) {
             setFile(selectedFile);
