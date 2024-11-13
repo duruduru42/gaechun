@@ -1,7 +1,7 @@
 "use client";
 
 import { KeyRound, Link as LucideLink } from "lucide-react";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/utils/supabase/client";
 import { useSearchParams, useRouter } from "next/navigation";
@@ -9,12 +9,14 @@ import Image from "next/image";
 import gaechunLogo from "@/components/gaechun.svg";
 import { ArrowLeft } from "lucide-react";
 import NextLink from 'next/link';
+import { useQueryClient } from "@tanstack/react-query"; // Import useQueryClient
 
 export default function SignInPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const params = useSearchParams();
   const router = useRouter();
+  const queryClient = useQueryClient(); // Initialize queryClient here
   const next = params.get("next") || "/";
 
   const handleKeyDown = (e, nextElementId) => {
@@ -47,8 +49,9 @@ export default function SignInPage() {
       console.error("Login error: ", error.message);
     } else {
       console.log("User logged in: ", data.user);
+      queryClient.invalidateQueries(["user"]); // Refresh user query cache
       router.refresh();
-      router.replace("/home");
+      router.push("/home"); // Redirect after refreshing
     }
   };
 
@@ -91,17 +94,7 @@ export default function SignInPage() {
             로그인
           </Button>
         </div>
-        {/* <div className="flex justify-center mt-6">
-          <p>계정이 없으신가요? 
-            <span
-              className="text-blue-500 cursor-pointer ml-1"
-              onClick={() => router.push("/signup")}
-            >
-              회원가입
-            </span>
-          </p>
-        </div> */}
-         <div className="flex justify-center mt-6">
+        <div className="flex justify-center mt-6">
           <p>계정이 없으신가요? 
             <span
               className="text-blue-500 cursor-pointer ml-1"
