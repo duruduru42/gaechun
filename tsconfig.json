@@ -36,8 +36,8 @@
   "components/ui/Detail.js",
   "app/inputpage/page.jsx",
   "app/signup/page.jsx",
-  "app/layout.jsx",
+  "app/layout.tsx",
   "app/home/page.js",
-  "app/apply/page.js"],
+  "app/apply/page.js", "app/submit/page.jsx", "app/submit/page.jsx", "app/hook/useUser.jsx", "app/guide/page.jsx", "app/confirm/page.jsx", "app/page.jsx", "app/auth/page.jsx"],
     "exclude": ["node_modules"]
 }
