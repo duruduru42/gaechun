@@ -3,7 +3,6 @@
 import { KeyRound, Link as LucideLink } from "lucide-react";
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { FcGoogle } from "react-icons/fc";
 import { createClient } from "@/utils/supabase/client";
 import { useSearchParams, useRouter } from "next/navigation";
 import Image from "next/image";
