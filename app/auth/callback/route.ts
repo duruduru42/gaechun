@@ -17,11 +17,11 @@ export async function GET(request: Request) {
   if (data.session) {
     const { data: profile } = await supabase
       .from("profile")
-      .select("name, selection_type")
+      .select("email, selection_type")
       .eq("id", data.session.user.id)
       .single();
 
-    if (profile && profile.name && profile.selection_type) {
+    if (profile && profile.email && profile.selection_type) {
       return NextResponse.redirect(`${origin}${next}`);
     } else {
       return NextResponse.redirect(`${origin}/authDetail`);
