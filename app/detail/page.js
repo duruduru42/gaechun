@@ -37,6 +37,8 @@ import { 경인교육대학교 } from '@/components/대학점수/경인교육대
 import { 대구교육대학교 } from '@/components/대학점수/대구교육대학교';
 import { 경기대학교 } from '@/components/대학점수/경기대학교';
 
+import Seoul from '@/components/상세정보/seoul';
+import Korea from '@/components/상세정보/korea1';
 
 import down from '@/components/caret-down.svg'
 import up from '@/components/caret-up.svg'
@@ -77,6 +79,48 @@ const scoreCalculators = {
   '경인교육대학교' : 경인교육대학교,
   '대구교육대학교' : 대구교육대학교,
   '경기대학교' : 경기대학교
+
+};
+
+const universityComponents = {
+  'seoul1': Seoul,
+  'seoul2': Seoul,
+  'korea1': Korea,
+  'korea2': Korea,
+  'korea3': Korea
+
+//   '연세대학교': 연세대학교,
+//   '고려대학교': 고려대학교,
+//   '서강대학교': 서강대학교,
+//   '한양대학교(서울)': 한양대학교,
+//   '중앙대학교' : 중앙대학교,
+//   '경희대학교(서울)' : 경희대학교서울,
+//   '경희대학교(국제)' : 경희대학교국제,
+//   '한국외국어대학교(서울)' : 한국외국어대학교서울,
+//   '한국외국어대학교(글로벌)' : 한국외국어대학교글로벌,
+//   '서울시립대학교' : 서울시립대학교,
+//   '건국대학교' : 건국대학교,
+//   '동국대학교' : 동국대학교,
+//   '홍익대학교(서울)' : 홍익대학교서울,
+//   '홍익대학교(세종)' : 홍익대학교세종,
+//   '숭실대학교' : 숭실대학교,
+//   '세종대학교' : 세종대학교, 
+//   '광운대학교' : 광운대학교,
+//   '상명대학교' : 상명대학교,
+//   '인천대학교' : 인천대학교,
+//   '아주대학교' : 아주대학교,
+//   '동덕여자대학교' : 동덕여자대학교,
+//   '성신여자대학교' : 성신여자대학교,
+//   '숙명여자대학교' : 숙명여자대학교,
+//   '이화여자대학교' : 이화여자대학교,
+//   '고려대학교(세종)' : 고려대학교세종,  
+//   '한양대학교(에리카)' : 한양대학교에리카,
+//   '한국공학대학교' : 한국공학대학교,
+//   '한국항공대학교' : 한국항공대학교,
+//   '인하대학교' : 인하대학교,  
+//   '경인교육대학교' : 경인교육대학교,
+//   '대구교육대학교' : 대구교육대학교,
+//   '경기대학교' : 경기대학교
 
 };
 
@@ -215,6 +259,7 @@ const Detail = () => {
     setCalculatedScores(scores); // Update state with calculated scores
   };
   
+  const UniversityComponent = universityComponents[name]
 
   return (
     <div className="container mx-auto p-4">
@@ -304,9 +349,9 @@ const Detail = () => {
           </tbody>
         </table>
           ) : (
-            <div className="mt-4 text-center">
-            <h1 className="text-lg font-bold">Hello World</h1>
-          </div>
+            <div>
+            <UniversityComponent />
+            </div>
         )}
       </div>
     </div>
