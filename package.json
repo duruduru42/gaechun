@@ -6,6 +6,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@channel.io/channel-web-sdk-loader": "^2.0.0",
     "@google-cloud/vision": "^4.3.0",
     "@radix-ui/react-slot": "^1.0.2",
     "@supabase/ssr": "^0.3.0",

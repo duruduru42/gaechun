@@ -115,6 +115,8 @@ export default function ClientLayout({ children }) {
           </div>
         </div>
       )}
+     {/* <Channeltalk /> */}
+
     </QueryProvider>
   );
 }

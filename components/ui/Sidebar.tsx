@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
+import Channeltalk from '@/components/channel_talk'; // Channeltalk import
 
 export default function Sidebar() {
   const pathname = usePathname();
@@ -16,16 +17,20 @@ export default function Sidebar() {
     { href: '/apply', label: '모의지원' },
     { href: '/video', label: '동영상' },
     { href: '/notice', label: '공지사항' },
-    { href: '/', label: '정시 컨설팅 신청' }
+    { href: '/', label: '정시 컨설팅 신청' },
   ];
 
   return (
-    <div className="w-64 h-screen p-5 bg-white shadow-md mt-12 font-semibold ">
+    <div className="w-64 h-screen p-5 bg-white shadow-md mt-12 font-semibold">
       <ul>
         {menuItems.map((item) => (
           <li
             key={item.href}
-            className={`mb-4 ${pathname === item.href ? 'bg-orange-500 text-white rounded-xl' : 'text-gray-900'} ${hovered === item.href && pathname !== item.href ? 'bg-orange-500 text-white rounded-xl' : ''}`}
+            className={`mb-4 ${
+              pathname === item.href ? 'bg-orange-500 text-white rounded-xl' : 'text-gray-900'
+            } ${
+              hovered === item.href && pathname !== item.href ? 'bg-orange-500 text-white rounded-xl' : ''
+            }`}
             onMouseEnter={() => setHovered(item.href)}
             onMouseLeave={() => setHovered(null)}
           >
@@ -36,13 +41,7 @@ export default function Sidebar() {
             </Link>
           </li>
         ))}
-        <li className="mt-auto">
-          <Link href="https://open.kakao.com/o/sR7ToArf" legacyBehavior>
-            <a className="flex items-center p-3 rounded-lg text-gray-900">
-              <span className="ml-2">고객센터</span>
-            </a>
-          </Link>
-        </li>
+        
       </ul>
     </div>
   );
