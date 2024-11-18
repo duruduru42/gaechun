@@ -1,4 +1,4 @@
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams } from "next/navigation";
 
 export function FailPage() {
   const [searchParams] = useSearchParams();
