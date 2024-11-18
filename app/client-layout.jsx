@@ -1,4 +1,3 @@
-// app/client-layout.js
 "use client";
 
 import { useEffect, useState } from 'react';
@@ -12,6 +11,7 @@ export default function ClientLayout({ children }) {
   const [isClient, setIsClient] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
   const [showExamPopup, setShowExamPopup] = useState(false);
+  const [showCustomerKeyPopup, setShowCustomerKeyPopup] = useState(false);
   const [session, setSession] = useState(null);
 
   const router = useRouter();
@@ -39,26 +39,39 @@ export default function ClientLayout({ children }) {
         setSession(sessionData.session);
         const { data: profile } = await supabase
           .from("profile")
-          .select("image_url")
+          .select("image_url, customer_key") // customer_key 가져오기
           .eq("id", sessionData.session.user.id)
           .single();
 
-        if (isRestrictedPage && (!profile || !profile.image_url)) {
-          setShowPopup(true);
+        if (pathname !== '/checkout') { // /checkout에서 팝업 비활성화
+          if (isRestrictedPage && (!profile || !profile.image_url)) {
+            setShowPopup(true);
+          } else {
+            setShowPopup(false);
+          }
+
+          if (isCheckExamPage) {
+            const { data: examResult } = await supabase
+              .from('exam_results')
+              .select('korean, pass')
+              .eq('user_id', sessionData.session.user.id)
+              .single();
+
+            setShowExamPopup(!examResult || !examResult.korean || examResult.pass === null);
+          } else {
+            setShowExamPopup(false);
+          }
+
+          if (!profile || !profile.customer_key) {
+            setShowCustomerKeyPopup(true);
+          } else {
+            setShowCustomerKeyPopup(false);
+          }
         } else {
+          // /checkout 경로에서는 모든 팝업을 비활성화
           setShowPopup(false);
-        }
-
-        if (isCheckExamPage) {
-          const { data: examResult } = await supabase
-            .from('exam_results')
-            .select('korean, pass')
-            .eq('user_id', sessionData.session.user.id)
-            .single();
-
-          setShowExamPopup(!examResult || !examResult.korean || examResult.pass === null);
-        } else {
           setShowExamPopup(false);
+          setShowCustomerKeyPopup(false);
         }
       } else {
         router.push('/auth'); // Redirect if there's no session
@@ -71,6 +84,11 @@ export default function ClientLayout({ children }) {
   if (!isClient) {
     return null;
   }
+
+  const handleCheckoutRedirect = () => {
+    setShowCustomerKeyPopup(false);
+    router.push('/checkout'); // /checkout으로 라우트
+  };
 
   const handleConfirm = () => {
     setShowExamPopup(false);
@@ -88,6 +106,21 @@ export default function ClientLayout({ children }) {
           </main>
         </div>
       </div>
+      {showCustomerKeyPopup && (
+        <div className="popup-overlay z-50">
+          <div className="popup-content">
+            <p className="text-lg font-semibold">
+              결제 후 이용 가능한 기능입니다.
+            </p>
+            <button
+              className="bg-blue-500 text-white p-3 rounded mt-3"
+              onClick={handleCheckoutRedirect}
+            >
+              결제 페이지로 이동
+            </button>
+          </div>
+        </div>
+      )}
       {showPopup && (
         <div className="popup-overlay">
           <div className="popup-content">
@@ -115,8 +148,6 @@ export default function ClientLayout({ children }) {
           </div>
         </div>
       )}
-     {/* <Channeltalk /> */}
-
     </QueryProvider>
   );
 }
