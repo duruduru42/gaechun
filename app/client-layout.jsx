@@ -39,7 +39,7 @@ export default function ClientLayout({ children }) {
         setSession(sessionData.session);
         const { data: profile } = await supabase
           .from("profile")
-          .select("image_url, customer_key") // customer_key 가져오기
+          .select("image_url, paymentkey") // paymentkey 가져오기
           .eq("id", sessionData.session.user.id)
           .single();
 
@@ -62,7 +62,7 @@ export default function ClientLayout({ children }) {
             setShowExamPopup(false);
           }
 
-          if (!profile || !profile.customer_key) {
+          if (!profile || !profile.paymentkey) {
             setShowCustomerKeyPopup(true);
           } else {
             setShowCustomerKeyPopup(false);

@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { createClient } from "@/utils/supabase/client"; // Supabase 클라이언트
 
 export default function SuccessPage() {
   const router = useRouter();
@@ -15,7 +16,7 @@ export default function SuccessPage() {
     };
 
     async function confirm() {
-      const response = await fetch("/confirm", {
+      const response = await fetch("/api/confirm", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -32,7 +33,37 @@ export default function SuccessPage() {
       }
 
       // 결제 성공 비즈니스 로직
+      const supabase = createClient();
+
+      try {
+        const { data: sessionData } = await supabase.auth.getSession();
+
+        if (!sessionData.session) {
+          throw new Error("유효한 세션이 없습니다.");
+        }
+
+        const userId = sessionData.session.user.id;
+
+        // profile 테이블 업데이트: paymentKey 및 orderId 저장
+        const { error } = await supabase
+          .from("profile")
+          .update({
+            customer_key: requestData.paymentKey,
+            order_id: requestData.orderId, // 추가된 부분
+          })
+          .eq("id", userId);
+
+        if (error) {
+          console.error("프로필 업데이트 실패:", error.message);
+          throw new Error("프로필 업데이트에 실패했습니다.");
+        }
+
+        console.log("프로필이 성공적으로 업데이트되었습니다.");
+      } catch (error) {
+        console.error("결제 성공 후 데이터베이스 업데이트 오류:", error.message);
+      }
     }
+
     confirm();
   }, []);
 
