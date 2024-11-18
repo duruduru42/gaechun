@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
 import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-export default function SuccessPage() {  // Export as default
+export default function SuccessPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -26,14 +26,15 @@ export default function SuccessPage() {  // Export as default
       const json = await response.json();
 
       if (!response.ok) {
-        // Handle payment failure and navigate to a failure page
+        // 결제 실패 비즈니스 로직
         router.push(`/fail?message=${json.message}&code=${json.code}`);
         return;
       }
-      // Payment success logic
+
+      // 결제 성공 비즈니스 로직
     }
     confirm();
-  }, [router, searchParams]);
+  }, []);
 
   return (
     <div className="result wrapper">
