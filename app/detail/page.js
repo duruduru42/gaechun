@@ -41,6 +41,7 @@ import Seoul from '@/components/상세정보/seoul';
 import Korea from '@/components/상세정보/korea1';
 
 import down from '@/components/caret-down.svg'
+
 import up from '@/components/caret-up.svg'
 import sorted from '@/components/sortarrow.svg'
 import Image from "next/image";
@@ -159,26 +160,41 @@ const Detail = () => {
   }, [user, selections]);
 
   const fetchUniversityDetails = async () => {
-    let orderCriteria = sortOrder.order;
-    if (sortOrder.column === '농어촌' || sortOrder.column === '기회균등') {
-      orderCriteria = 'desc'; // Always descending for these columns
-    }
-  
     const { data, error } = await supabase
       .from('departments')
       .select('*')
-      .eq('university_id', name)
-      .order(sortOrder.column, { ascending: orderCriteria === 'asc' });
+      .eq('university_id', name);
   
     if (error) {
       console.error('Error fetching university details:', error);
     } else {
-      setSelections(data);
+      const sortedData = data.sort((a, b) => {
+        const column = sortOrder.column;
+        const aValue = a[column] || '';
+        const bValue = b[column] || '';
+  
+        if (typeof aValue === 'number' && typeof bValue === 'number') {
+          // 숫자 정렬
+          return sortOrder.order === 'asc' ? aValue - bValue : bValue - aValue;
+        } else if (typeof aValue === 'string' && typeof bValue === 'string') {
+          // 문자열 정렬 (한글 포함)
+          return sortOrder.order === 'asc'
+            ? aValue.localeCompare(bValue, 'ko')
+            : bValue.localeCompare(aValue, 'ko');
+        } else {
+          // 다른 경우 (타입 혼합 등)
+          return 0;
+        }
+      });
+  
+      setSelections(sortedData);
+  
       if (user) {
-        calculateScoresForDepartments(data); // Call this function only when user is available
+        calculateScoresForDepartments(sortedData); // Call this function only when user is available
       }
     }
   };
+  
 
   const fetchApplications = async () => {
     const { data, error } = await supabase
@@ -308,19 +324,18 @@ const Detail = () => {
                   {sortOrder.column === '군' ? (sortOrder.order === 'asc' ? <Image src={down} width={8} className='ml-1'/> : <Image src={up} width={8} className='ml-1'/>) : <Image src={sorted} width={10} className='ml-1'/>}
                   </button>
               </th>              
-              <th className="py-3 px-6 text-center">모집인원</th>
+              <th className="py-3 px-6 text-center">모집인원
+              <button onClick={() => toggleSortOrder('모집인원')}>
+                  {sortOrder.column === '모집인원' ? (sortOrder.order === 'asc' ? <Image src={down} width={8} className='ml-1'/> : <Image src={up} width={8} className='ml-1'/>) : <Image src={sorted} width={10} className='ml-1'/>}
+                  </button></th>
               <th className="py-3 px-6 text-center">지난경쟁률</th>              
               <th className="py-3 px-6 text-center">
                 환산점수
-                <button onClick={() => toggleSortOrder('대학학부')}>
-                  {sortOrder.column === '대학학부' ? (sortOrder.order === 'asc' ? <Image src={down} width={8} className='ml-1'/> : <Image src={up} width={8} className='ml-1'/>) : <Image src={sorted} width={10} className='ml-1'/>}
-                  </button>
+
               </th>
               <th className="py-3 px-6 text-center">
                 합격률
-                <button onClick={() => toggleSortOrder('계열')}>
-                  {sortOrder.column === '계열' ? (sortOrder.order === 'asc' ? <Image src={down} width={8} className='ml-1'/> : <Image src={up} width={8} className='ml-1'/>) : <Image src={sorted} width={10} className='ml-1'/>}
-                  </button>
+
               </th>
               <th className="py-3 px-6 text-right"></th>
             </tr>
@@ -335,7 +350,7 @@ const Detail = () => {
                 <td className="py-3 px-6 text-center">{selection.모집인원}</td>
                 <td className="py-3 px-6 text-center">{selection.지난경쟁률}</td>                
                 <td className="py-3 px-6 text-center">{calculatedScores[selection.id] || '계산 중...'}</td>                
-                <td className="py-3 px-6 text-center">{selection.계열}</td>
+                <td className="py-3 px-6 text-center"> 합격%</td>
                 <td className="text-right">
                   <button
                     onClick={() => handleMockApplication(selection)}
