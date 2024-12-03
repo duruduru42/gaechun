@@ -127,7 +127,6 @@ const universityComponents = {
 
 };
 
-
 const Detail = () => {
   const searchParams = useSearchParams();
   const name = searchParams.get('name');
@@ -161,12 +160,64 @@ const Detail = () => {
     }
   }, [user, selections]);
 
-  const fetchUniversityDetails = async () => {
-    let orderCriteria = sortOrder.order;
-    if (sortOrder.column === '농어촌' || sortOrder.column === '기회균등') {
-      orderCriteria = 'desc'; // Always descending for these columns
+
+  // 비교 결과 계산 함수
+  const getComparisonResult = (score, selection) => {
+    const 진짜안정 = selection.안정 * 1.05;
+    const 안정 = selection.안정;
+    const 적정 = selection.적정;
+    const 소신 = selection.소신;
+    const 상향 = selection.상향;
+    const 진짜상향 = selection.상향 * 0.95;
+                                            
+    if (score >= 안정) {
+      const percent = ((score - 안정) / (진짜안정 - 안정)) * 20 + 80; // 안정과 진짜안정 사이
+      if (percent > 90) {
+        return '90% 이상';
+      }
+      return `${percent.toFixed(1)}%`;
+    } else if (score >= 적정 && score < 안정) {
+      const percent = ((score - 적정) / (안정 - 적정)) * 20 + 60; // 적정과 안정 사이
+      return `${percent.toFixed(1)}%`;
+    } else if (score >= 소신 && score < 적정) {
+      const percent = ((score - 소신) / (적정 - 소신)) * 20 + 40; // 소신과 적정 사이
+      return `${percent.toFixed(1)}%`;
+    } else if (score > 상향 && score < 소신) {
+      const percent = ((score - 상향) / (소신 - 상향)) * 20 + 20; // 상향과 소신 사이
+      return `${percent.toFixed(1)}%`;
+    } else if (score >= 진짜상향) {
+      const percent = ((score - 진짜상향) / (상향 - 진짜상향)) * 20;
+      if (percent < 10) {
+        return '10% 미만';
+      }
+      return `${percent.toFixed(1)}%`;
     }
-  
+    else if (score < 진짜상향) {return '10% 미만';}
+    return '불가'
+  };
+
+  const getBackgroundColor = (comparisonResult) => {
+    const percent = parseFloat(comparisonResult); 
+    if (percent >= 90) {
+      return 'bg-blue-700 text-white';
+    }
+    else if (percent >= 80) {
+      return 'bg-blue-400 text-white';
+     } else if (percent >= 60) {
+      return 'bg-green-500 text-white';
+    } else if (percent >= 40) {
+      return 'bg-yellow-500 text-white';
+    } else if (percent >= 20) {
+      return 'bg-orange-500 text-white';
+    } else if (percent > 10) {
+      return 'bg-red-500 text-white';
+    }
+      else if (10 >= percent) {
+      return 'bg-black text-white';
+    }
+  };
+
+  const fetchUniversityDetails = async () => {
     const { data, error } = await supabase
       .from('departments')
       .select('*')
@@ -175,14 +226,33 @@ const Detail = () => {
     if (error) {
       console.error('Error fetching university details:', error);
     } else {
-      setSelections(data);
+      const sortedData = data.sort((a, b) => {
+        const column = sortOrder.column;
+        const aValue = a[column] || '';
+        const bValue = b[column] || '';
+  
+        if (typeof aValue === 'number' && typeof bValue === 'number') {
+          // 숫자 정렬
+          return sortOrder.order === 'asc' ?  bValue - aValue : aValue - bValue ;
+        } else if (typeof aValue === 'string' && typeof bValue === 'string') {
+          // 문자열 정렬 (한글 포함)
+          return sortOrder.order === 'asc'
+            ? aValue.localeCompare(bValue, 'ko')
+            : bValue.localeCompare(aValue, 'ko');
+        } else {
+          // 다른 경우 (타입 혼합 등)
+          return 0;
+        }
+      });
+  
+      setSelections(sortedData);
+  
       if (user) {
         calculateScoresForDepartments(sortedData); // Call this function only when user is available
       }
     }
   };
   
-
   const fetchApplications = async () => {
     const { data, error } = await supabase
       .from('applications')
@@ -328,8 +398,15 @@ const Detail = () => {
             </tr>
           </thead>
           <tbody className="text-black text-sm font-medium">
-            {selections.map((selection) => (
-              <tr key={selection.id} className="border-b border-gray-200 hover:bg-gray-100">
+          {selections.map((selection) => {
+          const calculatedScore = calculatedScores[selection.id];
+          const comparisonResult =
+            calculatedScore && selection.안정
+              ? getComparisonResult(calculatedScore, selection)
+              : '계산 중...';
+
+         return (              
+          <tr key={selection.id} className="border-b border-gray-200 hover:bg-gray-100">
                 <td className="py-3 px-6 text-center">{selection.name}</td>
                 <td className="py-3 px-6 text-center w-1/3 break-keep	">{selection.모집단위}</td>
 
@@ -337,8 +414,16 @@ const Detail = () => {
                 <td className="py-3 px-6 text-center">{selection.모집인원}</td>
                 <td className="py-3 px-6 text-center">{selection.지난경쟁률}</td>                
                 <td className="py-3 px-6 text-center">{calculatedScores[selection.id] || '계산 중...'}</td>                
-                <td className="py-3 px-6 text-center">{selection.계열}</td>
-                <td className="text-right">
+                <td className="py-3 px-6 text-center">
+                <div
+                  className={`h-8 flex items-center justify-center rounded-md ${getBackgroundColor(
+                    comparisonResult
+                  )}`}
+                >
+                  {comparisonResult}
+                </div>
+              </td>                
+              <td className="text-right">
                   <button
                     onClick={() => handleMockApplication(selection)}
                     className="rounded px-3 py-1 text-l font-bold bg-orange-600 text-white"
@@ -347,8 +432,9 @@ const Detail = () => {
                   </button>
                 </td>
               </tr>
-            ))}
-          </tbody>
+      );
+    })}          
+    </tbody>
         </table>
           ) : (
             <div>
