@@ -306,6 +306,21 @@ export const 연세대학교 = async (userId, selection) => {
       (scienceScore1 + scienceScore2) * 1.5
     ) * 1000 / 900;
 
+  } else if (selection.계열 === '의학') {
+    const scienceScore1 = naturalScienceSubjects.includes(science1)
+    ? convertedScienceScore1 * 1.03
+    : convertedScienceScore1;
+
+    const scienceScore2 = naturalScienceSubjects.includes(science2)
+    ? convertedScienceScore2 * 1.03
+    : convertedScienceScore2;
+
+    baseScore = (
+      Number(standard_score_korean) +
+      Number(standard_score_math) * 1.5 +
+      getEnglishScore(grade_english) +
+      (scienceScore1 + scienceScore2) * 1.5
+    )
 
   } else if (selection.계열 === '생활') {
     baseScore = (

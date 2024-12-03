@@ -1,5 +1,11 @@
 import { createClient } from "@/utils/supabase/client";
 
+// 과탐 및 사탐 구분
+const naturalScienceSubjects = [
+    '물리학Ⅰ', '물리학Ⅱ', '화학Ⅰ', '화학Ⅱ',
+    '지구과학Ⅰ', '지구과학Ⅱ', '생명과학Ⅰ', '생명과학Ⅱ'
+  ];  
+
 const conversionTable = {
     자연: {
         100: 68.85, 99: 68.80, 98: 67.46, 97: 66.62, 96: 66.10, 95: 65.43,
@@ -41,11 +47,12 @@ const conversionTable = {
     }
 };
 
-// 탐구 변환 점수 계산 함수
+// Helper function to get the converted score
 const getConvertedScore = (percentile, subject) => {
-    const inquiryType = isNaturalScience(subject) ? '자연' : '인문';
-    return conversionTable[inquiryType][percentile] || 0;
-};
+    const track = naturalScienceSubjects.includes(subject) ? '자연' : '인문';
+    return conversionTable[track][percentile] || 0;
+  };
+  
 
 // 영어 환산 점수 표
 const getEnglishScore = (grade) => {
@@ -54,15 +61,6 @@ const getEnglishScore = (grade) => {
         6: 60, 7: 40, 8: 20, 9: 10
     };
     return englishScores[grade] || 0;
-};
-
-// 과목이 자연탐구 과목인지 확인하는 함수
-const isNaturalScience = (subject) => {
-    const naturalScienceSubjects = [
-        '물리학Ⅰ', '물리학Ⅱ', '화학Ⅰ', '화학Ⅱ',
-        '생명과학Ⅰ', '생명과학Ⅱ', '지구과학Ⅰ', '지구과학Ⅱ'
-    ];
-    return naturalScienceSubjects.includes(subject);
 };
 
 // 고려대학교(세종) 점수 계산 함수
@@ -94,13 +92,11 @@ export const 고려대학교세종 = async (userId, selection) => {
     // 영어 점수 계산
     const englishScore = getEnglishScore(grade_english);
 
-    // 탐구 과목 자연탐구 여부 확인
-    const isBothNaturalScience = isNaturalScience(science1) && isNaturalScience(science2);
-
         // 탐구 과목 변환 점수 계산
         const convertedScienceScore1 = getConvertedScore(percentile_science1, science1);
         const convertedScienceScore2 = getConvertedScore(percentile_science2, science2);
-        const totalScienceConvertedScore = convertedScienceScore1 + convertedScienceScore2;
+        const isBothNaturalScience = naturalScienceSubjects.includes(science1) && naturalScienceSubjects.includes(science2);
+
 
     // 모집단위 확인
     const isBigDataScience = selection.모집단위 === '빅데이터사이언스학부';
@@ -116,20 +112,20 @@ export const 고려대학교세종 = async (userId, selection) => {
 
     // 점수 계산
     let totalScore = 0;
-    let maxScore = 0;
+    let maxScore = 0; // maxScore 초기 선언 추가
 
     if (selection.계열 === '인문') {
-        totalScore = (standard_score_korean * 0.35 + standard_score_math * 0.2 + englishScore * 0.2 + totalScienceConvertedScore * 0.25);
-        maxScore = (150 * 0.35 + 148 * 0.2 + 100 * 0.2 + 68.83 * 2 * 0.25);
+        totalScore = (standard_score_korean * 0.35 + standard_score_math * 0.2 + englishScore * 0.2 + (convertedScienceScore1+convertedScienceScore2) * 0.25);
+        maxScore = (138 * 0.35 + 144 * 0.2 + 100 * 0.2 + 68.83 * 2 * 0.25);
     } else if (selection.계열 === '상경') {
-        totalScore = (standard_score_korean * 0.3 + standard_score_math * 0.3 + englishScore * 0.2 + totalScienceConvertedScore * 0.2);
-        maxScore = (150 * 0.3 + 148 * 0.3 + 100 * 0.2 + 68.83 * 2 * 0.2);
+        totalScore = (standard_score_korean * 0.3 + standard_score_math * 0.3 + englishScore * 0.2 + (convertedScienceScore1+convertedScienceScore2) * 0.2);
+        maxScore = (138 * 0.3 + 144 * 0.3 + 100 * 0.2 + 68.83 * 2 * 0.2);
     } else if (selection.계열 === '자연' || isBigDataScience) {
-        totalScore = (standard_score_korean * 0.2 + standard_score_math * 0.35 + englishScore * 0.2 + totalScienceConvertedScore * 0.25);
-        maxScore = (150 * 0.2 + 148 * 0.35 + 100 * 0.2 + 68.83 * 2 * 0.25);
+        totalScore = (standard_score_korean * 0.2 + standard_score_math * 0.35 + englishScore * 0.2 + (convertedScienceScore1+convertedScienceScore2) * 0.25);
+        maxScore = (138 * 0.2 + 144 * 0.35 + 100 * 0.2 + 68.83 * 2 * 0.25);
     } else if (selection.계열 === '데이터') {
-        totalScore = (standard_score_korean * 0.2 + standard_score_math * 0.35 + englishScore * 0.2 + totalScienceConvertedScore * 0.25);
-        maxScore = (150 * 0.2 + 148 * 0.35 + 100 * 0.2 + 68.83 * 2 * 0.25);
+        totalScore = (standard_score_korean * 0.2 + standard_score_math * 0.35 + englishScore * 0.2 + (convertedScienceScore1+convertedScienceScore2) * 0.25);
+        maxScore = (138 * 0.2 + 144 * 0.35 + 100 * 0.2 + 68.83 * 2 * 0.25);
     } else {
         return '불가'; // 잘못된 계열 값일 경우
     }
