@@ -94,6 +94,11 @@ export const 성신여자대학교 = async (userId, selection) => {
                  (englishScore * 0.2) +
                  (scienceAverage * 0.3)) * 5 +
                  historyBonus;
+                 if (isNaturalScience(science1) || isNaturalScience(science2)) {
+                  const higherSciencePercentile = Math.max(percentile_science1, percentile_science2); // 높은 percentile 선택
+                  totalScore += higherSciencePercentile * 0.1; // 10% 가산
+                }
+
 
   } else if (selection.계열 === '나1') {
     totalScore = ((percentile_korean * 0.3) +
@@ -115,6 +120,10 @@ export const 성신여자대학교 = async (userId, selection) => {
                  (englishScore * 0.3) +
                  (scienceAverage * 0.25)) * 5 +
                  historyBonus;
+                 if (isNaturalScience(science1) || isNaturalScience(science2)) {
+                  const higherSciencePercentile = Math.max(percentile_science1, percentile_science2); // 높은 percentile 선택
+                  totalScore += higherSciencePercentile * 0.1; // 10% 가산
+                }
 
   } else {
     return '불가: 잘못된 계열 값'; // 잘못된 계열 값일 경우

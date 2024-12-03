@@ -120,8 +120,8 @@ const TablePage = () => {
         <p className="text-center text-xl font-medium mt-6">2024. 12. 06</p>
         <p className="text-center text-xl font-medium tracking-widest mt-2">한국교육과정평가원장</p>
       </div>
-      <div className="grid justify-items-center w-full mt-5 font-medium text-gray-400">
-          <p className="underline underline-offset-2"><a href="https://open.kakao.com/o/se4mzOnf">성적표에 오류가 있어요!</a></p>
+      <div className="grid justify-items-center w-full mt-5 font-medium text-orange-400">
+          <p className="underline underline-offset-2 font-bold text-lg"><a href="/admin">수정하기</a></p>
         </div>
     </div>
   );

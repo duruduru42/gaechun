@@ -149,7 +149,6 @@ export default function CheckoutPage() {
             </div>
             <p className="mt-3 text-xs leading-5 text-gray-800">- 원서 마감일까지 서비스 운영 (2025년 1월 3일)</p>
             <p className="mt-3 text-xs leading-5 text-gray-800">- 성적표 인증 완료 전까지만 환불 가능.</p>
-
           </div>
         </div>
       </div>

@@ -1,6 +1,11 @@
 import { createClient } from "@/utils/supabase/client";
 
 // 탐구 변환 점수 테이블 (기본 값 적용)
+const naturalScienceSubjects = [
+  '물리학Ⅰ', '물리학Ⅱ', '화학Ⅰ', '화학Ⅱ',
+  '생명과학Ⅰ', '생명과학Ⅱ', '지구과학Ⅰ', '지구과학Ⅱ'
+];
+
 const conversionTable = {
     자연: {
       100: 68.85, 99: 68.80, 98: 67.46, 97: 66.62, 96: 66.10, 95: 65.43,
@@ -42,10 +47,10 @@ const conversionTable = {
     }
   };
 
-// 탐구 변환 점수 계산 함수
+// Helper function to get the converted score
 const getConvertedScore = (percentile, subject) => {
-  const inquiryType = isNaturalScience(subject) ? '과학탐구' : '사회탐구';
-  return conversionTable[inquiryType] ? percentile / conversionTable[inquiryType][100] : 0;
+  const track = naturalScienceSubjects.includes(subject) ? '자연' : '인문';
+  return conversionTable[track][percentile] || 0;
 };
 
 // 영어 환산 점수 표 (200점 기준)
@@ -63,15 +68,6 @@ const getEnglishScore = (grade, track) => {
 // 한국사 환산 점수 표 (감산)
 const getHistoryScore = (grade) => {
   return grade <= 3 ? 10 : 10 - (0.2 * (grade - 3));
-};
-
-// 과목이 자연탐구 과목인지 확인하는 함수
-const isNaturalScience = (subject) => {
-  const naturalScienceSubjects = [
-    '물리학Ⅰ', '물리학Ⅱ', '화학Ⅰ', '화학Ⅱ',
-    '생명과학Ⅰ', '생명과학Ⅱ', '지구과학Ⅰ', '지구과학Ⅱ'
-  ];
-  return naturalScienceSubjects.includes(subject);
 };
 
 // 세종대학교 점수 계산 함수
@@ -104,6 +100,9 @@ export const 세종대학교 = async (userId, selection) => {
   // 영어 점수 및 한국사 점수 계산
   const englishScore = getEnglishScore(grade_english, selection.계열);
   const historyScore = getHistoryScore(grade_history);
+  // Calculate science scores
+  const scienceScore1 = getConvertedScore(percentile_science1, science1);
+  const scienceScore2 = getConvertedScore(percentile_science2, science2);
 
   let totalScore = 0;
 
@@ -113,29 +112,37 @@ export const 세종대학교 = async (userId, selection) => {
       (standard_score_korean / 200 * 300) +
       (standard_score_math / 200 * 300) +
       englishScore +
-      (getConvertedScore(percentile_science1, science1) + getConvertedScore(percentile_science2, science2)) + 
+      (scienceScore1 + scienceScore2) + 
       historyScore;
   } 
   // 자연계열 계산 (자연1, 자연2 공통)
   else if (selection.계열 === '자연1' || selection.계열 === '자연2') {
     let mathBonus = 0;
-    let scienceBonus = 0;
-    const science1Bonus = isNaturalScience(science1) ? (selection.계열 === '자연1' ? 0.05 : 0.03) : 0;
-    const science2Bonus = isNaturalScience(science2) ? (selection.계열 === '자연1' ? 0.05 : 0.03) : 0;
 
-    // 수학이 '미적분' 또는 '기하'일 때 가산점 적용
+    // science1, science2가 naturalScienceSubjects에 포함되어 있는지 확인하고 가산점 계산
+    const science1Bonus = naturalScienceSubjects.includes(science1)
+      ? (selection.계열 === '자연1' ? 0.05 : 0.03)
+      : 0;
+
+    const science2Bonus = naturalScienceSubjects.includes(science2)
+      ? (selection.계열 === '자연1' ? 0.05 : 0.03)
+      : 0;
+
+    // 수학 가산점 계산
     if (math === '미적분' || math === '기하') {
       mathBonus = selection.계열 === '자연1' ? 0.05 : 0.03;
     }
 
+    // 최종 점수 계산
     totalScore =
-      standard_score_korean + // 자연계열에서는 국어에 대한 배점이 없음
-      (standard_score_math / 200 * 350) * (1 + mathBonus) +
-      englishScore +
-      (getConvertedScore(percentile_science1, science1) / 200 * 250) * (1 + science1Bonus) +
-      (getConvertedScore(percentile_science2, science2) / 200 * 250) * (1 + science2Bonus) +
-      historyScore;
-  } 
+    (Number(standard_score_korean) || 0) +
+    ((Number(standard_score_math) / 200 * 350) || 0) * (1 + mathBonus) +
+    (Number(englishScore) || 0) +
+    ((Number(scienceScore1) / 200 * 250) || 0) * (1 + science1Bonus) +
+    ((Number(scienceScore2) / 200 * 250) || 0) * (1 + science2Bonus) +
+    (Number(historyScore) || 0);
+  
+}
   else {
     return '불가'; // 잘못된 계열 값일 경우
   }

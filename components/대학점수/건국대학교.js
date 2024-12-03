@@ -41,11 +41,16 @@ const conversionTable = {
       4: 33.70, 3: 33.10, 2: 32.46, 1: 31.55, 0: 29.51
     }
   };
-  
 
-const getConvertedScore = (percentile, track) => {
-  return conversionTable[track][percentile] || 0;
-};
+  const naturalScienceSubjects = [
+    '물리학Ⅰ', '물리학Ⅱ', '화학Ⅰ', '화학Ⅱ',
+    '생명과학Ⅰ', '생명과학Ⅱ', '지구과학Ⅰ', '지구과학Ⅱ'
+  ];
+  
+  const getConvertedScore = (percentile, subject) => {
+    const track = naturalScienceSubjects.includes(subject) ? '자연' : '인문';
+    return conversionTable[track][percentile] || 0;
+  };
 
 export const 건국대학교 = async (userId, selection) => {
   const supabase = createClient();
@@ -75,9 +80,9 @@ export const 건국대학교 = async (userId, selection) => {
   // 한국사 감점 계산
   const historyPenalty = getHistoryPenalty(grade_history);
 
-  // 탐구 과목 변환 점수 계산 (탐구 변환점수 로직 적용)
-  const scienceScore1 = getConvertedScore(percentile_science1, selection.계열 === '자연' ? '자연' : '인문');
-  const scienceScore2 = getConvertedScore(percentile_science2, selection.계열 === '자연' ? '자연' : '인문');
+ // Calculate science scores
+ const scienceScore1 = getConvertedScore(percentile_science1, science1);
+ const scienceScore2 = getConvertedScore(percentile_science2, science2);
 
   // 탐구 과목 점수 계산
   const scienceScore = (scienceScore1 + scienceScore2) * 0.2;

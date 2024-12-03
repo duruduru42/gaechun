@@ -30,10 +30,13 @@ export const 삼육대학교 = async (userId, selection) => {
         .single();
 
     if (error || !data) {
-        return '불가'; // If there's an error or no data found
+        console.error('Error fetching exam results:', error);
+        console.error('Fetched data:', data);
+        return '불가';
     }
 
-    const {
+    // Use `let` for variables that need to be reassigned
+    let {
         percentile_korean,
         percentile_math,
         percentile_science1,
@@ -45,56 +48,61 @@ export const 삼육대학교 = async (userId, selection) => {
         math
     } = data;
 
-    // Calculate English and Korean History scores
+    if (!['인문', '자연', '약학'].includes(selection.계열)) {
+        console.warn('Invalid 계열:', selection.계열);
+        return '불가';
+    }
+
     const englishScore = getConvertedScore(grade_english);
     const historyScore = getConvertedScore(grade_history);
 
-    // Determine exploration subject scores (탐구) and apply conditions
-    let explorationScore1 = percentile_science1;
-    let explorationScore2 = percentile_science2;
+    let explorationScore1 = percentile_science1 || 0;
+    let explorationScore2 = percentile_science2 || 0;
 
     if (selection.계열 === '자연' && (math === '미적분' || math === '기하')) {
-        // 5% bonus if math is "미적분" or "기하" for natural sciences
-        percentile_math *= 1.05;
+        percentile_math *= 1.05; // Apply bonus
     }
 
     if (selection.계열 === '약학') {
-        // Apply bonuses for 약학 track
         if (math === '미적분' || math === '기하') {
-            percentile_math *= 1.05; // 5% bonus for math if it is "미적분" or "기하"
+            percentile_math *= 1.05; // Apply bonus
         }
-
-        // Apply science inquiry subject bonus if both 탐구 subjects are science inquiry subjects
         if (isScienceInquiry(science1) && isScienceInquiry(science2)) {
             explorationScore1 *= 1.03;
             explorationScore2 *= 1.03;
         }
     }
 
-    // Select the top two scores among 탐구1, 탐구2, and 한국사
     const explorationScores = [explorationScore1, explorationScore2, historyScore];
     explorationScores.sort((a, b) => b - a);
-    const topTwoExplorationScores = explorationScores[0] + explorationScores[1];
+    const topTwoExplorationScores = (Number(explorationScores[0]) + Number(explorationScores[1]))/2;
 
-    // Calculate final score based on track
     let totalScore = 0;
 
     if (selection.계열 === '인문' || selection.계열 === '자연') {
-        // Sort scores in descending order and apply weight
-        const scores = [percentile_korean, percentile_math, englishScore, topTwoExplorationScores];
+        // Ensure all scores are numbers
+        const scores = [
+            Number(percentile_korean),
+            Number(percentile_math),
+            Number(englishScore),
+            Number(topTwoExplorationScores)
+        ];
+    
+        // Sort scores in descending order
         scores.sort((a, b) => b - a);
-
+    
+        // Calculate the total score
         totalScore = (scores[0] * 0.4 + scores[1] * 0.3 + scores[2] * 0.2 + scores[3] * 0.1) * 10;
-    } else if (selection.계열 === '약학') {
-        // Calculate score for 약학 track
+    }
+     else if (selection.계열 === '약학') {
         totalScore = (
             percentile_korean * 0.25 +
             percentile_math * 0.3 +
             englishScore * 0.25 +
-            topTwoExplorationScores * 0.2
+            (explorationScore1+explorationScore2) * 0.1
         ) * 10;
     } else {
-        return '불가'; // Invalid track
+        return '불가';
     }
 
     return totalScore.toFixed(2);

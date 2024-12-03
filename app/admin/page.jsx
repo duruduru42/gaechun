@@ -31,6 +31,8 @@ export default function InputPage() {
     const [gradeScience2, setGradeScience2] = useState('');
     const [gradeForeignLanguage, setGradeForeignLanguage] = useState('');
     const [isTakingForeignLanguage, setIsTakingForeignLanguage] = useState(false);
+    const [selection_type, setSelectionType] = useState("");
+    const [name, setName] = useState("");
 
     const router = useRouter(); // Ensure router is defined
 
@@ -41,22 +43,6 @@ export default function InputPage() {
                 console.error('Error fetching user:', userError);
                 alert('User not logged in.');
                 return;
-            }
-
-            const { data: examResult, error: examError } = await supabase
-                .from('exam_results')
-                .select('korean')
-                .eq('user_id', user.id)
-                .single();
-
-            if (examError) {
-                console.error('Error fetching exam result:', examError);
-                return;
-            }
-
-            if (examResult && examResult.korean) {
-                alert('성적을 이미 입력하셨습니다.');
-                router.push('/home');
             }
         };
 
@@ -72,7 +58,7 @@ export default function InputPage() {
                 return;
             }
 
-            const { error } = await supabase
+            const { examError  } = await supabase
                 .from('exam_results')
                 .update({
                     korean,
@@ -97,15 +83,29 @@ export default function InputPage() {
                     grade_foreign_language: parseInt(gradeForeignLanguage),
                 })
                 .eq('user_id', user.id);
-
-            if (error) {
+                
+            if (examError ) {
                 console.error('Error updating exam results:', error);
                 alert(`Failed to submit data: ${error.message}`);
                 return;
             }
+            
+            const { error: profileError } = await supabase
+            .from('profile')
+            .update({
+                selection_type: selection_type,
+                display_name: name // 여기서 selectedType은 입력된 selection_type 값
+            })
+            .eq('id', user.id); // profile 테이블의 id와 user.id를 매칭
 
-            alert('성적표 제출이 완료되었습니다.');
-            router.push('/home'); // '/home' 페이지로 이동
+        if (profileError) {
+            console.error('Error updating profile selection_type:', profileError);
+            alert(`Failed to update selection type: ${profileError.message}`);
+            return;
+        }
+
+            alert('성적 입력 완료');
+            router.push('/admin/grade1'); // '/home' 페이지로 이동
         } catch (error) {
             console.error('Unexpected error:', error);
             alert('An unexpected error occurred');
@@ -176,10 +176,39 @@ export default function InputPage() {
     return (
         <div className="text-left box-border p-4 border-4 flex flex-col items-center justify-center">
             <h1 className="font-bold text-4xl text-black mt-20 mb-12">성적 입력</h1>
-            <div className="w-full max-w-2xl bg-white shadow-md rounded-lg">
-                <h1 className="font-bold text-sm text-center text-red-400 mt-10">*방금 제출한 성적표와 동일한 성적을 입력해주세요. <br/>기재한 성적이 다른 경우 승인이 되지 않습니다.</h1>
 
+            <div className="w-full max-w-2xl bg-white shadow-md rounded-lg">
                 {/* Korean */}
+                <div className="mb-6 mt-10">
+                    <p className="text-2xl font-semibold mb-10 text-center">이름</p>
+                    <div className="flex justify-center">
+                    <input
+                    type="text"
+                    placeholder="학생이름"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="w-2/3 p-3 border rounded"
+                    id="name"
+                    />
+                    </div>
+                </div>
+
+                <div className="mb-6 mt-10">
+                    <p className="text-2xl font-semibold mb-10 text-center">전형</p>
+                    <div className="flex justify-center">
+                    <select
+                    value={selection_type}
+                    onChange={(e) => setSelectionType(e.target.value)}
+                    className="block pt-4 pb-1.5 px-0 w-2/3 text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+                    id="type"
+                    >
+                    <option value="">전형을 선택하세요</option>
+                    <option value="기회균형전형">기회균형전형</option>
+                    <option value="농어촌전형">농어촌전형</option>
+                    </select>
+                    </div>
+                </div>
+
                 <div className="mb-6 mt-10">
                     <p className="text-2xl font-semibold mb-10 text-center">국어</p>
                     {renderSelectField('korean', '선택과목 입력', korean, setKorean, ['언어와 매체', '화법과 작문'], 'standard_score_korean')}
@@ -270,7 +299,7 @@ export default function InputPage() {
                     id="submit"
                     onClick={handleSubmit}
                 >
-                    제출하기
+                    입력 완료 
                 </button>
                 </div>
             </div>

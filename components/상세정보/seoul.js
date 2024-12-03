@@ -105,7 +105,7 @@ export default function Seoul() {
 
 
         {/* Section 2 */}
-        <h3 className="text-lg font-semibold mt-8 mb-4">3.2025학년도 수능 응시영역기준</h3>
+        <h3 className="text-lg font-semibold mt-8 mb-4">3.수능 응시영역기준</h3>
         <table className="min-w-full border">
           <thead>
             <tr className="bg-orange-500 text-white">

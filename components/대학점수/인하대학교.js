@@ -118,13 +118,13 @@ export const 인하대학교 = async (userId, selection) => {
     let totalScore = 0;
 
     if (selection.계열 === '인문') {
-        totalScore = (standard_score_korean * 0.35 / 150) + (standard_score_math * 0.25 / 148) +
+        totalScore = (standard_score_korean * 0.35 / 138) + (standard_score_math * 0.25 / 144) +
             (englishScore * 0.15 / 150) + (totalExplorationScore * 0.25) + historyScore;
     } else if (selection.계열 === '자연') {
-        totalScore = (standard_score_korean * 0.25 / 150) + (standard_score_math * 0.35 / 148) +
+        totalScore = (standard_score_korean * 0.25 / 138) + (standard_score_math * 0.35 / 144) +
             (englishScore * 0.10 / 100) + (totalExplorationScore * 0.3) + historyScore;
     } else if (selection.계열 === '예체능') {
-        totalScore = (standard_score_korean * 0.4 / 150) + (englishScore * 0.4 / 150) +
+        totalScore = (standard_score_korean * 0.4 / 138) + (englishScore * 0.4 / 144) +
             (totalExplorationScore * 0.2) + historyScore;
     } else {
         return '불가'; // Invalid track

@@ -4,23 +4,19 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 
-export default function Sidebar() {
+export function Sidebar1() {
   const pathname = usePathname();
   const [hovered, setHovered] = useState<string | null>(null);
 
   const menuItems = [
-    { href: '/home', label: '홈' },
-    { href: '/guide', label: '개천용 합격예측 설명' },
-    { href: '/grade', label: '내 성적' },
-    { href: '/dashboard', label: '대학 합격률' },
-    { href: '/apply', label: '모의지원' },
-    { href: '/video', label: '동영상' },
-    { href: '/notice', label: '공지사항' },
-    { href: '/', label: '정시 컨설팅 신청' },
+    { href: '/admin', label: '성적 입력' },
+    { href: '/admin/grade1', label: '성적' },
+    { href: '/admin/dashboard1', label: '대학 합격률' },
   ];
 
   return (
-    <div className="w-64 h-screen p-5 bg-white shadow-md mt-12 font-semibold">
+    <div className="w-64 h-screen p-5 bg-white shadow-md font-semibold">
+      <div className='mt-12'>
       <ul>
         {menuItems.map((item) => (
           <li
@@ -42,6 +38,7 @@ export default function Sidebar() {
         ))}
         
       </ul>
+      </div>
     </div>
   );
 }

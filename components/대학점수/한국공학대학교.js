@@ -30,32 +30,34 @@ export const 한국공학대학교 = async (userId, selection) => {
     }
 
     const {
-        percentile_korean,
-        percentile_math,
-        percentile_science1,
-        percentile_science2,
-        grade_english,
+        percentile_korean = 0,
+        percentile_math = 0,
+        percentile_science1 = 0,
+        percentile_science2 = 0,
+        grade_english = 0,
         math
     } = data;
 
-    // Calculate English score
-    const englishScore = getEnglishScore(grade_english);
+    // Ensure all values are numbers
+    const koreanScore = Number(percentile_korean) || 0;
+    const rawMathScore = Number(percentile_math) || 0;
+    const science1Score = Number(percentile_science1) || 0;
+    const science2Score = Number(percentile_science2) || 0;
+    const englishScore = getEnglishScore(Number(grade_english)) || 0;
 
     // Apply 10% bonus if math subject is '미적분' or '기하'
-    const mathScore = isAdvancedMath(math) ? percentile_math * 1.1 : percentile_math;
-
-    // Select the higher score between the two 탐구 subjects
-    const highestScienceScore = Math.max(percentile_science1, percentile_science2);
+    const mathScore = isAdvancedMath(math) ? rawMathScore * 1.1 : rawMathScore;
 
     // Calculate the total score based on the selected track
     let totalScore = 0;
     if (selection.계열 === '공학') {
-        totalScore = percentile_korean + (mathScore * 1.4) + (englishScore * 0.8) + (highestScienceScore * 0.8);
+        totalScore = koreanScore + (mathScore * 1.4) + (englishScore * 0.8) + (Math.max(science1Score, science2Score) * 0.8);
     } else if (selection.계열 === '경영') {
-        totalScore = (percentile_korean * 1.2) + (mathScore * 1.2) + (englishScore * 0.8) + (highestScienceScore * 0.8);
+        totalScore = (koreanScore * 1.2) + (mathScore * 1.2) + (englishScore * 0.8) + (Math.max(science1Score, science2Score) * 0.8);
     } else {
         return '불가'; // If the track is invalid
     }
 
-    return totalScore.toFixed(2);
+    // Ensure totalScore is a number before formatting
+    return Number(totalScore).toFixed(2);
 };

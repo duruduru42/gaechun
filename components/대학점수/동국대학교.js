@@ -79,7 +79,8 @@ const conversionTable = {
 const isNaturalScience = (subject) => naturalScienceSubjects.includes(subject);
 
 // 탐구 변환 점수 계산 함수
-const getConvertedScore = (percentile, track) => {
+const getConvertedScore = (percentile, subject) => {
+  const track = naturalScienceSubjects.includes(subject) ? '자연' : '인문';
   return conversionTable[track][percentile] || 0;
 };
 
@@ -123,55 +124,56 @@ export const 동국대학교 = async (userId, selection) => {
   const historyPenalty = getHistoryPenalty(grade_history);
 
   // 탐구 과목 변환 점수 계산 (탐구 변환 점수 로직 적용)
-  const convertedScienceScore1 = getConvertedScore(percentile_science1, selection.계열 === '자연' ? '자연' : '인문');
-  const convertedScienceScore2 = getConvertedScore(percentile_science2, selection.계열 === '자연' ? '자연' : '인문');
+  const convertedScienceScore1 = getConvertedScore(percentile_science1, science1);
+  const convertedScienceScore2 = getConvertedScore(percentile_science2, science2);
 
   // 기본 점수 계산
   let totalScore = 0;
+
 
   if (selection.계열 === '인문') {
     totalScore =
       (standard_score_korean / 200) * 1000 * 0.35 +
       (standard_score_math / 200) * 1000 * 0.25 +
       (convertedScienceScore1 + convertedScienceScore2) * 5 * 0.25 +
-      englishScore +
+      englishScore * 5 * 0.15 +
       historyPenalty;
   } else if (selection.계열 === '자연') {
     totalScore =
       (standard_score_korean / 200) * 1000 * 0.25 +
       (standard_score_math / 200) * 1000 * 0.35 +
       (convertedScienceScore1 + convertedScienceScore2) * 5 * 0.25 +
-      englishScore +
+      englishScore * 5 * 0.15 +
       historyPenalty;
   } else {
     return '불가';
   }
 
-  // 추가 조건 1: 수학 가산점
-  if (recruitmentUnitMath.includes(selection.모집단위) && (math === '미적분' || math === '기하')) {
-    totalScore += standard_score_math * 0.03;
+   // 추가 조건 1: 수학 가산점
+   if (recruitmentUnitMath.includes(selection.모집단위) && (math === '미적분' || math === '기하')) {
+    totalScore += standard_score_math * 0.03 * 5 * 0.35;
   }
 
   // 추가 조건 2: 탐구 가산점 (과탐)
   if (recruitmentUnitScience.includes(selection.모집단위)) {
     if (isNaturalScience(science1)) {
-      totalScore += convertedScienceScore1 * 0.03;
+      totalScore += convertedScienceScore1 * 0.03 * 5 * 0.25;
     }
     if (isNaturalScience(science2)) {
-      totalScore += convertedScienceScore2 * 0.03;
+      totalScore += convertedScienceScore2 * 0.03 * 5 * 0.25;
     }
   }
 
   // 추가 조건 3: 수학 및 탐구 가산점
   if (recruitmentUnitBoth.includes(selection.모집단위)) {
     if (math === '미적분' || math === '기하') {
-      totalScore += standard_score_math * 0.03;
+      totalScore += standard_score_math * 0.03 * 5 * 0.35;
     }
     if (isNaturalScience(science1)) {
-      totalScore += convertedScienceScore1 * 0.03;
+      totalScore += convertedScienceScore1 * 0.03 * 5 * 0.25;
     }
     if (isNaturalScience(science2)) {
-      totalScore += convertedScienceScore2 * 0.03;
+      totalScore += convertedScienceScore2 * 0.03 * 5 * 0.25;
     }
   }
 

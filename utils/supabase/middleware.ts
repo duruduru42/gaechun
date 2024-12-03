@@ -55,6 +55,7 @@ export async function middleware(request: NextRequest) {
   return response;
 }
 
+
 // Configure middleware to match all paths except those for static assets, images, and favicon
 export const config = {
   matcher: [

@@ -1,46 +1,53 @@
 import { createClient } from "@/utils/supabase/client";
 
+const naturalScienceSubjects = [
+  '물리학Ⅰ', '물리학Ⅱ', '화학Ⅰ', '화학Ⅱ',
+  '생명과학Ⅰ', '생명과학Ⅱ', '지구과학Ⅰ', '지구과학Ⅱ'
+];
+
 // 탐구 변환 점수 테이블
 const conversionTable = {
-    자연: {
-      100: 68.85, 99: 68.80, 98: 67.46, 97: 66.62, 96: 66.10, 95: 65.43,
-      94: 64.85, 93: 64.34, 92: 63.94, 91: 63.49, 90: 63.15, 89: 62.83,
-      88: 62.52, 87: 62.22, 86: 61.92, 85: 61.52, 84: 61.11, 83: 60.68,
-      82: 60.28, 81: 59.99, 80: 59.69, 79: 59.38, 78: 59.08, 77: 58.79,
-      76: 58.49, 75: 58.19, 74: 57.81, 73: 57.43, 72: 57.16, 71: 56.89,
-      70: 56.62, 69: 56.32, 68: 56.00, 67: 55.67, 66: 55.33, 65: 55.00,
-      64: 54.67, 63: 54.37, 62: 54.11, 61: 53.85, 60: 53.59, 59: 53.34,
-      58: 53.09, 57: 52.84, 56: 52.60, 55: 52.26, 54: 51.90, 53: 51.60,
-      52: 51.23, 51: 50.85, 50: 50.46, 49: 50.07, 48: 49.77, 47: 49.42,
-      46: 49.08, 45: 48.75, 44: 48.40, 43: 48.07, 42: 47.75, 41: 47.37,
-      40: 46.94, 39: 46.57, 38: 46.21, 37: 45.84, 36: 45.41, 35: 45.01,
-      34: 44.67, 33: 44.33, 32: 44.02, 31: 43.70, 30: 43.38, 29: 43.11,
-      28: 42.77, 27: 42.40, 26: 42.08, 25: 41.75, 24: 41.42, 23: 41.09,
-      22: 40.70, 21: 40.33, 20: 39.99, 19: 39.64, 18: 39.31, 17: 38.98,
-      16: 38.56, 15: 38.14, 14: 37.71, 13: 37.29, 12: 36.93, 11: 36.57,
-      10: 36.23, 9: 35.89, 8: 35.55, 7: 35.16, 6: 34.72, 5: 33.99,
-      4: 33.15, 3: 32.49, 2: 31.81, 1: 30.88, 0: 28.58
-    },
-    인문: {
-      100: 68.03, 99: 67.73, 98: 66.74, 97: 66.12, 96: 65.65, 95: 65.13,
-      94: 64.68, 93: 64.29, 92: 63.92, 91: 63.56, 90: 63.21, 89: 62.89,
-      88: 62.58, 87: 62.28, 86: 62.00, 85: 61.67, 84: 61.32, 83: 60.97,
-      82: 60.65, 81: 60.39, 80: 60.12, 79: 59.83, 78: 59.53, 77: 59.24,
-      76: 58.96, 75: 58.67, 74: 58.34, 73: 58.00, 72: 57.71, 71: 57.43,
-      70: 57.13, 69: 56.82, 68: 56.46, 67: 56.11, 66: 55.77, 65: 55.44,
-      64: 55.11, 63: 54.77, 62: 54.47, 61: 54.15, 60: 53.83, 59: 53.49,
-      58: 53.19, 57: 52.88, 56: 52.56, 55: 52.15, 54: 51.73, 53: 51.36,
-      52: 50.96, 51: 50.57, 50: 50.14, 49: 49.73, 48: 49.35, 47: 48.96,
-      46: 48.62, 45: 48.27, 44: 47.92, 43: 47.58, 42: 47.23, 41: 46.86,
-      40: 46.48, 39: 46.09, 38: 45.71, 37: 45.36, 36: 44.98, 35: 44.62,
-      34: 44.28, 33: 43.95, 32: 43.64, 31: 43.33, 30: 43.03, 29: 42.76,
-      28: 42.43, 27: 42.11, 26: 41.81, 25: 41.49, 24: 41.17, 23: 40.87,
-      22: 40.52, 21: 40.19, 20: 39.87, 19: 39.55, 18: 39.25, 17: 38.95,
-      16: 38.60, 15: 38.24, 14: 37.88, 13: 37.52, 12: 37.19, 11: 36.86,
-      10: 36.53, 9: 36.16, 8: 35.81, 7: 35.40, 6: 34.95, 5: 34.37,
-      4: 33.70, 3: 33.10, 2: 32.46, 1: 31.55, 0: 29.51
-    }
-  };
+  자연: {
+    100: 71.75, 99: 71.00, 98: 69.88, 97: 68.69, 96: 68.00, 95: 67.31,
+    94: 66.63, 93: 66.06, 92: 65.48, 91: 64.85, 90: 64.33, 89: 63.89,
+    88: 63.42, 87: 63.02, 86: 62.63, 85: 62.07, 84: 61.56, 83: 60.98,
+    82: 60.43, 81: 60.03, 80: 59.66, 79: 59.24, 78: 58.82, 77: 58.47,
+    76: 58.03, 75: 57.66, 74: 57.24, 73: 56.76, 72: 56.40, 71: 56.01,
+    70: 55.65, 69: 55.31, 68: 54.95, 67: 54.61, 66: 54.21, 65: 53.86,
+    64: 53.53, 63: 53.23, 62: 52.94, 61: 52.63, 60: 52.29, 59: 51.97,
+    58: 51.66, 57: 51.34, 56: 51.06, 55: 50.76, 54: 50.44, 53: 50.14,
+    52: 49.79, 51: 49.46, 50: 49.15, 49: 48.84, 48: 48.56, 47: 48.24,
+    46: 47.91, 45: 47.59, 44: 47.29, 43: 47.01, 42: 46.73, 41: 46.43,
+    40: 46.11, 39: 45.81, 38: 45.50, 37: 45.18, 36: 44.84, 35: 44.54,
+    34: 44.27, 33: 44.00, 32: 43.74, 31: 43.47, 30: 43.22, 29: 42.98,
+    28: 42.73, 27: 42.44, 26: 42.16, 25: 41.89, 24: 41.61, 23: 41.34,
+    22: 41.03, 21: 40.74, 20: 40.44, 19: 40.16, 18: 39.89, 17: 39.63,
+    16: 39.34, 15: 39.02, 14: 38.70, 13: 38.39, 12: 38.11, 11: 37.81,
+    10: 37.50, 9: 37.19, 8: 36.86, 7: 36.49, 6: 36.10, 5: 35.53,
+    4: 34.96, 3: 34.42, 2: 33.81, 1: 32.88, 0: 30.25
+  },
+  인문: {
+    100: 67.22, 99: 66.67, 98: 66.02, 97: 65.62, 96: 65.21, 95: 64.83,
+    94: 64.51, 93: 64.24, 92: 63.91, 91: 63.64, 90: 63.28, 89: 62.98,
+    88: 62.67, 87: 62.38, 86: 62.10, 85: 61.82, 84: 61.54, 83: 61.27,
+    82: 61.03, 81: 60.79, 80: 60.55, 79: 60.28, 78: 59.98, 77: 59.69,
+    76: 59.44, 75: 59.16, 74: 58.87, 73: 58.57, 72: 58.27, 71: 57.99,
+    70: 57.68, 69: 57.37, 68: 56.94, 67: 56.55, 66: 56.21, 65: 55.89,
+    64: 55.55, 63: 55.18, 62: 54.83, 61: 54.45, 60: 54.08, 59: 53.65,
+    58: 53.29, 57: 52.93, 56: 52.52, 55: 52.05, 54: 51.57, 53: 51.13,
+    52: 50.69, 51: 50.30, 50: 49.83, 49: 49.39, 48: 48.93, 47: 48.50,
+    46: 48.16, 45: 47.81, 44: 47.48, 43: 47.12, 42: 46.73, 41: 46.37,
+    40: 46.02, 39: 45.62, 38: 45.22, 37: 44.89, 36: 44.55, 35: 44.24,
+    34: 43.90, 33: 43.57, 32: 43.26, 31: 42.96, 30: 42.68, 29: 42.41,
+    28: 42.12, 27: 41.85, 26: 41.59, 25: 41.25, 24: 40.92, 23: 40.65,
+    22: 40.35, 21: 40.05, 20: 39.75, 19: 39.46, 18: 39.20, 17: 38.92,
+    16: 38.64, 15: 38.35, 14: 38.06, 13: 37.76, 12: 37.45, 11: 37.16,
+    10: 36.84, 9: 36.44, 8: 36.08, 7: 35.64, 6: 35.19, 5: 34.76,
+    4: 34.26, 3: 33.72, 2: 33.11, 1: 32.22, 0: 30.44
+  }
+};
+
+
 // 영어 환산 점수 표
 const getEnglishScore = (grade) => {
   const englishScores = {
@@ -50,27 +57,20 @@ const getEnglishScore = (grade) => {
   return englishScores[grade] || 0;
 };
 
-// 한국사 가산점 표
+// 한국사 가산점 표 (이거 바꿔야 됨!!!!!!!!!!!!!! 일단 임의로 해놓음)
 const getHistoryBonus = (grade) => {
   if (grade >= 1 && grade <= 3) return 3;
   if (grade >= 4 && grade <= 6) return 2;
   return 1;
 };
 
-// 과목이 자연탐구 과목인지 확인하는 함수
-const isNaturalScience = (subject) => {
-  const naturalScienceSubjects = [
-    '물리학Ⅰ', '물리학Ⅱ', '화학Ⅰ', '화학Ⅱ',
-    '생명과학Ⅰ', '생명과학Ⅱ', '지구과학Ⅰ', '지구과학Ⅱ'
-  ];
-  return naturalScienceSubjects.includes(subject);
+const getConvertedScore = (percentile, subject) => {
+  const track = naturalScienceSubjects.includes(subject) ? '자연' : '인문';
+  const percentileScore = conversionTable[track][percentile]; // 백분위에 해당하는 점수 가져오기
+  const maxScore = conversionTable[track][100]; // 백분위 100 점수 가져오기
+  return maxScore && percentileScore ? percentileScore / maxScore : 0; // 변환 점수 계산
 };
 
-// 탐구 변환 점수 계산 함수
-const getConvertedScore = (percentile, subject) => {
-  const inquiryType = isNaturalScience(subject) ? '자연' : '인문';
-  return conversionTable[inquiryType][percentile] || 0;
-};
 
 // 숙명여자대학교 점수 계산 함수
 export const 숙명여자대학교 = async (userId, selection) => {
@@ -103,66 +103,73 @@ export const 숙명여자대학교 = async (userId, selection) => {
   const englishScore = getEnglishScore(grade_english) / 100;
   const historyBonus = getHistoryBonus(grade_history);
 
-  // 탐구 과목 변환 점수 계산
-  const convertedScienceScore1 = getConvertedScore(percentile_science1, science1);
-  const convertedScienceScore2 = getConvertedScore(percentile_science2, science2);
-  const totalScienceConvertedScore = convertedScienceScore1 + convertedScienceScore2;
+  const scienceScore1 = getConvertedScore(percentile_science1, science1);
+  const scienceScore2 = getConvertedScore(percentile_science2, science2);
 
   let totalScore = 0;
+  let adjustedScienceScore1 = 0;
+  let adjustedScienceScore2 = 0;
+
 
   // 계열별 계산
   if (selection.계열 === '인문') {
     totalScore = (
-      (standard_score_korean / 150) * 0.35 +
-      (standard_score_math / 148) * 0.25 +
+      (standard_score_korean / 138) * 0.35 +
+      (standard_score_math / 144) * 0.25 +
       englishScore * 0.2 +
-      (totalScienceConvertedScore / 137.7) * 0.2
+      ((Number(scienceScore1) + Number(scienceScore2))) * 0.1
     ) * 1000 + historyBonus;
   } else if (selection.계열 === '경상') {
     totalScore = (
-      (standard_score_korean / 150) * 0.3 +
-      (standard_score_math / 148) * 0.3 +
+      (standard_score_korean / 138) * 0.3 +
+      (standard_score_math / 144) * 0.3 +
       englishScore * 0.2 +
-      (totalScienceConvertedScore / 137.7) * 0.2
+      ((scienceScore1 + scienceScore2)) * 0.1
     ) * 1000 + historyBonus;
   } else if (selection.계열 === '자연') {
-    let scienceBonus = 1;
-    if (selection.모집단위 === '신소재물리전공' && science1 === '물리학Ⅰ' && science2 === '물리학Ⅱ') {
-      scienceBonus = 1.05;
+    if (selection.모집단위 === '신소재물리전공' && science1 === '물리학Ⅰ' && science1==='물리학Ⅱ') {
+      adjustedScienceScore1 = scienceScore1*1.05
+    }else {
+      adjustedScienceScore1 = scienceScore1; // 조건에 부합하지 않으면 원래 값 사용
+    }
+    if (selection.모집단위 === '신소재물리전공' && science2 === '물리학Ⅰ' && science1==='물리학Ⅱ') {
+      adjustedScienceScore2 = scienceScore2*1.05
+    }else {
+      adjustedScienceScore2 = scienceScore2; // 조건에 부합하지 않으면 원래 값 사용
     }
 
     totalScore = (
-      (standard_score_korean / 150) * 0.25 +
-      (standard_score_math / 148) * 0.35 +
+      (standard_score_korean / 138) * 0.25 +
+      (standard_score_math / 144) * 0.35 +
       englishScore * 0.2 +
-      (totalScienceConvertedScore / 137.7) * 0.2 * scienceBonus
+      ((adjustedScienceScore1 + adjustedScienceScore2)) * 0.1
     ) * 1000 + historyBonus;
   } else if (selection.계열 === '수학') {
-    if (!isNaturalScience(science1) || !isNaturalScience(science2) || (math !== '기하' && math !== '미적분')) {
+    if (!naturalScienceSubjects.includes(science1) || !naturalScienceSubjects.includes(science2) || (math !== '기하' && math !== '미적분')) {
       return '불가: 수학 과목 조건 불충족'; // 수학 과목 조건 불충족 시
     }
     totalScore = (
-      (standard_score_korean / 150) * 0.15 +
-      (standard_score_math / 148) * 0.5 +
+      (standard_score_korean / 138) * 0.15 +
+      (standard_score_math / 144) * 0.5 +
       englishScore * 0.2 +
-      (totalScienceConvertedScore /137.7) * 0.15
+      (scienceScore1 + scienceScore2) * 0.075
     ) * 1000 + historyBonus;
   } else if (selection.계열 === '통계') {
     totalScore = (
-      (standard_score_korean / 150) * 0.25 +
-      (standard_score_math / 148) * 0.4 +
+      (standard_score_korean / 138) * 0.25 +
+      (standard_score_math / 144) * 0.4 +
       englishScore * 0.2 +
-      (totalScienceConvertedScore / 137.7) * 0.15
+      (scienceScore1 + scienceScore2) * 0.075
     ) * 1000 + historyBonus;
   } else if (selection.계열 === '자연2') {
-    if (!isNaturalScience(science1) && !isNaturalScience(science2)) {
+    if (!naturalScienceSubjects.includes(science1) && !naturalScienceSubjects.includes(science2)) {
       return '불가: 자연 탐구 과목 조건 불충족';
     }
     totalScore = (
-      (standard_score_korean / 150) * 0.25 +
-      (standard_score_math / 148) * 0.35 +
+      (standard_score_korean / 138) * 0.25 +
+      (standard_score_math / 144) * 0.35 +
       englishScore * 0.2 +
-      (totalScienceConvertedScore / 137.7) * 0.2
+      (scienceScore1 + scienceScore2) * 0.1
     ) * 1000 + historyBonus;
   } else {
     return '불가: 잘못된 계열 값';

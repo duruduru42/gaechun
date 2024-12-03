@@ -40,20 +40,22 @@ export const 경희대학교국제 = async (userId, selection) => {
   const scienceScore2 = getConvertedScore(percentile_science2, isNaturalScience(science2) ? '자연' : '인문');
 
   // Apply additional points for specific subjects
-  let scienceBonus = 0;
-  if (isHumanitiesSubject(science1)) scienceBonus += 4;
-  if (isHumanitiesSubject(science2)) scienceBonus += 4;
-  if (isNaturalScience(science1)) scienceBonus += 4;
-  if (isNaturalScience(science2)) scienceBonus += 4;
+  let scienceBonus1 = 0;
+  if (isHumanitiesSubject(science1)) scienceBonus1 += 4;
+  if (isHumanitiesSubject(science2)) scienceBonus1 += 4;
+
+  let scienceBonus2 = 0;
+  if (isNaturalScience(science1)) scienceBonus2 += 4;
+  if (isNaturalScience(science2)) scienceBonus2 += 4;
 
   let baseScore = 0;
 
   if (selection.계열 === '인문') {
-    baseScore = (standard_score_korean * 0.35 + standard_score_math * 0.2 + (scienceScore1 + scienceScore2 + scienceBonus) * 0.3 + englishScore * 0.15 + historyPenalty) * 4;
+    baseScore = (standard_score_korean * 0.35 + standard_score_math * 0.2 + (scienceScore1 + scienceScore2 + scienceBonus1) * 0.3 + englishScore * 0.15 + historyPenalty) * 4;
   } else if (selection.계열 === '사회') {
-    baseScore = (standard_score_korean * 0.3 + standard_score_math * 0.3 + (scienceScore1 + scienceScore2 + scienceBonus) * 0.25 + englishScore * 0.15 + historyPenalty) * 4;
+    baseScore = (standard_score_korean * 0.3 + standard_score_math * 0.3 + (scienceScore1 + scienceScore2 + scienceBonus1) * 0.25 + englishScore * 0.15 + historyPenalty) * 4;
   } else if (selection.계열 === '자연') {
-    baseScore = (standard_score_korean * 0.2 + standard_score_math * 0.35 + (scienceScore1 + scienceScore2 + scienceBonus) * 0.3 + englishScore * 0.15 + historyPenalty) * 4;
+    baseScore = (standard_score_korean * 0.2 + standard_score_math * 0.35 + (scienceScore1 + scienceScore2 + scienceBonus2) * 0.3 + englishScore * 0.15 + historyPenalty) * 4;
   } else if (selection.계열 === '예술') {
     const higherScienceScore = Math.max(scienceScore1, scienceScore2);
     baseScore = (standard_score_korean * 0.5 + higherScienceScore * 0.3 + englishScore * 0.2 + historyPenalty) * 2;

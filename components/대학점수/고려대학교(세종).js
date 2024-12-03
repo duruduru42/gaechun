@@ -107,11 +107,11 @@ export const 고려대학교세종 = async (userId, selection) => {
 
     // 수학 조건 확인
     if (selection.계열 === '자연' && (math !== '미적분' && math !== '기하')) {
-        return '불가'; // 수학이 '미적분' 또는 '기하'가 아니면 불가
+        return '불가 : 수학 미적기하 필수 '; // 수학이 '미적분' 또는 '기하'가 아니면 불가
     }
 
     if (selection.계열 === '자연' && !isBothNaturalScience) {
-        return '불가'; // 탐구 과목이 자연탐구가 아니면 불가
+        return '불가 : 과학탐구 필수'; // 탐구 과목이 자연탐구가 아니면 불가
     }
 
     // 점수 계산
@@ -121,7 +121,7 @@ export const 고려대학교세종 = async (userId, selection) => {
     if (selection.계열 === '인문') {
         totalScore = (standard_score_korean * 0.35 + standard_score_math * 0.2 + englishScore * 0.2 + totalScienceConvertedScore * 0.25);
         maxScore = (150 * 0.35 + 148 * 0.2 + 100 * 0.2 + 68.83 * 2 * 0.25);
-    } else if (selection.계열 === '경상') {
+    } else if (selection.계열 === '상경') {
         totalScore = (standard_score_korean * 0.3 + standard_score_math * 0.3 + englishScore * 0.2 + totalScienceConvertedScore * 0.2);
         maxScore = (150 * 0.3 + 148 * 0.3 + 100 * 0.2 + 68.83 * 2 * 0.2);
     } else if (selection.계열 === '자연' || isBigDataScience) {

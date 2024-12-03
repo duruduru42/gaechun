@@ -1,5 +1,10 @@
 import { createClient } from "@/utils/supabase/client";
 
+const naturalScienceSubjects = [
+    '물리학Ⅰ', '물리학Ⅱ', '화학Ⅰ', '화학Ⅱ',
+    '생명과학Ⅰ', '생명과학Ⅱ', '지구과학Ⅰ', '지구과학Ⅱ'
+];
+
 const conversionTable = {
     자연: {
         100: 68.85, 99: 68.80, 98: 67.46, 97: 66.62, 96: 66.10, 95: 65.43,
@@ -41,20 +46,13 @@ const conversionTable = {
     }
 };
 
-// 탐구 변환 점수 계산 함수
+// Helper function to get the converted score
 const getConvertedScore = (percentile, subject) => {
-    const inquiryType = isNaturalScience(subject) ? '자연' : '인문';
-    return conversionTable[inquiryType][percentile] || 0;
-};
+    const track = naturalScienceSubjects.includes(subject) ? '자연' : '인문';
+    return conversionTable[track][percentile] || 0;
+  };
+  
 
-// 과목이 자연탐구 과목인지 확인하는 함수
-const isNaturalScience = (subject) => {
-    const naturalScienceSubjects = [
-        '물리학Ⅰ', '물리학Ⅱ', '화학Ⅰ', '화학Ⅱ',
-        '생명과학Ⅰ', '생명과학Ⅱ', '지구과학Ⅰ', '지구과학Ⅱ'
-    ];
-    return naturalScienceSubjects.includes(subject);
-};
 
 // 고려대학교(세종) 점수 계산 함수
 export const 고려대학교 = async (userId, selection) => {
@@ -62,10 +60,11 @@ export const 고려대학교 = async (userId, selection) => {
 
     // 사용자 시험 데이터 불러오기
     const { data, error } = await supabase
-        .from('exam_results')
-        .select('standard_score_korean, standard_score_math, percentile_science1, percentile_science2, grade_english, science1, science2, math')
-        .eq('user_id', userId)
-        .single();
+    .from('exam_results')
+    .select('standard_score_korean, standard_score_math, percentile_science1, percentile_science2, grade_english, grade_history, science1, science2, math')
+    .eq('user_id', userId)
+    .single();
+
 
     if (error || !data) {
         return '불가'; // 데이터가 없거나 에러일 경우 처리
@@ -77,15 +76,13 @@ export const 고려대학교 = async (userId, selection) => {
         percentile_science1,
         percentile_science2,
         grade_english,
+        grade_history,
         science1,
         science2,
     } = data;
 
-    // 영어 점수 계산
-    const englishScore = getEnglishScore(grade_english);
-
     // 탐구 과목 자연탐구 여부 확인
-    const isBothNaturalScience = isNaturalScience(science1) && isNaturalScience(science2);
+    const isBothNaturalScience = naturalScienceSubjects.includes(science1) && naturalScienceSubjects.includes(science2);
 
         // 탐구 과목 변환 점수 계산
         const convertedScienceScore1 = getConvertedScore(percentile_science1, science1);
@@ -96,12 +93,14 @@ export const 고려대학교 = async (userId, selection) => {
         return '불가'; // 탐구 과목이 자연탐구가 아니면 불가
     }
 
+    let score = 0;
+
 
     if (selection.계열 === '인문') {
         score = ((Number(standard_score_korean) + Number(standard_score_math) + (Number(totalScienceConvertedScore)*0.8)) / 560 * 1000);
 
     } else if (selection.계열 === '자연') {
-      score = ((Number(standard_score_korean) + Number(standard_score_math) + (Number(totalScienceConvertedScore))) / 640 * 1000);
+      score = ((Number(standard_score_korean) + Number(standard_score_math)*1.2 + (Number(totalScienceConvertedScore))) / 640 * 1000);
 
     }  else {
         return '불가'; // 잘못된 계열 값일 경우
@@ -121,5 +120,5 @@ export const 고려대학교 = async (userId, selection) => {
     score += historyBonus[grade_history] || 0;
   
 
-    return score.toFixed(2);
+    return parseFloat(score.toFixed(2))
 };

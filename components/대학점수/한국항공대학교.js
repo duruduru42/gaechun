@@ -17,14 +17,10 @@ const getHistoryBonus = (grade) => {
     return historyBonuses[grade] || 0;
 };
 
-// Check if the subject is a science inquiry subject (과탐)
-const isScienceInquiry = (subject) => {
-    const scienceSubjects = [
-        '물리학Ⅰ', '물리학Ⅱ', '화학Ⅰ', '화학Ⅱ',
-        '지구과학Ⅰ', '지구과학Ⅱ', '생명과학Ⅰ', '생명과학Ⅱ'
-    ];
-    return scienceSubjects.includes(subject);
-};
+const naturalScienceSubjects = [
+    '물리학Ⅰ', '물리학Ⅱ', '화학Ⅰ', '화학Ⅱ',
+    '지구과학Ⅰ', '지구과학Ⅱ', '생명과학Ⅰ', '생명과학Ⅱ'
+  ];
 
 // Korea Aerospace University score calculation function
 export const 한국항공대학교 = async (userId, selection) => {
@@ -52,29 +48,42 @@ export const 한국항공대학교 = async (userId, selection) => {
         science2
     } = data;
 
-    // Calculate English score
     const englishScore = getEnglishScore(grade_english);
 
-    // Calculate Korean History bonus
     const historyBonus = getHistoryBonus(grade_history);
 
-    // Check if both 탐구 subjects are science inquiry subjects
-    const isBothScienceInquiry = isScienceInquiry(science1) && isScienceInquiry(science2);
-    const scienceBonus = isBothScienceInquiry ? 1.05 : 1;
-
-    // Calculate 탐구 score with science inquiry bonus if applicable
-    const totalScienceScore = (standard_score_science1 + standard_score_science2) * scienceBonus;
-
-    // Calculate the total score based on the selected track
     let totalScore = 0;
     if (selection.계열 === '자연1') {
-        totalScore = (standard_score_korean * 0.2 + standard_score_math * 0.35 + englishScore * 0.2 + totalScienceScore * 0.25) * 5 + historyBonus;
+
+        const scienceScore1 = naturalScienceSubjects.includes(science1)
+        ? standard_score_science1 * 1.05
+        : standard_score_science1;
+    
+        const scienceScore2 = naturalScienceSubjects.includes(science2)
+        ? standard_score_science2 * 1.05
+        : standard_score_science2;
+
+        totalScore = (standard_score_korean * 0.2 + standard_score_math * 0.35 + englishScore * 0.2 + (scienceScore1+scienceScore2) * 0.25) * 5 + historyBonus;
+
     } else if (selection.계열 === '자연2') {
-        totalScore = (standard_score_korean * 0.25 + standard_score_math * 0.3 + englishScore * 0.2 + totalScienceScore * 0.25) * 5 + historyBonus;
+
+        const scienceScore1 = naturalScienceSubjects.includes(science1)
+        ? standard_score_science1 * 1.05
+        : standard_score_science1;
+    
+        const scienceScore2 = naturalScienceSubjects.includes(science2)
+        ? standard_score_science2 * 1.05
+        : standard_score_science2;
+
+        totalScore = (standard_score_korean * 0.25 + standard_score_math * 0.3 + englishScore * 0.2 + (scienceScore1+scienceScore2) * 0.25) * 5 + historyBonus;
+
     } else if (selection.계열 === '인문') {
-        totalScore = (standard_score_korean * 0.3 + standard_score_math * 0.25 + englishScore * 0.2 + totalScienceScore * 0.25) * 5 + historyBonus;
+        const scienceScore1 = standard_score_science1;
+        const scienceScore2 = standard_score_science2;
+
+        totalScore = (standard_score_korean * 0.3 + standard_score_math * 0.25 + englishScore * 0.2 + (Number(scienceScore1)+Number(scienceScore2))* 0.25) * 5 + historyBonus;
     } else {
-        return '불가'; // Invalid track
+        return '불가'; // Invalid tracks
     }
 
     return totalScore.toFixed(2);

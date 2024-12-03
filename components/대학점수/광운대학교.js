@@ -45,8 +45,8 @@ const conversionTable = {
 
 // 탐구 변환 점수 계산 함수
 const getConvertedScore = (percentile, subject) => {
-  const inquiryType = isNaturalScience(subject) ? '과학탐구' : '사회탐구';
-  return conversionTable[inquiryType] ? percentile / conversionTable[inquiryType][100] : 0;
+  const inquiryType = isNaturalScience(subject) ? '자연' : '인문';
+  return conversionTable[inquiryType][percentile] || 0;
 };
 
 // 영어 환산 점수 표 (200점 기준)

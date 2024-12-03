@@ -11,10 +11,10 @@ const getEnglishScore = (grade) => {
 
 // Highest standard score for each inquiry subject
 const maxScores = {
-    "생활과 윤리": 65, "윤리와 사상": 63, "한국지리": 65, "세계지리": 67,
-    "동아시아사": 66, "세계사": 63, "경제": 73, "정치와 법": 73, "사회 문화": 70,
-    "물리학Ⅰ": 69, "화학Ⅰ": 69, "생명과학Ⅰ": 69, "지구과학Ⅰ": 68,
-    "물리학Ⅱ": 74, "화학Ⅱ": 80, "생명과학Ⅱ": 73, "지구과학Ⅱ": 72
+    "생활과 윤리": 77, "윤리와 사상": 74, "한국지리": 70, "세계지리": 70,
+    "동아시아사": 68, "세계사": 70, "경제": 71, "정치와 법": 68, "사회 문화": 70,
+    "물리학Ⅰ": 68, "화학Ⅰ": 66, "생명과학Ⅰ": 70, "지구과학Ⅰ": 73,
+    "물리학Ⅱ": 73, "화학Ⅱ": 74, "생명과학Ⅱ": 73, "지구과학Ⅱ": 75
 };
 
 // Get the maximum score for a given inquiry subject
@@ -53,12 +53,13 @@ export const 대구교육대학교 = async (userId) => {
     // Calculate inquiry scores based on maximum score for each subject
     const maxScore1 = getMaxScore(science1);
     const maxScore2 = getMaxScore(science2);
+    
     const adjustedInquiryScore = Number(standard_score_science1 * 0.1 / maxScore1) + Number(standard_score_science2 * 0.1 / maxScore2);
 
     // Calculate total score
     const totalScore = (
-        (Number(standard_score_korean) * 0.3 / 150) +
-        (Number(standard_score_math) * 0.3 / 148) +
+        (Number(standard_score_korean) * 0.3 / 138) +
+        (Number(standard_score_math) * 0.3 / 144) +
         adjustedInquiryScore
     ) * 1000 + Number(englishScore);
     

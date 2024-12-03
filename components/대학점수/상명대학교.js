@@ -69,7 +69,7 @@ export const 상명대학교 = async (userId, selection) => {
     totalScore =
       (percentile_korean * 0.35 * 10) +
       (percentile_math * 0.25 * 10) +
-      (englishScore * 0.2) +
+      (englishScore * 0.2 *10) +
       (higherSciencePercentile * 0.2 * 10) +
       historyScore;
   } 
@@ -95,7 +95,7 @@ export const 상명대학교 = async (userId, selection) => {
     totalScore =
       (percentile_korean * 0.25 * 10) +
       (percentile_math * 0.35 * 10 * mathBonus) +
-      (englishScore * 0.2) +
+      (englishScore * 0.2 * 10) +
       (higherSciencePercentile * 0.2 * 10 * scienceBonus) +
       historyScore;
   } 

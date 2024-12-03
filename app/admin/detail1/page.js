@@ -350,14 +350,6 @@ const Detail = () => {
             >
               합격예측
             </button>
-            <button
-              onClick={() => setActiveTab('상세정보')}
-              className={`sm:text-xl text-lg font-bold sm:px-1 pb-1 border-b-2 duration-200 ${
-                activeTab === '상세정보' ? 'border-orange-600 text-gray-800' : 'border-transparent text-gray-300'
-              }`}
-            >
-              상세정보
-            </button>
           </div>
           <hr />
         </nav>
@@ -430,14 +422,6 @@ const Detail = () => {
   >
     {comparisonResult}
   </div>
-</td>
-<td className="py-3 px-6 text-right">
-  <button
-    onClick={() => handleMockApplication(selection)}
-    className="rounded px-3 py-1 text-sm font-bold bg-orange-600 text-white"
-  >
-    모의지원
-  </button>
 </td>
 
        </tr>
