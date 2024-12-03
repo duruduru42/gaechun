@@ -5,6 +5,7 @@ import { createClient } from '@/utils/supabase/client';
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useRouter } from 'next/navigation';
+import LoadingSpinner from '@/components/ui/LoadingSpinner'; // Adjust the filename accordingly
 
 const ItemTypes = {
     APPLICATION: 'application',

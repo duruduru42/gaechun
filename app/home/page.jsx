@@ -7,6 +7,7 @@ import 탐구 from '@/components/탐구.svg';
 import 합 from '@/components/합.svg';
 import { useEffect, useState } from 'react';
 import { createClient } from '@/utils/supabase/client';
+import LoadingSpinner from '@/components/ui/LoadingSpinner'; // Adjust the filename accordingly
 
 export default function Home() {
     const supabase = createClient();
@@ -67,7 +68,9 @@ export default function Home() {
 
         if (results) {
             const total = results.length;
-            const koreanRank = results.findIndex((result) => result.user_id === user.id) + 1;
+
+            const koreanResults = [...results].sort((a, b) => b.standard_score_korean - a.standard_score_korean);
+            const koreanRank = koreanResults.findIndex((result) => result.user_id === user.id) + 1;
 
             const mathResults = [...results].sort((a, b) => b.standard_score_math - a.standard_score_math);
             const mathRank = mathResults.findIndex((result) => result.user_id === user.id) + 1;
@@ -211,7 +214,7 @@ export default function Home() {
             <div className="flex-1 p-5">
                 <h1 className="text-3xl font-bold p-5">홈</h1>
                 <div className="mb-5 p-4 bg-white rounded-lg shadow-sm cursor-pointer hover:shadow-md">
-                    <p>안내 | 대규모 업데이트 적용 완료 : 12월 19일(화) 21:15</p>
+                    <p>안내 | 12/6 실채점 적용 완료</p>
                 </div>
 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-5">
@@ -277,7 +280,7 @@ export default function Home() {
                     </div>
                 </div>
                 {isLoadingUserPriorities ? (
-                        <div>Loading...</div>
+                        <LoadingSpinner />
                     ) : (
 <div className="bg-white p-6 w-full rounded-xl summaryCard undefined">
     <div className="flex flex-col ">
@@ -334,7 +337,7 @@ export default function Home() {
                             </div>
                         </div>
                         {isLoadingTopUniversities ? (
-                            <div>Loading...</div>
+                            <LoadingSpinner />
                         ) : (
                         <div className="bg-white p-6 w-full rounded-xl summaryCard undefined">
                             <div className="flex flex-col">

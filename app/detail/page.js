@@ -3,6 +3,7 @@
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { createClient } from '@/utils/supabase/client';
+import Calculate from '@/components/ui/Calculate'; // Adjust the filename accordingly
 import { 서울대학교 } from '@/components/대학점수/서울대학교';
 import { 고려대학교 } from '@/components/대학점수/고려대학교';
 import { 연세대학교 } from '@/components/대학점수/연세대학교';
@@ -403,7 +404,7 @@ const Detail = () => {
           const comparisonResult =
             calculatedScore && selection.안정
               ? getComparisonResult(calculatedScore, selection)
-              : '계산 중...';
+              : <Calculate />;
 
          return (              
           <tr key={selection.id} className="border-b border-gray-200 hover:bg-gray-100">
@@ -413,7 +414,7 @@ const Detail = () => {
                 <td className="py-3 px-6 text-center">{selection.군}</td>
                 <td className="py-3 px-6 text-center">{selection.모집인원}</td>
                 <td className="py-3 px-6 text-center">{selection.지난경쟁률}</td>                
-                <td className="py-3 px-6 text-center">{calculatedScores[selection.id] || '계산 중...'}</td>                
+                <td className="py-3 px-6 text-center">{calculatedScores[selection.id] || <Calculate />}</td>                
                 <td className="py-3 px-6 text-center">
                 <div
                   className={`h-8 flex items-center justify-center rounded-md ${getBackgroundColor(
