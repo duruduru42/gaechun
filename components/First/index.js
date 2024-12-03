@@ -28,7 +28,7 @@ const Hero = () => {
         </p>
         <Link href={'/home'}>        
         <button className="rounded-2xl px-6 py-3 text-lg font-bold mt-10 mb-24 bg-black text-white">
-          바로가기
+          2025/12/6일 오픈
         </button>
         </Link>
       </div>
