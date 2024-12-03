@@ -47,6 +47,7 @@ export default function SignInPage() {
 
     if (error) {
       console.error("Login error: ", error.message);
+      alert("아이디/비밀번호를 다시 확인해주세요."); // 실패 시 경고창 표시
     } else {
       console.log("User logged in: ", data.user);
       queryClient.invalidateQueries(["user"]); // Refresh user query cache
