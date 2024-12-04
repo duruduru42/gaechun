@@ -1,5 +1,3 @@
-// app/more/[id]/page.js
-
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -15,21 +13,51 @@ const MorePage = () => {
     const [departmentName, setDepartmentName] = useState('');
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [currentUserId, setCurrentUserId] = useState(null);
 
-    useEffect(() => {
-        if (department_id) {
-            fetchData();
-        }
+
+       useEffect(() => {
+        const fetchInitialData = async () => {
+            await fetchUserId(); // Fetch the current user ID
+            if (department_id) {
+                await fetchData(); // Fetch data related to the department
+            }
+        };
+
+        fetchInitialData();
     }, [department_id]);
 
+    const fetchUserId = async () => {
+        try {
+            const { data: sessionData, error } = await supabase.auth.getSession();
+            if (error) {
+                console.error('Error fetching user session:', error);
+                return;
+            }
+            if (sessionData?.session?.user?.id) {
+                setCurrentUserId(sessionData.session.user.id);
+            }
+        } catch (err) {
+            console.error('Unexpected error fetching user ID:', err);
+        }
+    };
+    
     const truncateText = (text, maxLength) => {
         if (!text || text.length <= maxLength) return text;
         return `${text.substring(0, maxLength)}...`;
       };
 
-
     const fetchData = async () => {
-        const { data: applications, error } = await supabase
+
+        const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+        if (sessionError) {
+            console.error('Error fetching user session:', sessionError);
+            return;
+        }
+        const userId = sessionData?.session?.user?.id || null;
+        setCurrentUserId(userId);
+
+        const { data: applications, error: applicationsError } = await supabase
             .from('applications')
             .select(`
                 id,
@@ -47,8 +75,8 @@ const MorePage = () => {
             `)
             .eq('department_id', department_id);
 
-        if (error) {
-            console.error('Error fetching application data:', error);
+        if (applicationsError) {
+            console.error('Error fetching application data:', applicationsError);
             return;
         }
 
@@ -137,16 +165,29 @@ const MorePage = () => {
                 </thead>
                 <tbody className="text-black text-sm font-medium">
                     {data.map((item, index) => (
-                        <tr key={index} className="border-b border-gray-200 hover:bg-gray-100">
-                            <td className="py-3 px-6 text-center">{index + 1} 등</td>
+                        <tr 
+                        key={index} 
+                        className={`border-b border-gray-200 hover:bg-gray-100 ${
+                            item.user_id === currentUserId ? 'bg-orange-300' : ''
+                        }`}>
+
+                            <td className="py-3 px-6 text-center">
+                                {index + 1} 등
+                            {item.user_id === currentUserId && <span className="ml-2 text-red-500">(본인)</span>}
+                            </td>
                             <td className="py-3 px-6 text-center">{item.score} 점</td>
                             <td className="py-3 px-6 text-center">{item.우선순위} 순위</td>
                             <td className="py-3 px-6 text-center">
                                 {item.다른_군_지원대학1 ? (
                                 <div className="flex items-center justify-center text-center p-2 m-2">
-                                        <img src={item.다른_군_지원대학1.university.logo_url} alt="logo" className="w-10 h-10 mr-2 rounded-full" />
+                                        <img 
+                                        src={item.다른_군_지원대학1.university.logo_url} 
+                                        alt="logo" 
+                                        className="w-10 h-10 mr-2 rounded-full" />
                                         <div>
-                                            <div className='font-semibold'>{item.다른_군_지원대학1.university.name} {truncateText(item.다른_군_지원대학1.모집단위,15)}</div>
+                                            <div className='font-semibold'>
+                                                {item.다른_군_지원대학1.university.name} 
+                                                {truncateText(item.다른_군_지원대학1.모집단위,15)}</div>
                                         </div>
                                     </div>
                                 ) : '없음'}
@@ -154,9 +195,14 @@ const MorePage = () => {
                             <td className="py-3 px-6 text-center">
                                 {item.다른_군_지원대학2 ? (
                                  <div className="flex items-center justify-center text-center p-2 m-2">
-                                        <img src={item.다른_군_지원대학2.university.logo_url} alt="logo" className="w-10 h-10 mr-2 rounded-full" />
+                                        <img 
+                                        src={item.다른_군_지원대학2.university.logo_url} 
+                                        alt="logo" 
+                                        className="w-10 h-10 mr-2 rounded-full" />
                                         <div>
-                                            <div className='font-semibold'>{item.다른_군_지원대학2.university.name} {truncateText(item.다른_군_지원대학2.모집단위,15)}</div>
+                                            <div className='font-semibold'>
+                                                {item.다른_군_지원대학2.university.name} 
+                                                {truncateText(item.다른_군_지원대학2.모집단위,15)}</div>
                                         </div>
                                     </div>
                                 ) : '없음'}
