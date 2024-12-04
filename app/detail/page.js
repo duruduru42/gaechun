@@ -359,14 +359,14 @@ const Detail = () => {
             >
               합격예측
             </button>
-            <button
+            {/* <button
               onClick={() => setActiveTab('상세정보')}
               className={`sm:text-xl text-lg font-bold sm:px-1 pb-1 border-b-2 duration-200 ${
                 activeTab === '상세정보' ? 'border-orange-600 text-gray-800' : 'border-transparent text-gray-300'
               }`}
             >
               상세정보
-            </button>
+            </button> */}
           </div>
           <hr />
         </nav>

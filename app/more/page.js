@@ -47,78 +47,90 @@ const MorePage = () => {
         return `${text.substring(0, maxLength)}...`;
       };
 
-    const fetchData = async () => {
-
-        const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
-        if (sessionError) {
-            console.error('Error fetching user session:', sessionError);
-            return;
-        }
-        const userId = sessionData?.session?.user?.id || null;
-        setCurrentUserId(userId);
-
-        const { data: applications, error: applicationsError } = await supabase
-            .from('applications')
-            .select(`
-                id,
-                user_id,
-                score,
-                department_id,
-                departments (
-                    군,
-                    모집단위,
-                    university:university_id (
-                        name,
-                        logo_url
-                    )
-                )
-            `)
-            .eq('department_id', department_id);
-
-        if (applicationsError) {
-            console.error('Error fetching application data:', applicationsError);
-            return;
-        }
-
-        if (applications.length > 0) {
-            const universityName = applications[0].departments.university.name;
-            const departmentName = applications[0].departments.모집단위;
-            setUniversityName(universityName);
-            setDepartmentName(departmentName);
-
-            const { data: prioritiesData, error: prioritiesError } = await supabase
-                .from('priorities')
-                .select('*')
-                .eq('department_id', department_id);
-
-            if (prioritiesError) {
-                console.error('Error fetching priorities data:', prioritiesError);
+      const fetchData = async () => {
+        try {
+            const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+            if (sessionError) {
+                console.error('Error fetching user session:', sessionError);
                 return;
             }
-
-            const combinedData = await Promise.all(
-                applications.map(async (app) => {
-                    const priority = prioritiesData.find(p => p.department_id === app.department_id);
-                    
-                    const another1Data = priority?.another1 ? await fetchAnotherUniversity(priority.another1) : null;
-                    const another2Data = priority?.another2 ? await fetchAnotherUniversity(priority.another2) : null;
-                    
-                    return {
-                        score: app.score,
-                        우선순위: priority ? priority.priority : null,
-                        다른_군_지원대학1: another1Data,
-                        다른_군_지원대학2: another2Data,
-                    };
-                })
-            );
-
-            const sortedData = combinedData.sort((a, b) => b.score - a.score);
-            setData(sortedData);
+            const userId = sessionData?.session?.user?.id || null;
+            setCurrentUserId(userId);
+    
+            const { data: applications, error: applicationsError } = await supabase
+                .from('applications')
+                .select(`
+                    id,
+                    user_id,
+                    score,
+                    department_id,
+                    departments (
+                        군,
+                        모집단위,
+                        university:university_id (
+                            name,
+                            logo_url
+                        )
+                    )
+                `)
+                .eq('department_id', department_id);
+    
+            if (applicationsError) {
+                console.error('Error fetching application data:', applicationsError);
+                return;
+            }
+    
+            if (applications.length > 0) {
+                const universityName = applications[0].departments.university.name;
+                const departmentName = applications[0].departments.모집단위;
+                setUniversityName(universityName);
+                setDepartmentName(departmentName);
+    
+                const { data: prioritiesData, error: prioritiesError } = await supabase
+                    .from('priorities')
+                    .select('*')
+                    .eq('department_id', department_id);
+    
+                if (prioritiesError) {
+                    console.error('Error fetching priorities data:', prioritiesError);
+                    return;
+                }
+    
+                const combinedData = await Promise.all(
+                    applications.map(async (app) => {
+                        // `priority`는 user_id와 department_id로 연결
+                        const priority = prioritiesData.find(
+                            (p) => p.department_id === app.department_id && p.user_id === app.user_id
+                        );
+                
+                        // 각각의 유저 데이터에 따라 another1과 another2 데이터를 동적으로 가져옴
+                        const another1Data = priority?.another1
+                            ? await fetchAnotherUniversity(priority.another1)
+                            : null;
+                        const another2Data = priority?.another2
+                            ? await fetchAnotherUniversity(priority.another2)
+                            : null;
+                
+                        return {
+                            ...app, // 모든 application 데이터 포함
+                            우선순위: priority ? priority.priority : null,
+                            다른_군_지원대학1: another1Data,
+                            다른_군_지원대학2: another2Data,
+                        };
+                    })
+                );
+                
+    
+                const sortedData = combinedData.sort((a, b) => b.score - a.score);
+                setData(sortedData);
+            }
+        } catch (err) {
+            console.error('Unexpected error fetching data:', err);
+        } finally {
+            setLoading(false);
         }
-
-        setLoading(false);
     };
-
+    
     const fetchAnotherUniversity = async (anotherDepartmentId) => {
         try {
             const { data: anotherData, error } = await supabase
@@ -168,7 +180,7 @@ const MorePage = () => {
                         <tr 
                         key={index} 
                         className={`border-b border-gray-200 hover:bg-gray-100 ${
-                            item.user_id === currentUserId ? 'bg-orange-300' : ''
+                            item.user_id === currentUserId ? 'bg-orange-100' : ''
                         }`}>
 
                             <td className="py-3 px-6 text-center">
@@ -186,7 +198,7 @@ const MorePage = () => {
                                         className="w-10 h-10 mr-2 rounded-full" />
                                         <div>
                                             <div className='font-semibold'>
-                                                {item.다른_군_지원대학1.university.name} 
+                                                {item.다른_군_지원대학1.university.name} {' '}
                                                 {truncateText(item.다른_군_지원대학1.모집단위,15)}</div>
                                         </div>
                                     </div>
@@ -201,7 +213,7 @@ const MorePage = () => {
                                         className="w-10 h-10 mr-2 rounded-full" />
                                         <div>
                                             <div className='font-semibold'>
-                                                {item.다른_군_지원대학2.university.name} 
+                                                {item.다른_군_지원대학2.university.name} {' '}
                                                 {truncateText(item.다른_군_지원대학2.모집단위,15)}</div>
                                         </div>
                                     </div>

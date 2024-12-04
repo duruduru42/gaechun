@@ -102,27 +102,60 @@ export default function Home() {
         setIsLoadingTopUniversities(true);
     
         try {
-            // Supabase 요청: `applications`와 관련된 대학 및 학과 데이터 가져오기
-            const { data: applications, error } = await supabase
+            // 현재 유저의 selection_type 가져오기
+            const { data: profileData, error: profileError } = await supabase
+                .from('profile')
+                .select('selection_type')
+                .eq('id', user.id)
+                .single();
+    
+            if (profileError || !profileData) {
+                console.error('Error fetching profile data:', profileError);
+                return;
+            }
+    
+            const userSelectionType = profileData.selection_type;
+    
+            // applications 데이터 가져오기
+            const { data: applications, error: applicationsError } = await supabase
                 .from('applications')
                 .select(`
                     university_id,
                     departments!inner(name, 계열, 군, university:university_id(logo_url))
                 `)
-                .eq('user_id', user.id)
                 .eq('departments.군', gun); // 특정 군에 해당하는 데이터 필터링
     
-            if (error) {
-                console.error('Error fetching applications:', error);
+            if (applicationsError || !applications) {
+                console.error('Error fetching applications:', applicationsError);
                 return;
             }
     
             // university_id 기준으로 지원자 수 계산
-            const universityCounts = applications.reduce((acc, app) => {
+            const universityCounts = {};
+            applications.forEach((app) => {
                 const { university_id } = app;
-                acc[university_id] = (acc[university_id] || 0) + 1;
-                return acc;
-            }, {});
+    
+                // university_id에서 끝자리 숫자 추출
+                const match = university_id.match(/\d+$/); // 숫자로 끝나는 부분 추출
+                const lastDigit = match ? parseInt(match[0], 10) : null;
+    
+                // university_id 끝자리로 전형 필터링
+                let selectionTypeForUniversity;
+                if (lastDigit === 1) {
+                    selectionTypeForUniversity = '기회균형전형';
+                } else if (lastDigit === 2) {
+                    selectionTypeForUniversity = '농어촌전형';
+                }
+    
+                // 유저의 selection_type과 매칭되는 데이터만 처리
+                if (selectionTypeForUniversity === userSelectionType) {
+                    if (universityCounts[university_id]) {
+                        universityCounts[university_id] += 1;
+                    } else {
+                        universityCounts[university_id] = 1;
+                    }
+                }
+            });
     
             // 대학별 지원자 수 정렬 및 상위 5개 선택
             const sortedUniversityCounts = Object.entries(universityCounts)
@@ -139,7 +172,8 @@ export default function Home() {
                     university_id,
                     name,
                     계열,
-                    logo_url: university.logo_url
+                    logo_url: university.logo_url,
+                    count // 지원자 수 추가
                 };
             }).filter(Boolean); // null 데이터 필터링
     
@@ -148,6 +182,7 @@ export default function Home() {
             setIsLoadingTopUniversities(false);
         }
     };
+    
 
     const fetchUserPriorities = async (gun) => {
         if (isLoadingUserPriorities) return;

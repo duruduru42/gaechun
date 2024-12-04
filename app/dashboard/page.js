@@ -111,7 +111,7 @@ export default function Dashboard() {
         <th className="py-3 px-4 text-center">모집군</th>
         <th className="py-3 px-4 text-center">전체 모집인원(명)</th>
         <th className="py-3 px-4 text-center">변수등급</th>
-        <th className="py-3 px-4 text-center">모의지원자 수</th>
+        <th className="py-3 px-4 text-center"></th>
       </tr>
     </thead>
     <tbody className="text-gray-600 text-m">
@@ -130,9 +130,7 @@ export default function Dashboard() {
           <td className="py-3 px-4 text-center">{university.recruited_number}</td>
           <td className={`py-3 px-4 text-center ${getGradeColor(university.변수등급)}`}>{university.변수등급}</td>
           <td className="py-3 px-4 text-center">
-            <div className={`w-full h-8 flex items-center justify-center rounded text-black`}>
-              000명
-            </div>
+
           </td>
         </tr>
       ))}
