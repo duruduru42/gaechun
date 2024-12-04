@@ -11,6 +11,11 @@ const ItemTypes = {
     APPLICATION: 'application',
 };
 
+const truncateText = (text, maxLength) => {
+    if (!text || text.length <= maxLength) return text;
+    return `${text.substring(0, maxLength)}...`;
+  };
+
 const Application = ({ app, handleAddToPriority, handleDelete }) => {
     const [{ isDragging }, drag] = useDrag(() => ({
         type: ItemTypes.APPLICATION,
@@ -29,7 +34,8 @@ const Application = ({ app, handleAddToPriority, handleDelete }) => {
             <img src={app.departments.university.logo_url} alt="logo" className="w-10 h-10 mr-2 rounded-full" />
             <div>
                 <div className="">{app.departments.university.name}</div>
-                <div className="text-sm text-gray-400">{app.departments.모집단위}</div>
+                <div className="text-sm text-gray-400">{truncateText(app.departments.모집단위, 15)}
+                </div>
                 <div className="text-sm text-gray-400">{app.departments.군}군</div>
             </div>
             <button onClick={() => handleAddToPriority(app.department_id, app.departments.군)} className="bg-blue-500 text-white p-1 rounded ml-2">
@@ -55,9 +61,7 @@ const TestPage = () => {
     const [priorities, setPriorities] = useState({
         1: { 가: null, 나: null, 다: null },
         2: { 가: null, 나: null, 다: null },
-        3: { 가: null, 나: null, 다: null },
-        4: { 가: null, 나: null, 다: null },
-        5: { 가: null, 나: null, 다: null },
+        3: { 가: null, 나: null, 다: null }
     });
     const [storedPriorities, setStoredPriorities] = useState(null);
     const [modificationCount, setModificationCount] = useState(null); // Default value
@@ -88,6 +92,8 @@ const TestPage = () => {
         }
     };
 
+
+    
     const fetchApplications = async (user_id) => {
         if (!user_id) {
             console.log('No user ID provided');
@@ -173,7 +179,7 @@ const TestPage = () => {
                         <img src={selected.university.logo_url} alt="logo" className="w-10 h-10 mr-2 rounded-full" />
                         <div>
                             <div>{selected.university.name}</div>
-                            <div className="text-sm text-gray-400">{selected.모집단위}</div>
+                            <div className="text-sm text-gray-400">{truncateText(selected.모집단위, 15)}</div>
                         </div>
                         <button onClick={() => handleRemove(priority, 군)} className="bg-red-500 text-white p-1 rounded ml-2">
                             삭제
@@ -212,7 +218,8 @@ const TestPage = () => {
                         <img src={selected.university.logo_url} alt="logo" className="w-10 h-10 mr-2 rounded-full" />
                         <div>
                             <div className="font-bold">{selected.university.name}</div>
-                            <div className="text-sm text-gray-400">{selected.모집단위}</div>
+                            <div className="text-sm text-gray-400">{truncateText(selected.모집단위, 15)}
+                            </div>
                             <div className="text-sm text-gray-400">지원자 수: {applicantCount}</div>
                         </div>
                         <button 
@@ -308,7 +315,7 @@ const TestPage = () => {
                 )
             `)
             .eq('user_id', user_id);
-
+    
         if (error) {
             console.error('Error fetching stored priorities:', error);
         } else {
@@ -322,9 +329,11 @@ const TestPage = () => {
                     department_id: item.department_id, // Ensure department_id is available
                 };
             });
+    
             setStoredPriorities(priorityMap); // Update stored priorities
         }
     };
+    
 
     const fetchModificationCount = async (user_id) => {
         const { data, error } = await supabase
@@ -353,10 +362,6 @@ const TestPage = () => {
     };
 
     const handleSave = async () => {
-        if (modificationCount <= 0) {
-            alert('수정 횟수를 초과했습니다.');
-            return;
-        }
     
         // Ensure all priorities are filled
         for (let priority = 1; priority <= 3; priority++) {
@@ -428,13 +433,13 @@ const TestPage = () => {
     
     
     if (loading) {
-        return <div>Loading...</div>;
+        return <LoadingSpinner />;
     }
 
     return (
         <DndProvider backend={HTML5Backend}>
             <div className="container mx-auto p-10">
-                {storedPriorities ? (
+                {storedPriorities && Object.keys(storedPriorities).length > 0 ? (
                     <div>
                         <h2 className="text-2xl font-bold mb-4">저장된 우선순위</h2>
                         <table className="min-w-full table-auto bg-white">
@@ -458,12 +463,18 @@ const TestPage = () => {
                             </tbody>
                         </table>
                         <div className="flex justify-center mt-4">
-                            <button
-                                onClick={() => setStoredPriorities(null)} // Show editable view
-                                className="bg-blue-500 text-white p-2 rounded"
-                            >
-                                수정하기 ({modificationCount}/3)
-                            </button>
+                        <button
+                            onClick={() => {
+                                if (modificationCount <= 0) {
+                                    alert('수정 횟수를 초과했습니다.');
+                                } else {
+                                    setStoredPriorities(null); // Reset priorities for editing
+                                }
+                            }}
+                            className="bg-blue-500 text-white p-2 rounded"
+                        >
+                            수정하기 ({modificationCount}/3)
+                        </button>
                         </div>
                     </div>
                 ) : (<div className="mt-8">
@@ -515,7 +526,8 @@ const TestPage = () => {
                             ))}
                         </tbody>
                     </table>
-                    <div className="flex justify-center mt-4">
+                    <div className="flex justify-end space-x-4 mt-4">
+
                         <button
                             onClick={handleSave}
                             className="bg-green-500 text-white p-2 rounded"

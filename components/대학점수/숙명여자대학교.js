@@ -76,6 +76,22 @@ const getConvertedScore = (percentile, subject) => {
 export const 숙명여자대학교 = async (userId, selection) => {
   const supabase = createClient();
 
+  const { data: profile, error: profileError } = await supabase
+    .from('profile')
+    .select('gender')
+    .eq('id', userId)
+    .single();
+
+  if (profileError || !profile) {
+    return '불가: 사용자 정보 없음'; // 프로필 데이터가 없을 경우 처리
+  }
+
+  // 성별이 '남'이면 불가 처리
+  if (profile.gender === '남학생') {
+    return '불가: 남성 지원 불가';
+  }
+
+
   // 사용자 시험 데이터 불러오기
   const { data, error } = await supabase
     .from('exam_results')

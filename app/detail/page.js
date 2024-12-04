@@ -280,6 +280,13 @@ const Detail = () => {
       return;
     }
 
+    const score = calculatedScores[selection.id]; // 선택된 점수 가져오기
+
+    if (score === null || score === undefined) {
+      alert('점수 계산 완료 후 재시도해주세요.');
+      return;
+    }
+    
     try {
       const { error } = await supabase
         .from('applications')
@@ -287,7 +294,7 @@ const Detail = () => {
           user_id: user.id,
           university_id: selection.university_id,
           department_id: selection.id,
-          score: calculatedScores[selection.id]
+          score: score
         });
 
       if (error) {
@@ -309,6 +316,7 @@ const Detail = () => {
   };
 
   const calculateScoresForDepartments = async (departments) => {
+
     if (!user) return; // Ensure user is available
   
     const scores = {};

@@ -62,6 +62,31 @@ export default function Dashboard() {
     }
   };
 
+  const fetchApplicantCounts = async (departmentIds) => {
+    if (departmentIds.length === 0) return {};
+
+    const { data, error } = await supabase
+        .from('applications')
+        .select('department_id, user_id')
+        .in('department_id', departmentIds);
+
+    if (error) {
+        console.error('Error fetching applicant counts:', error);
+        return {};
+    }
+
+    const counts = data.reduce((acc, { department_id }) => {
+        if (!acc[department_id]) {
+            acc[department_id] = 0;
+        }
+        acc[department_id] += 1;
+        return acc;
+    }, {});
+
+    console.log('Department counts:', counts); // Debug log
+    return counts;
+};
+
   const filterAndSortUniversities = () => {
     let filtered = universities.filter(
       (university) => university.selection_type_name === selectionType

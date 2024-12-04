@@ -8,9 +8,12 @@ import 합 from '@/components/합.svg';
 import { useEffect, useState } from 'react';
 import { createClient } from '@/utils/supabase/client';
 import LoadingSpinner from '@/components/ui/LoadingSpinner'; // Adjust the filename accordingly
+import { useRouter } from 'next/navigation';
+
 
 export default function Home() {
     const supabase = createClient();
+    const router = useRouter(null);
     const [user, setUser] = useState(null);
     const [koreanRank, setKoreanRank] = useState(null);
     const [mathRank, setMathRank] = useState(null);
@@ -55,6 +58,11 @@ export default function Home() {
         }
     };
 
+    const truncateText = (text, maxLength) => {
+        if (!text || text.length <= maxLength) return text;
+        return `${text.substring(0, maxLength)}...`;
+      };
+
     const fetchRankAndTotalUsers = async () => {
         const { data: results, error } = await supabase
             .from('exam_results')
@@ -92,39 +100,50 @@ export default function Home() {
     const fetchTopUniversities = async (gun) => {
         if (isLoadingTopUniversities) return; // 이미 로딩 중이라면 함수 실행을 막음
         setIsLoadingTopUniversities(true);
+    
         try {
+            // Supabase 요청: `applications`와 관련된 대학 및 학과 데이터 가져오기
             const { data: applications, error } = await supabase
                 .from('applications')
-                .select('university_id, departments!inner(name, 계열, 군, university:university_id (logo_url))')
+                .select(`
+                    university_id,
+                    departments!inner(name, 계열, 군, university:university_id(logo_url))
+                `)
                 .eq('user_id', user.id)
-                .eq('departments.군', gun);
+                .eq('departments.군', gun); // 특정 군에 해당하는 데이터 필터링
     
             if (error) {
                 console.error('Error fetching applications:', error);
                 return;
             }
     
+            // university_id 기준으로 지원자 수 계산
             const universityCounts = applications.reduce((acc, app) => {
-                acc[app.university_id] = (acc[app.university_id] || 0) + 1;
+                const { university_id } = app;
+                acc[university_id] = (acc[university_id] || 0) + 1;
                 return acc;
             }, {});
     
+            // 대학별 지원자 수 정렬 및 상위 5개 선택
             const sortedUniversityCounts = Object.entries(universityCounts)
-                .sort(([, a], [, b]) => b - a)
+                .sort(([, countA], [, countB]) => countB - countA)
                 .slice(0, 5);
     
+            // 상위 5개 대학 데이터 매핑
             const topUniversities = sortedUniversityCounts.map(([university_id, count]) => {
-                const university = applications.find(app => app.university_id === university_id).departments;
+                const matchingApp = applications.find(app => app.university_id === university_id);
+                if (!matchingApp) return null;
+    
+                const { name, 계열, university } = matchingApp.departments;
                 return {
                     university_id,
-                    name: university.name,
-                    계열: university.계열,
-                    logo_url: university.university.logo_url,
-                    count,
+                    name,
+                    계열,
+                    logo_url: university.logo_url
                 };
-            });
+            }).filter(Boolean); // null 데이터 필터링
     
-            setTopUniversities(topUniversities);
+            setTopUniversities(topUniversities); // 상태 업데이트
         } finally {
             setIsLoadingTopUniversities(false);
         }
@@ -173,18 +192,31 @@ export default function Home() {
                         count: uniqueUserCount
                     };
                 }));
-    
                 const userPriorityData = departmentCounts.map(priority => ({
                     ...priority,
                     count: priority.count
                 }));
     
                 setUserPriorities(userPriorityData); // 데이터를 한 번에 업데이트
+
             }
         } finally {
             setIsLoadingUserPriorities(false); // 로딩 상태 해제
         }
     };
+    
+    // handleNavigate 함수
+    const handleNavigate = (priority) => {
+        if (priority) {
+            console.log("Selected Department ID:", priority.department_id);
+            if (priority.department_id) {
+                router.push(`/more?id=${priority.department_id}`);
+            } else {
+                console.error("department_id is undefined");
+            }
+        }
+    };
+    
 
     const handleGunChangeTopUniversities = async (direction2) => {
         if (isLoadingTopUniversities) return; // 이미 로딩 중이라면 함수 실행을 막음
@@ -289,7 +321,7 @@ export default function Home() {
             <div className="w-full justify-center text-center" style={{ maxWidth: '160px' }}>대학명</div>
             <div className="w-full justify-center text-center" style={{ maxWidth: 'auto' }}>학과명</div>
             <div className="w-full justify-center text-center" style={{ maxWidth: '120px' }}>지원인원</div>
-            <div className="w-full justify-center text-center" style={{ maxWidth: '100px' }}>등수</div>
+            <div className="w-full justify-center text-center" style={{ maxWidth: '100px' }}></div>
         </div>
         {userPriorities.map((priority) => (
             <div key={priority.department_id} className="flex gap-5 justify-between text-center h-12 border-b border-neutral-100 border-0 border-solid cursor-pointer hover:bg-neutral-50">
@@ -303,7 +335,7 @@ export default function Home() {
                     <div className="line-clamp-1">{priority.departments.university.name}</div>
                 </div>
                 <div className="w-full flex items-center text-sm justify-center">
-                    <div className="flex relative">{priority.departments.모집단위}</div>
+                    <div className="flex relative">{truncateText(priority.departments.모집단위,15)}</div>
                 </div>
                 <div className="w-full flex items-center text-sm justify-center" style={{ maxWidth: '120px' }}>
                     <div className="p-1 justify-center items-center gap-5 inline-flex h-6 px-3 rounded-full">
@@ -311,8 +343,13 @@ export default function Home() {
                     </div>
                 </div>
                 <div className="w-full flex items-center text-sm justify-center" style={{ maxWidth: '100px' }}>
-                    <span>1등</span>
-                </div>
+                <button 
+                    onClick={() => handleNavigate(priority)}
+                    className="bg-orange-200 text-gray-600 font-bold p-2 rounded ml-auto"
+                        >
+                        상세 보기
+                    </button>               
+                     </div>
             </div>
         ))}
     </div>
@@ -344,23 +381,19 @@ export default function Home() {
                                 <div className="flex gap-5 w-full justify-between text-sm text-neutral-400 h-8 border-0 border-b border-neutral-100 border-solid">
                                     <div className="w-1/6 text-center">순위</div>
                                     <div className="w-1/3 text-center">대학명</div>
-                                    <div className="w-1/6 text-center">계열</div>
                                     <div className="w-1/6 text-center">지원자</div>
                                 </div>
                                 {topUniversities.map((university, index) => (
                                     <div key={university.university_id} className="flex gap-5 justify-between text-center h-12 border-b border-neutral-100 border-0 border-solid cursor-pointer hover:bg-neutral-50">
                                         <div className="w-1/6 flex items-center text-sm justify-center">
-                                            <div>{index + 1}</div>
+                                            <div>{index + 1} 등</div>
                                         </div>
                                         <div className="w-1/3 flex items-center text-sm justify-center">
                                             <img src={university.logo_url} alt="logo" className="w-6 h-6 mr-2 rounded-full" />
                                             <div>{university.name}</div>
                                         </div>
                                         <div className="w-1/6 flex items-center text-sm justify-center">
-                                            <div>{university.계열}</div>
-                                        </div>
-                                        <div className="w-1/6 flex items-center text-sm justify-center">
-                                            <span>{university.count}</span>
+                                            <span>{university.count}명</span>
                                         </div>
                                     </div>
                                 ))}

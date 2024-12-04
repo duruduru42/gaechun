@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function calculate({
+export default function Calculate({
   size = "6", // Default size
   color = "blue-500", // Default color
   text = "계산 중...", // Default text

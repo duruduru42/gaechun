@@ -62,6 +62,8 @@ export default function Dashboard() {
     }
   };
 
+
+  
   const filterAndSortUniversities = () => {
     let filtered = universities.filter(
       (university) => university.selection_type_name === selectionType

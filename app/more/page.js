@@ -5,12 +5,12 @@
 import { useEffect, useState } from 'react';
 import { createClient } from '@/utils/supabase/client';
 import { useSearchParams } from 'next/navigation';
+import LoadingSpinner from '@/components/ui/LoadingSpinner'; // Adjust the filename accordingly
 
 const MorePage = () => {
     const supabase = createClient();
     const searchParams = useSearchParams();
     const department_id = searchParams.get('id');
-
     const [universityName, setUniversityName] = useState('');
     const [departmentName, setDepartmentName] = useState('');
     const [data, setData] = useState([]);
@@ -22,8 +22,14 @@ const MorePage = () => {
         }
     }, [department_id]);
 
+    const truncateText = (text, maxLength) => {
+        if (!text || text.length <= maxLength) return text;
+        return `${text.substring(0, maxLength)}...`;
+      };
+
+
     const fetchData = async () => {
-        const { data: applications, error: applicationsError } = await supabase
+        const { data: applications, error } = await supabase
             .from('applications')
             .select(`
                 id,
@@ -41,8 +47,8 @@ const MorePage = () => {
             `)
             .eq('department_id', department_id);
 
-        if (applicationsError) {
-            console.error('Error fetching application data:', applicationsError);
+        if (error) {
+            console.error('Error fetching application data:', error);
             return;
         }
 
@@ -86,29 +92,34 @@ const MorePage = () => {
     };
 
     const fetchAnotherUniversity = async (anotherDepartmentId) => {
-        const { data: anotherData, error } = await supabase
-            .from('applications')
-            .select(`
-                departments (
+        try {
+            const { data: anotherData, error } = await supabase
+                .from('departments')
+                .select(`
+                    모집단위,
                     university:university_id (
                         name,
                         logo_url
-                    ),
-                    모집단위
-                )
-            `)
-            .eq('department_id', anotherDepartmentId)
-            .single();
-
-        if (error || !anotherData) {
-            console.error('Error fetching another university data:', error);
+                    )
+                `)
+                .eq('id', anotherDepartmentId)
+                .single();
+    
+            if (error || !anotherData) {
+                console.error('Error fetching another university data:', error);
+                return null;
+            }
+    
+            console.log('Fetched another university data:', anotherData);
+            return anotherData;
+        } catch (err) {
+            console.error('Unexpected error in fetchAnotherUniversity:', err);
             return null;
         }
-
-        return anotherData.departments;
     };
+    
+    if (loading) return <div className='items-center justify-center'><LoadingSpinner size="10"/></div>
 
-    if (loading) return <div>Loading...</div>;
 
     return (
         <div className="container mx-auto p-10">
@@ -135,7 +146,7 @@ const MorePage = () => {
                                 <div className="flex items-center justify-center text-center p-2 m-2">
                                         <img src={item.다른_군_지원대학1.university.logo_url} alt="logo" className="w-10 h-10 mr-2 rounded-full" />
                                         <div>
-                                            <div className='font-semibold'>{item.다른_군_지원대학1.university.name} {item.다른_군_지원대학1.모집단위}</div>
+                                            <div className='font-semibold'>{item.다른_군_지원대학1.university.name} {truncateText(item.다른_군_지원대학1.모집단위,15)}</div>
                                         </div>
                                     </div>
                                 ) : '없음'}
@@ -145,7 +156,7 @@ const MorePage = () => {
                                  <div className="flex items-center justify-center text-center p-2 m-2">
                                         <img src={item.다른_군_지원대학2.university.logo_url} alt="logo" className="w-10 h-10 mr-2 rounded-full" />
                                         <div>
-                                            <div className='font-semibold'>{item.다른_군_지원대학2.university.name} {item.다른_군_지원대학2.모집단위}</div>
+                                            <div className='font-semibold'>{item.다른_군_지원대학2.university.name} {truncateText(item.다른_군_지원대학2.모집단위,15)}</div>
                                         </div>
                                     </div>
                                 ) : '없음'}
