@@ -63,55 +63,55 @@ export default function SignUpPage() {
   const handleSignUp = async () => {
     let validationErrors = {};
 
+    // 유효성 검사
     if (!validateEmail(email)) {
-      validationErrors.email = "유효한 이메일 주소를 입력해주세요.";
+        validationErrors.email = "유효한 이메일 주소를 입력해주세요.";
     }
-
-    if (password.length < 8 || password.length > 16 || !/\d/.test(password) || !/[a-zA-Z]/.test(password)) {
-      validationErrors.password = "비밀번호는 8~16자리의 영문과 숫자 조합이어야 합니다.";
+    if (
+        password.length < 8 ||
+        password.length > 16 ||
+        !/\d/.test(password) ||
+        !/[a-zA-Z]/.test(password)
+    ) {
+        validationErrors.password = "비밀번호는 8~16자리의 영문과 숫자 조합이어야 합니다.";
     }
-
     if (password !== confirmPassword) {
-      validationErrors.confirmPassword = "비밀번호가 일치하지 않습니다.";
+        validationErrors.confirmPassword = "비밀번호가 일치하지 않습니다.";
     }
 
     setErrors(validationErrors);
 
+    // 에러가 없을 때 회원가입 실행
     if (Object.keys(validationErrors).length === 0) {
-      const supabase = createClient()
+        const supabase = createClient();
 
-      // Minimal data: Only email and password
-      const { data, error } = await supabase.auth.signUp({
-        email: email,
-        password: password,
-       options: {
-        data: {
-          display_name: name,
-          phone: phoneNumber,
-          gender: gender,
-          selection_type: selection_type,
-          coins: 3, // Ensure coins is an integer
-          image_url: null // This assumes url is defined and holds a valid string, or null if not available
-        }    
-    }
-  });
+        const { data, error } = await supabase.auth.signUp({
+            email: email,
+            password: password,
+            options: {
+                data: {
+                    display_name: name,
+                    phone: phoneNumber,
+                    gender: gender,
+                    selection_type: selection_type,
+                    coins: 3,
+                    image_url: null
+                }
+            }
+        });
 
-      if (error) {
-        console.error("Error signing up: ", error.message);
-        alert("Error signing up: " + error.message);
-        return;
-      }
+        if (error) {
+            console.error("Error signing up:", error.message);
+            alert(`회원가입 중 오류 발생: ${error.message}`);
+            return;
+        }
 
-      console.log("User signed up: ", data.user);
-      router.push("/"); // redirect to home or other appropriate page
+        alert("인증 이메일을 보내드렸습니다. 이메일 인증을 완료해주세요.");
+        console.log("User signed up: ", data.user);
     } else {
-      alert('모든 필드를 올바르게 입력해주세요.');
+        alert("모든 필드를 올바르게 입력해주세요.");
     }
 };
-
-  
-
-  
 
   const isPage2Valid = () => {
     return (
@@ -606,11 +606,16 @@ export default function SignUpPage() {
             <div className="text-center">
               <h2 className="text-xl font-bold">이메일 인증</h2>
               <p className="text-gray-600 mt-10">기재해주신 이메일 주소로 인증메일을 보내드렸습니다
-                <br/>메일함으로 가셔서 인증메일에서 '인증하기' 버튼을 누른 후,
-                <br/>아래에 있는 '회원가입 완료하기' 버튼을 누르시면 회원가입이 완료됩니다.</p>
-              <Button className="mt-4 bg-orange-500 text-white p-3 rounded" onClick={() => router.push("/")}>
-                인증여부 확인하기
-              </Button>
+                <br/>메일함으로 가셔서 인증메일에서 '인증하기' 버튼을 누르시면 완료됩니다.
+                <br/>만약 메일이 오지 않은 경우, 스팸 메일함 확인 부탁드립니다.
+                <br/>스팸 메일함에도 없다면 고객센터로 문의 바랍니다. </p>
+                <Button
+                className="mt-4 bg-orange-500 text-white p-3 rounded"
+                onClick={ router.push('/')}
+            >
+                확인
+            </Button>
+
             </div>
           </div>
         )}

@@ -99,8 +99,8 @@ export default function SignInPage() {
           <p>계정이 없으신가요? 
             <span
               className="text-blue-500 cursor-pointer ml-1"
-              onClick={() => alert('정식 서비스 오픈 후 이용해주세요.')}
-            >
+              onClick={() => router.push('/signup')}
+              >
               회원가입
             </span>
           </p>

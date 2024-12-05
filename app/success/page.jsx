@@ -48,7 +48,7 @@ export default function SuccessPage() {
         const { error } = await supabase
           .from("profile")
           .update({
-            customer_key: requestData.paymentKey,
+            paymentkey: requestData.paymentKey,
             order_id: requestData.orderId, // 추가된 부분
           })
           .eq("id", userId);
