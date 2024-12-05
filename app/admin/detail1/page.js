@@ -43,6 +43,7 @@ import Seoul from '@/components/상세정보/seoul';
 import Korea from '@/components/상세정보/korea1';
 
 import down from '@/components/caret-down.svg'
+
 import up from '@/components/caret-up.svg'
 import sorted from '@/components/sortarrow.svg'
 import Image from "next/image";
@@ -127,7 +128,6 @@ const universityComponents = {
 
 };
 
-
 const Detail = () => {
   const searchParams = useSearchParams();
   const name = searchParams.get('name');
@@ -160,7 +160,8 @@ const Detail = () => {
       calculateScoresForDepartments(selections);
     }
   }, [user, selections]);
-  
+
+
   // 비교 결과 계산 함수
   const getComparisonResult = (score, selection) => {
     const 진짜안정 = selection.안정 * 1.05;
@@ -216,7 +217,7 @@ const Detail = () => {
       return 'bg-black text-white';
     }
   };
-  
+
   const fetchUniversityDetails = async () => {
     const { data, error } = await supabase
       .from('departments')
@@ -253,7 +254,6 @@ const Detail = () => {
     }
   };
   
-
   const fetchApplications = async () => {
     const { data, error } = await supabase
       .from('applications')
@@ -280,6 +280,13 @@ const Detail = () => {
       return;
     }
 
+    const score = calculatedScores[selection.id]; // 선택된 점수 가져오기
+
+    if (score === null || score === undefined) {
+      alert('점수 계산 완료 후 재시도해주세요.');
+      return;
+    }
+    
     try {
       const { error } = await supabase
         .from('applications')
@@ -287,7 +294,7 @@ const Detail = () => {
           user_id: user.id,
           university_id: selection.university_id,
           department_id: selection.id,
-          score: calculatedScores[selection.id]
+          score: score
         });
 
       if (error) {
@@ -309,6 +316,7 @@ const Detail = () => {
   };
 
   const calculateScoresForDepartments = async (departments) => {
+
     if (!user) return; // Ensure user is available
   
     const scores = {};
@@ -351,6 +359,14 @@ const Detail = () => {
             >
               합격예측
             </button>
+            {/* <button
+              onClick={() => setActiveTab('상세정보')}
+              className={`sm:text-xl text-lg font-bold sm:px-1 pb-1 border-b-2 duration-200 ${
+                activeTab === '상세정보' ? 'border-orange-600 text-gray-800' : 'border-transparent text-gray-300'
+              }`}
+            >
+              상세정보
+            </button> */}
           </div>
           <hr />
         </nav>
@@ -391,44 +407,43 @@ const Detail = () => {
             </tr>
           </thead>
           <tbody className="text-black text-sm font-medium">
-    {selections.map((selection) => {
-      const calculatedScore = calculatedScores[selection.id];
-      const comparisonResult =
-        calculatedScore && selection.안정
-          ? getComparisonResult(calculatedScore, selection)
-          : <Calculate/>;
+          {selections.map((selection) => {
+          const calculatedScore = calculatedScores[selection.id];
+          const comparisonResult =
+            calculatedScore && selection.안정
+              ? getComparisonResult(calculatedScore, selection)
+              : <Calculate />;
 
-      return (
-        <tr
-          key={selection.id}
-          className="border-b border-gray-200 hover:bg-gray-100"
-        >
-          <td className="py-3 px-6 text-center">{selection.name}</td>
-          <td className="py-3 px-6 text-center">{selection.모집단위}</td>
-          <td className="py-3 px-6 text-center">{selection.군}</td>
-          <td className="py-3 px-6 text-center">
-           {selection.university_id === 'sookmyung1' && selection.모집단위 !== '약학부' || selection.name === '성신여자대학교'&& selection.모집단위 !== '간호학과' 
-          ? `(계열 확인)* ${selection.모집인원}`
-              : selection.모집인원}
-          </td>          
-          <td className="py-3 px-6 text-center">{selection.지난경쟁률}</td>
-          <td className="py-3 px-6 text-center">
-            {calculatedScore || <Calculate/>}
-          </td>
-          <td className="py-3 px-6 text-center">
-  <div
-    className={`h-8 flex items-center justify-center rounded-md ${getBackgroundColor(
-      comparisonResult
-    )}`}
-  >
-    {comparisonResult}
-  </div>
-</td>
+         return (              
+          <tr key={selection.id} className="border-b border-gray-200 hover:bg-gray-100">
+                <td className="py-3 px-6 text-center">{selection.name}</td>
+                <td className="py-3 px-6 text-center w-1/3 break-keep	">{selection.모집단위}</td>
 
-       </tr>
+                <td className="py-3 px-6 text-center">{selection.군}</td>
+                <td className="py-3 px-6 text-center">{selection.모집인원}</td>
+                <td className="py-3 px-6 text-center">{selection.지난경쟁률}</td>                
+                <td className="py-3 px-6 text-center">{calculatedScores[selection.id] || <Calculate />}</td>                
+                <td className="py-3 px-6 text-center">
+                <div
+                  className={`h-8 flex items-center justify-center rounded-md ${getBackgroundColor(
+                    comparisonResult
+                  )}`}
+                >
+                  {comparisonResult}
+                </div>
+              </td>                
+              <td className="text-right">
+                  {/* <button
+                    onClick={() => handleMockApplication(selection)}
+                    className="rounded px-3 py-1 text-l font-bold bg-orange-600 text-white"
+                  >
+                    모의지원
+                  </button> */}
+                </td>
+              </tr>
       );
-    })}
-  </tbody>
+    })}          
+    </tbody>
         </table>
           ) : (
             <div>
