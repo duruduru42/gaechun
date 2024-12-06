@@ -27,16 +27,16 @@ export default function SignInPage() {
         nextElement.focus();
       }
     } 
-    // else if (e.key === 'Enter') {
-    //   if (nextElementId === 'login') {
-    //     handleLoginWithEmail();
-    //   } else {
-    //     const nextElement = document.getElementById(nextElementId);
-    //     if (nextElement) {
-    //       nextElement.focus();
-    //     }
-    //   }
-    // }
+    else if (e.key === 'Enter') {
+      if (nextElementId === 'login') {
+        handleLoginWithEmail();
+      } else {
+        const nextElement = document.getElementById(nextElementId);
+        if (nextElement) {
+          nextElement.focus();
+        }
+      }
+    }
   };
 
   const handleLoginWithEmail = async () => {
@@ -90,7 +90,7 @@ export default function SignInPage() {
           />
           <Button
             className="w-full bg-red-500 text-white p-3 rounded mt-3"
-            onClick={() => alert("오픈 후 이용해주세요")}
+            onClick={handleLoginWithEmail}
             id="login"
           >
             로그인

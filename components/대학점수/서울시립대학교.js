@@ -135,7 +135,7 @@ export const 서울시립대학교 = async (userId, selection) => {
     ? convertedScienceScore2 * 1.03
     : convertedScienceScore2;
 
-    totalScore = (standard_score_korean * 350 / 138) + (standard_score_math * 300 / 144) + englishScore + (scienceScore1+scienceScore2) * 200/2;
+    totalScore = (standard_score_korean * 350 / 139) + (standard_score_math * 300 / 140) + englishScore + (scienceScore1+scienceScore2) * 200/2;
 
   } else if (selection.계열 === '인문2') {
 
@@ -147,7 +147,7 @@ export const 서울시립대학교 = async (userId, selection) => {
     ? convertedScienceScore2 * 1.03
     : convertedScienceScore2;
 
-    totalScore = (standard_score_korean * 350 / 138) + (standard_score_math * 400 / 144) + englishScore + (scienceScore1+scienceScore2) * 100/2;
+    totalScore = (standard_score_korean * 350 / 139) + (standard_score_math * 400 / 140) + englishScore + (scienceScore1+scienceScore2) * 100/2;
   } else if (selection.계열 === '인문3') {
 
     const scienceScore1 = humanitiesSubjects.includes(science1)
@@ -158,7 +158,7 @@ export const 서울시립대학교 = async (userId, selection) => {
     ? convertedScienceScore2 * 1.03
     : convertedScienceScore2;
 
-    totalScore = (standard_score_korean * 350 / 138) + (standard_score_math * 250 / 144) + englishScore + (scienceScore1+scienceScore2) * 150/2;
+    totalScore = (standard_score_korean * 350 / 139) + (standard_score_math * 250 / 140) + englishScore + (scienceScore1+scienceScore2) * 150/2;
   } else if (selection.계열 === '자연1') {
 
     const scienceScore1 = naturalScienceSubjects.includes(science1)
@@ -169,7 +169,7 @@ export const 서울시립대학교 = async (userId, selection) => {
     ? convertedScienceScore2 * 1.07
     : convertedScienceScore2;
 
-    totalScore = (standard_score_korean * 200 / 138) + (standard_score_math * 400 / 144) + englishScore + (scienceScore1+scienceScore2) * 300/2;
+    totalScore = (standard_score_korean * 200 / 139) + (standard_score_math * 400 / 140) + englishScore + (scienceScore1+scienceScore2) * 300/2;
   } else if (selection.계열 === '자연2') {
 
     const scienceScore1 = naturalScienceSubjects.includes(science1)
@@ -180,7 +180,7 @@ export const 서울시립대학교 = async (userId, selection) => {
     ? convertedScienceScore2 * 1.07
     : convertedScienceScore2;
 
-    totalScore = (standard_score_korean * 200 / 138) + (standard_score_math * 350 / 144) + englishScore + (scienceScore1+scienceScore2) * 350/2;
+    totalScore = (standard_score_korean * 200 / 139) + (standard_score_math * 350 / 140) + englishScore + (scienceScore1+scienceScore2) * 350/2;
   } else if (selection.계열 === '자연3') {
 
     const scienceScore1 = naturalScienceSubjects.includes(science1)
@@ -191,7 +191,7 @@ export const 서울시립대학교 = async (userId, selection) => {
     ? convertedScienceScore2 * 1.07
     : convertedScienceScore2;
 
-    totalScore = (standard_score_korean * 200 / 138) + (standard_score_math * 350 / 144) + englishScore + (scienceScore1+scienceScore2) * 350/2;
+    totalScore = (standard_score_korean * 200 / 139) + (standard_score_math * 350 / 140) + englishScore + (scienceScore1+scienceScore2) * 350/2;
   } else {
     return '불가';
   }

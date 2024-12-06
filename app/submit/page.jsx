@@ -129,7 +129,7 @@ export default function Submit() {
             </p>
             <p className='font-bold text-xl text-black mt-1 mb-12'>
                 제출 24시간 내에 관리자 승인 후 해당 계정의 '성적'이 확정됩니다.
-                <br />성적 확정 시 해당 계정 이메일로 알려드립니다.</p>
+                <br />성적표가 나온 당일에는 인원이 몰릴 수 있으니, 여유를 가지고 기다려주시기 바랍니다.</p>
             <input
                 ref={inputRef}
                 type="file"

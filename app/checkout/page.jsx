@@ -25,6 +25,7 @@ export default function CheckoutPage() {
   const [ready, setReady] = useState(false);
   const [customerKey, setCustomerKey] = useState(""); // Dynamic customerKey
   const orderName = "개천용 합격예측";
+  const orderId = `order-${uuidv4()}`; // 고유 주문 ID 생성
 
   // 고유 customerKey 생성
   useEffect(() => {
@@ -56,6 +57,7 @@ export default function CheckoutPage() {
     if (!widgets) await initTossWidgets();
   };
 
+  
   // 'checkout' 단계
   if (step === "checkout") {
     return (
@@ -78,7 +80,7 @@ export default function CheckoutPage() {
                   orderId: `order-${Date.now()}`,
                   orderName,
                   successUrl: `${window.location.origin}/success`,
-                  failUrl: `${window.location.origin}/fail`,
+                  failUrl: `${window.location.origin}/success`,
                 });
               } catch (error) {
                 alert("결제 요청에 실패했습니다. 다시 시도해주세요.");

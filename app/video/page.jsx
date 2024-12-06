@@ -4,10 +4,10 @@ import React, { useState } from 'react';
 
 export default function VideoPage() {
   const videoList = [
-    { id: 1, name: "비디오 1", src: "https://www.youtube.com/embed/JVVKnZbkeac" },
-    { id: 2, name: "비디오 2", src: "https://www.youtube.com/embed/JVVKnZbkeac" },
-    { id: 3, name: "비디오 3", src: "https://www.youtube.com/embed/JVVKnZbkeac" },
-    { id: 4, name: "비디오 4", src: "https://www.youtube.com/embed/JVVKnZbkeac" },
+    { id: 1, name: "2024/12/7 업로드 예정", src: "" },
+    // { id: 2, name: "비디오 2", src: "" },
+    // { id: 3, name: "비디오 3", src: "" },
+    // { id: 4, name: "비디오 4", src: "" },
   ];
 
   const [currentVideo, setCurrentVideo] = useState(videoList[0]); // 기본 동영상 설정
