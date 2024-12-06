@@ -26,9 +26,9 @@ const Hero = () => {
         <p className="text-2xl text-gray-400 p-5 font-bold">
           전국 최초 <span className="underline underline-offset-4 decoration-4 decoration-orange-500 text-black">성적표 인증</span> 기반
         </p>
-        <Link href={'/'}>        
+        <Link href={'/home'}>        
         <button className="rounded-2xl px-6 py-3 text-lg font-bold mt-10 mb-24 bg-black text-white">
-          12/6일 18:00시 오픈
+          바로가기
         </button>
         </Link>
       </div>
