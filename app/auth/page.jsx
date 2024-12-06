@@ -89,7 +89,7 @@ export default function SignInPage() {
           />
           <Button
             className="w-full bg-red-500 text-white p-3 rounded mt-3"
-            onClick={handleLoginWithEmail}
+            onClick={() => alert("오픈 후 이용해주세요")}
             id="login"
           >
             로그인
