@@ -26,16 +26,17 @@ export default function SignInPage() {
       if (nextElement) {
         nextElement.focus();
       }
-    } else if (e.key === 'Enter') {
-      if (nextElementId === 'login') {
-        handleLoginWithEmail();
-      } else {
-        const nextElement = document.getElementById(nextElementId);
-        if (nextElement) {
-          nextElement.focus();
-        }
-      }
-    }
+    } 
+    // else if (e.key === 'Enter') {
+    //   if (nextElementId === 'login') {
+    //     handleLoginWithEmail();
+    //   } else {
+    //     const nextElement = document.getElementById(nextElementId);
+    //     if (nextElement) {
+    //       nextElement.focus();
+    //     }
+    //   }
+    // }
   };
 
   const handleLoginWithEmail = async () => {
