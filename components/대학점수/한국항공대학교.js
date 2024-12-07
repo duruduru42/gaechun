@@ -53,38 +53,41 @@ export const 한국항공대학교 = async (userId, selection) => {
     const historyBonus = getHistoryBonus(grade_history);
 
     let totalScore = 0;
+
     if (selection.계열 === '자연1') {
-
+    
         const scienceScore1 = naturalScienceSubjects.includes(science1)
-        ? standard_score_science1 * 1.05
-        : standard_score_science1;
+            ? Number(standard_score_science1) * 1.05
+            : Number(standard_score_science1);
     
         const scienceScore2 = naturalScienceSubjects.includes(science2)
-        ? standard_score_science2 * 1.05
-        : standard_score_science2;
-
-        totalScore = (standard_score_korean * 0.2 + standard_score_math * 0.35 + englishScore * 0.2 + (scienceScore1+scienceScore2) * 0.25) * 5 + historyBonus;
-
+            ? Number(standard_score_science2) * 1.05
+            : Number(standard_score_science2);
+    
+        totalScore = (Number(standard_score_korean) * 0.2 + Number(standard_score_math) * 0.35 + Number(englishScore) * 0.2 + (scienceScore1 + scienceScore2) * 0.25) * 5 + Number(historyBonus);
+    
     } else if (selection.계열 === '자연2') {
-
+    
         const scienceScore1 = naturalScienceSubjects.includes(science1)
-        ? standard_score_science1 * 1.05
-        : standard_score_science1;
+            ? Number(standard_score_science1) * 1.05
+            : Number(standard_score_science1);
     
         const scienceScore2 = naturalScienceSubjects.includes(science2)
-        ? standard_score_science2 * 1.05
-        : standard_score_science2;
-
-        totalScore = (standard_score_korean * 0.25 + standard_score_math * 0.3 + englishScore * 0.2 + (scienceScore1+scienceScore2) * 0.25) * 5 + historyBonus;
-
+            ? Number(standard_score_science2) * 1.05
+            : Number(standard_score_science2);
+    
+        totalScore = (Number(standard_score_korean) * 0.25 + Number(standard_score_math) * 0.3 + Number(englishScore) * 0.2 + (scienceScore1 + scienceScore2) * 0.25) * 5 + Number(historyBonus);
+    
     } else if (selection.계열 === '인문') {
-        const scienceScore1 = standard_score_science1;
-        const scienceScore2 = standard_score_science2;
-
-        totalScore = (standard_score_korean * 0.3 + standard_score_math * 0.25 + englishScore * 0.2 + (Number(scienceScore1)+Number(scienceScore2))* 0.25) * 5 + historyBonus;
+    
+        const scienceScore1 = Number(standard_score_science1);
+        const scienceScore2 = Number(standard_score_science2);
+    
+        totalScore = (Number(standard_score_korean) * 0.3 + Number(standard_score_math) * 0.25 + Number(englishScore) * 0.2 + (scienceScore1 + scienceScore2) * 0.25) * 5 + Number(historyBonus);
+    
     } else {
         return '불가'; // Invalid tracks
     }
-
+    
     return totalScore.toFixed(2);
 };

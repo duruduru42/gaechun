@@ -96,10 +96,10 @@ export const 삼육대학교 = async (userId, selection) => {
     }
      else if (selection.계열 === '약학') {
         totalScore = (
-            percentile_korean * 0.25 +
-            percentile_math * 0.3 +
-            englishScore * 0.25 +
-            (explorationScore1+explorationScore2) * 0.1
+            Number(percentile_korean) * 0.25 +
+            Number(percentile_math) * 0.3 +
+            Number(englishScore) * 0.25 +
+            (Number(explorationScore1)+Number(explorationScore2)) * 0.1
         ) * 10;
     } else {
         return '불가';
