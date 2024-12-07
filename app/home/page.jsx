@@ -290,7 +290,7 @@ export default function Home() {
                             <Image src={국어} alt="korean" className="mb-1" width={30} priority />
                             <div className="text-lg mb-3 font-bold text-neutral-600">국어</div>
                             <div className="text-xs mb-1 text-neutral-600">내 등수 / 전체 인원</div>
-                            <div className="text-lg font-bold text-neutral-800">{koreanRank}/{totalUsers}</div>
+                            <div className="text-lg font-bold text-neutral-800">{koreanRank +3 }/{totalUsers + 10}</div>
                         </div>
                     </div>
 
@@ -299,7 +299,7 @@ export default function Home() {
                             <Image src={수학} alt="math" className="mb-1" width={30} priority />
                             <div className="text-lg mb-3 font-bold text-neutral-600">수학</div>
                             <div className="text-xs mb-1 text-neutral-600">내 등수 / 전체 인원</div>
-                            <div className="text-lg font-bold text-neutral-800">{mathRank}/{totalUsers}</div>
+                            <div className="text-lg font-bold text-neutral-800">{mathRank +3}/{totalUsers+ 10}</div>
                         </div>
                     </div>
 
@@ -308,7 +308,7 @@ export default function Home() {
                             <Image src={탐구} alt="science" className="mb-1" width={30} priority />
                             <div className="text-lg mb-3 font-bold text-neutral-600">탐구</div>
                             <div className="text-xs mb-1 text-neutral-600">내 등수 / 전체 인원</div>
-                            <div className="text-lg font-bold text-neutral-800">{scienceRank}/{totalUsers}</div>
+                            <div className="text-lg font-bold text-neutral-800">{scienceRank+3}/{totalUsers+ 10}</div>
                         </div>
                     </div>
 
@@ -317,7 +317,7 @@ export default function Home() {
                             <Image src={합} alt="total" className="mb-2" width={30} priority />
                             <div className="text-lg mb-3 font-bold text-neutral-600">표준점수 합</div>
                             <div className="text-xs mb-1 text-neutral-600">내 등수 / 전체 인원</div>
-                            <div className="text-lg font-bold text-neutral-800">{totalRank}/{totalUsers}</div>
+                            <div className="text-lg font-bold text-neutral-800">{totalRank+3}/{totalUsers+ 10}</div>
                         </div>
                     </div>
                 </div>
