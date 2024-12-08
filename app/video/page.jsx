@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 
 export default function VideoPage() {
   const videoList = [
-    { id: 1, name: "2024/12/7 업로드 예정", src: "" },
+    { id: 1, name: "합격예측 이용 방법 (공개 동영상)", src: "https://youtu.be/sM4Nv2spLmY?si=HTgKbfpcdKqtWEyW" },
     // { id: 2, name: "비디오 2", src: "" },
     // { id: 3, name: "비디오 3", src: "" },
     // { id: 4, name: "비디오 4", src: "" },
