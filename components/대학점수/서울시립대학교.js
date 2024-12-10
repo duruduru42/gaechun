@@ -108,7 +108,7 @@ export const 서울시립대학교 = async (userId, selection) => {
   } = data;
 
   // 조건 3: 자연 계열에서 수학이 '확률과통계'일 경우 불가
-  if ((selection.계열 === '자연1' || selection.계열 === '자연2') && math === '확률과통계') {
+  if ((selection.계열 === '자연1' || selection.계열 === '자연2') && math === '확률과 통계') {
     return '불가';
   }
 
