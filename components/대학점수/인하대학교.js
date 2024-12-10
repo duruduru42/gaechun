@@ -62,22 +62,16 @@ const conversionTable = {
     }
 };
 
-const isScienceInquiry = (subject) => {
-    const scienceSubjects = ['물리학Ⅰ', '물리학Ⅱ', '화학Ⅰ', '화학Ⅱ', '생명과학Ⅰ', '생명과학Ⅱ', '지구과학Ⅰ', '지구과학Ⅱ'];
-    return scienceSubjects.includes(subject);
-};
+const naturalScienceSubjects = [
+    '물리학Ⅰ', '물리학Ⅱ', '화학Ⅰ', '화학Ⅱ',
+    '지구과학Ⅰ', '지구과학Ⅱ', '생명과학Ⅰ', '생명과학Ⅱ'
+  ];
 
-const isSocialInquiry = (subject) => {
-    const socialSubjects = ['생활과 윤리', '윤리와 사상', '한국지리', '세계지리', '동아시아사', '세계사', '경제', '정치와 법', '사회·문화'];
-    return socialSubjects.includes(subject);
-};
-
-// Exploration score calculation function
 const getConvertedScore = (percentile, subject) => {
-    const track = isScienceInquiry(subject) ? '과탐' : isSocialInquiry(subject) ? '사탐' : null;
-    return track ? conversionTable[track][percentile] || 0 : 0;
-};
-
+    const track = naturalScienceSubjects.includes(subject) ? '자연' : '인문';
+    return conversionTable[track][percentile] || 0;
+  };
+  
 // Inha University score calculation function
 export const 인하대학교 = async (userId, selection) => {
     const supabase = createClient();

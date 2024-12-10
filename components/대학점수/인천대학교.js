@@ -71,6 +71,15 @@ export const 인천대학교 = async (userId, selection) => {
       (percentile_science2 * 1.5) +
       englishScore;
   } 
+  else if (selection.계열 === '특성자연') {
+    // 자연계열은 탐구 과목이 '과학탐구'여야 함
+    totalScore =
+      (percentile_korean * 2.5) +
+      (percentile_math * 3.5) +
+      (percentile_science1 * 1.5) +
+      (percentile_science2 * 1.5) +
+      englishScore;
+  } 
   else {
     return '불가'; // 잘못된 계열 값일 경우
   }
