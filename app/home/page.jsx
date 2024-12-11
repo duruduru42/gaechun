@@ -63,32 +63,39 @@ export default function Home() {
         return `${text.substring(0, maxLength)}...`;
       };
 
-    const fetchRankAndTotalUsers = async () => {
+      const fetchRankAndTotalUsers = async () => {
         const { data: results, error } = await supabase
             .from('exam_results')
-            .select('id, user_id, standard_score_korean, standard_score_math, standard_score_science1, standard_score_science2')
+            .select('id, user_id, standard_score_korean, standard_score_math, standard_score_science1, standard_score_science2, noRank')
             .order('standard_score_korean', { ascending: false });
-
+    
         if (error) {
             console.error('Error fetching exam results:', error);
             return;
         }
-
+    
         if (results) {
-            const total = results.length;
-
-            const koreanResults = [...results].sort((a, b) => b.standard_score_korean - a.standard_score_korean);
+            // no_Rank가 'y'가 아닌 데이터만 필터링
+            const filteredResults = results.filter((result) => result.noRank !== 'y');
+            const total = filteredResults.length;
+    
+            const koreanResults = [...filteredResults].sort((a, b) => b.standard_score_korean - a.standard_score_korean);
             const koreanRank = koreanResults.findIndex((result) => result.user_id === user.id) + 1;
-
-            const mathResults = [...results].sort((a, b) => b.standard_score_math - a.standard_score_math);
+    
+            const mathResults = [...filteredResults].sort((a, b) => b.standard_score_math - a.standard_score_math);
             const mathRank = mathResults.findIndex((result) => result.user_id === user.id) + 1;
-
-            const scienceResults = [...results].sort((a, b) => (b.standard_score_science1 + b.standard_score_science2) - (a.standard_score_science1 + a.standard_score_science2));
+    
+            const scienceResults = [...filteredResults].sort((a, b) => 
+                (b.standard_score_science1 + b.standard_score_science2) - (a.standard_score_science1 + a.standard_score_science2)
+            );
             const scienceRank = scienceResults.findIndex((result) => result.user_id === user.id) + 1;
-
-            const totalResults = [...results].sort((a, b) => (b.standard_score_korean + b.standard_score_math + b.standard_score_science1 + b.standard_score_science2) - (a.standard_score_korean + a.standard_score_math + a.standard_score_science1 + a.standard_score_science2));
+    
+            const totalResults = [...filteredResults].sort((a, b) => 
+                (b.standard_score_korean + b.standard_score_math + b.standard_score_science1 + b.standard_score_science2) - 
+                (a.standard_score_korean + a.standard_score_math + a.standard_score_science1 + a.standard_score_science2)
+            );
             const totalRank = totalResults.findIndex((result) => result.user_id === user.id) + 1;
-
+    
             setTotalUsers(total);
             setKoreanRank(koreanRank);
             setMathRank(mathRank);
@@ -96,6 +103,7 @@ export default function Home() {
             setTotalRank(totalRank);
         }
     };
+    
 
     const fetchTopUniversities = async (gun) => {
         if (isLoadingTopUniversities) return; // 이미 로딩 중이라면 함수 실행을 막음
@@ -290,7 +298,7 @@ export default function Home() {
                             <Image src={국어} alt="korean" className="mb-1" width={30} priority />
                             <div className="text-lg mb-3 font-bold text-neutral-600">국어</div>
                             <div className="text-xs mb-1 text-neutral-600">내 등수 / 전체 인원</div>
-                            <div className="text-lg font-bold text-neutral-800">{koreanRank +1}/{totalUsers + 7}</div>
+                            <div className="text-lg font-bold text-neutral-800">{koreanRank +1}/{totalUsers + 13}</div>
                         </div>
                     </div>
 
@@ -299,7 +307,7 @@ export default function Home() {
                             <Image src={수학} alt="math" className="mb-1" width={30} priority />
                             <div className="text-lg mb-3 font-bold text-neutral-600">수학</div>
                             <div className="text-xs mb-1 text-neutral-600">내 등수 / 전체 인원</div>
-                            <div className="text-lg font-bold text-neutral-800">{mathRank }/{totalUsers+ 7}</div>
+                            <div className="text-lg font-bold text-neutral-800">{mathRank }/{totalUsers+ 13}</div>
                         </div>
                     </div>
 
@@ -308,7 +316,7 @@ export default function Home() {
                             <Image src={탐구} alt="science" className="mb-1" width={30} priority />
                             <div className="text-lg mb-3 font-bold text-neutral-600">탐구</div>
                             <div className="text-xs mb-1 text-neutral-600">내 등수 / 전체 인원</div>
-                            <div className="text-lg font-bold text-neutral-800">{scienceRank}/{totalUsers+ 7}</div>
+                            <div className="text-lg font-bold text-neutral-800">{scienceRank}/{totalUsers+ 13}</div>
                         </div>
                     </div>
 
@@ -317,7 +325,7 @@ export default function Home() {
                             <Image src={합} alt="total" className="mb-2" width={30} priority />
                             <div className="text-lg mb-3 font-bold text-neutral-600">표준점수 합</div>
                             <div className="text-xs mb-1 text-neutral-600">내 등수 / 전체 인원</div>
-                            <div className="text-lg font-bold text-neutral-800">{totalRank}/{totalUsers+ 7}</div>
+                            <div className="text-lg font-bold text-neutral-800">{totalRank}/{totalUsers+ 13}</div>
                         </div>
                     </div>
                 </div>
