@@ -96,8 +96,8 @@ export default function Home() {
             );
             const totalRank = totalResults.findIndex((result) => result.user_id === user.id) + 1;
     
-            setTotalUsers(total);
-            setKoreanRank(koreanRank);
+            setTotalUsers(total+13);
+            setKoreanRank(koreanRank+1);
             setMathRank(mathRank);
             setScienceRank(scienceRank);
             setTotalRank(totalRank);
@@ -289,7 +289,7 @@ export default function Home() {
             <div className="flex-1 p-5">
                 <h1 className="text-3xl font-bold p-5">홈</h1>
                 <div className="mb-5 p-4 bg-white rounded-lg shadow-sm cursor-pointer hover:shadow-md">
-                    <p>안내 | 12/6 실채점 적용 완료</p>
+                    <p><span className='font-bold'>안내 | 12/11</span> 특성화고 합격예측 이용 가능, 등수 변경 버그 수정. (자세한 건 공지사항 확인)</p>
                 </div>
 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-5">
@@ -298,7 +298,7 @@ export default function Home() {
                             <Image src={국어} alt="korean" className="mb-1" width={30} priority />
                             <div className="text-lg mb-3 font-bold text-neutral-600">국어</div>
                             <div className="text-xs mb-1 text-neutral-600">내 등수 / 전체 인원</div>
-                            <div className="text-lg font-bold text-neutral-800">{koreanRank +1}/{totalUsers + 13}</div>
+                            <div className="text-lg font-bold text-neutral-800">{koreanRank}/{totalUsers }</div>
                         </div>
                     </div>
 
@@ -307,7 +307,7 @@ export default function Home() {
                             <Image src={수학} alt="math" className="mb-1" width={30} priority />
                             <div className="text-lg mb-3 font-bold text-neutral-600">수학</div>
                             <div className="text-xs mb-1 text-neutral-600">내 등수 / 전체 인원</div>
-                            <div className="text-lg font-bold text-neutral-800">{mathRank }/{totalUsers+ 13}</div>
+                            <div className="text-lg font-bold text-neutral-800">{mathRank }/{totalUsers}</div>
                         </div>
                     </div>
 
@@ -316,7 +316,7 @@ export default function Home() {
                             <Image src={탐구} alt="science" className="mb-1" width={30} priority />
                             <div className="text-lg mb-3 font-bold text-neutral-600">탐구</div>
                             <div className="text-xs mb-1 text-neutral-600">내 등수 / 전체 인원</div>
-                            <div className="text-lg font-bold text-neutral-800">{scienceRank}/{totalUsers+ 13}</div>
+                            <div className="text-lg font-bold text-neutral-800">{scienceRank}/{totalUsers}</div>
                         </div>
                     </div>
 
@@ -325,7 +325,7 @@ export default function Home() {
                             <Image src={합} alt="total" className="mb-2" width={30} priority />
                             <div className="text-lg mb-3 font-bold text-neutral-600">표준점수 합</div>
                             <div className="text-xs mb-1 text-neutral-600">내 등수 / 전체 인원</div>
-                            <div className="text-lg font-bold text-neutral-800">{totalRank}/{totalUsers+ 13}</div>
+                            <div className="text-lg font-bold text-neutral-800">{totalRank}/{totalUsers}</div>
                         </div>
                     </div>
                 </div>
