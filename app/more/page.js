@@ -132,31 +132,34 @@ const MorePage = () => {
     };
     
     const fetchAnotherUniversity = async (anotherDepartmentId) => {
-        try {
-            const { data: anotherData, error } = await supabase
-                .from('departments')
-                .select(`
-                    모집단위,
-                    university:university_id (
-                        name,
-                        logo_url
-                    )
-                `)
-                .eq('id', anotherDepartmentId)
-                .single();
-    
-            if (error || !anotherData) {
-                console.error('Error fetching another university data:', error);
-                return null;
-            }
-    
-            console.log('Fetched another university data:', anotherData);
-            return anotherData;
-        } catch (err) {
-            console.error('Unexpected error in fetchAnotherUniversity:', err);
+    try {
+        console.log('Fetching another university for department ID:', anotherDepartmentId);
+
+        const { data: anotherData, error } = await supabase
+            .from('departments')
+            .select(`
+                모집단위,
+                university:university_id (
+                    name,
+                    logo_url
+                )
+            `)
+            .eq('id', anotherDepartmentId)
+            .single();
+
+        if (error || !anotherData) {
+            console.error('Error fetching another university data:', error);
             return null;
         }
-    };
+
+        console.log('Fetched another university data:', anotherData);
+        return anotherData;
+    } catch (err) {
+        console.error('Unexpected error in fetchAnotherUniversity:', err);
+        return null;
+    }
+};
+
     
     if (loading) return <div className='items-center justify-center'><LoadingSpinner size="10"/></div>
 
@@ -166,63 +169,62 @@ const MorePage = () => {
             <h2 className="text-3xl font-bold mb-2">{universityName}</h2>
             <div className="text-lg text-gray-500 mb-4">{departmentName}</div>
             <table className="min-w-full table-auto bg-white">
-                <thead className="bg-gray-200 text-gray-600 uppercase text-sm leading-normal font-bold">
-                    <tr>
-                        <th className="py-3 px-6 text-center">순위</th>
-                        <th className="py-3 px-6 text-center">환산점수</th>
-                        <th className="py-3 px-6 text-center">우선순위</th>
-                        <th className="py-3 px-6 text-center">다른 군 지원대학1</th>
-                        <th className="py-3 px-6 text-center">다른 군 지원대학2</th>
-                    </tr>
-                </thead>
-                <tbody className="text-black text-sm font-medium">
-                    {data.map((item, index) => (
-                        <tr 
-                        key={index} 
-                        className={`border-b border-gray-200 hover:bg-gray-100 ${
-                            item.user_id === currentUserId ? 'bg-orange-100' : ''
-                        }`}>
+    <thead className="bg-gray-200 text-gray-600 uppercase text-sm leading-normal font-bold">
+        <tr>
+            <th className="py-3 px-6 text-center">순위</th>
+            <th className="py-3 px-6 text-center">환산점수</th>
+            <th className="py-3 px-6 text-center">우선순위</th>
+            <th className="py-3 px-6 text-center">다른 군 지원대학1</th>
+            <th className="py-3 px-6 text-center">다른 군 지원대학2</th>
+        </tr>
+    </thead>
+    <tbody className="text-black text-sm font-medium">
+        {data
+            .filter((item) => item.다른_군_지원대학1 && item.다른_군_지원대학2) // 두 값 중 하나라도 없으면 제외
+            .map((item, index) => (
+                <tr 
+                    key={index} 
+                    className={`border-b border-gray-200 hover:bg-gray-100 ${
+                        item.user_id === currentUserId ? 'bg-orange-100' : ''
+                    }`}
+                >
+                    <td className="py-3 px-6 text-center">
+                        {index + 1} 등
+                        {item.user_id === currentUserId && <span className="ml-2 text-red-500">(본인)</span>}
+                    </td>
+                    <td className="py-3 px-6 text-center">{item.score} 점</td>
+                    <td className="py-3 px-6 text-center">{item.우선순위} 순위</td>
+                    <td className="py-3 px-6 text-center">
+                        <div className="flex items-center justify-center text-center p-2 m-2">
+                            <img 
+                                src={item.다른_군_지원대학1.university.logo_url} 
+                                alt="logo" 
+                                className="w-10 h-10 mr-2 rounded-full" 
+                            />
+                            <div className='font-semibold'>
+                                {item.다른_군_지원대학1.university.name}{' '}
+                                {truncateText(item.다른_군_지원대학1.모집단위, 15)}
+                            </div>
+                        </div>
+                    </td>
+                    <td className="py-3 px-6 text-center">
+                        <div className="flex items-center justify-center text-center p-2 m-2">
+                            <img 
+                                src={item.다른_군_지원대학2.university.logo_url} 
+                                alt="logo" 
+                                className="w-10 h-10 mr-2 rounded-full" 
+                            />
+                            <div className='font-semibold'>
+                                {item.다른_군_지원대학2.university.name}{' '}
+                                {truncateText(item.다른_군_지원대학2.모집단위, 15)}
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            ))}
+    </tbody>
+</table>
 
-                            <td className="py-3 px-6 text-center">
-                                {index + 1} 등
-                            {item.user_id === currentUserId && <span className="ml-2 text-red-500">(본인)</span>}
-                            </td>
-                            <td className="py-3 px-6 text-center">{item.score} 점</td>
-                            <td className="py-3 px-6 text-center">{item.우선순위} 순위</td>
-                            <td className="py-3 px-6 text-center">
-                                {item.다른_군_지원대학1 ? (
-                                <div className="flex items-center justify-center text-center p-2 m-2">
-                                        <img 
-                                        src={item.다른_군_지원대학1.university.logo_url} 
-                                        alt="logo" 
-                                        className="w-10 h-10 mr-2 rounded-full" />
-                                        <div>
-                                            <div className='font-semibold'>
-                                                {item.다른_군_지원대학1.university.name} {' '}
-                                                {truncateText(item.다른_군_지원대학1.모집단위,15)}</div>
-                                        </div>
-                                    </div>
-                                ) : '없음'}
-                            </td>
-                            <td className="py-3 px-6 text-center">
-                                {item.다른_군_지원대학2 ? (
-                                 <div className="flex items-center justify-center text-center p-2 m-2">
-                                        <img 
-                                        src={item.다른_군_지원대학2.university.logo_url} 
-                                        alt="logo" 
-                                        className="w-10 h-10 mr-2 rounded-full" />
-                                        <div>
-                                            <div className='font-semibold'>
-                                                {item.다른_군_지원대학2.university.name} {' '}
-                                                {truncateText(item.다른_군_지원대학2.모집단위,15)}</div>
-                                        </div>
-                                    </div>
-                                ) : '없음'}
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
         </div>
     );
 };
