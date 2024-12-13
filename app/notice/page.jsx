@@ -4,13 +4,25 @@ import photoDetails from '@/components/공지사항.svg';
 const NoticePage = () => {
     const notices = [
         {
-            date: "2024.12.13 (예정)",
+            date: "2024.12.13",
             updates: [
                 {
                     title: "모의지원 수정권한 3회 추가",
                     subtitle: "모의지원 수정 권한 추가",
                     details: [
                         "모의지원 수정 권한이 일주일 단위로 리셋 될 예정입니다."
+                    ],
+                },
+            ],
+        },
+        {
+            date: "2024.12.12",
+            updates: [
+                {
+                    title: "대구교대 환산점수 수정",
+                    subtitle: "사회탐구 선택자 한해서 오류",
+                    details: [
+                        "대구교대에서 사회탐구 선택자 환산 과정에서 오류가 있어 수정했습니다."
                     ],
                 },
             ],
