@@ -424,7 +424,7 @@ const TestPage = () => {
             console.error('Error saving priorities:', error);
         } else {
             alert('우선순위가 저장되었습니다.');
-            fetchStoredPriorities(user.id);
+            await fetchStoredPriorities(user.id);
             const newCount = modificationCount - 1;
             setModificationCount(newCount);
             updateModificationCount(user.id, newCount);

@@ -110,20 +110,6 @@ export default function Home() {
         setIsLoadingTopUniversities(true);
     
         try {
-            // 현재 유저의 selection_type 가져오기
-            const { data: profileData, error: profileError } = await supabase
-                .from('profile')
-                .select('selection_type')
-                .eq('id', user.id)
-                .single();
-    
-            if (profileError || !profileData) {
-                console.error('Error fetching profile data:', profileError);
-                return;
-            }
-    
-            const userSelectionType = profileData.selection_type;
-    
             // applications 데이터 가져오기
             const { data: applications, error: applicationsError } = await supabase
                 .from('applications')
@@ -138,30 +124,15 @@ export default function Home() {
                 return;
             }
     
-            // university_id 기준으로 지원자 수 계산
+            // name 기준으로 지원자 수 계산
             const universityCounts = {};
             applications.forEach((app) => {
-                const { university_id } = app;
+                const { name } = app.departments;
     
-                // university_id에서 끝자리 숫자 추출
-                const match = university_id.match(/\d+$/); // 숫자로 끝나는 부분 추출
-                const lastDigit = match ? parseInt(match[0], 10) : null;
-    
-                // university_id 끝자리로 전형 필터링
-                let selectionTypeForUniversity;
-                if (lastDigit === 1) {
-                    selectionTypeForUniversity = '기회균형전형';
-                } else if (lastDigit === 2) {
-                    selectionTypeForUniversity = '농어촌전형';
-                }
-    
-                // 유저의 selection_type과 매칭되는 데이터만 처리
-                if (selectionTypeForUniversity === userSelectionType) {
-                    if (universityCounts[university_id]) {
-                        universityCounts[university_id] += 1;
-                    } else {
-                        universityCounts[university_id] = 1;
-                    }
+                if (universityCounts[name]) {
+                    universityCounts[name] += 1;
+                } else {
+                    universityCounts[name] = 1;
                 }
             });
     
@@ -171,13 +142,12 @@ export default function Home() {
                 .slice(0, 5);
     
             // 상위 5개 대학 데이터 매핑
-            const topUniversities = sortedUniversityCounts.map(([university_id, count]) => {
-                const matchingApp = applications.find(app => app.university_id === university_id);
+            const topUniversities = sortedUniversityCounts.map(([name, count]) => {
+                const matchingApp = applications.find(app => app.departments.name === name);
                 if (!matchingApp) return null;
     
-                const { name, 계열, university } = matchingApp.departments;
+                const { 계열, university } = matchingApp.departments;
                 return {
-                    university_id,
                     name,
                     계열,
                     logo_url: university.logo_url,
@@ -190,6 +160,7 @@ export default function Home() {
             setIsLoadingTopUniversities(false);
         }
     };
+    
     
 
     const fetchUserPriorities = async (gun) => {
