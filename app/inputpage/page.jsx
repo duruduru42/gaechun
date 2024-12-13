@@ -216,7 +216,7 @@ export default function InputPage() {
                         '물리학Ⅰ', '화학Ⅰ', '생명과학Ⅰ', '지구과학Ⅰ',
                         '물리학Ⅱ', '화학Ⅱ', '생명과학Ⅱ', '생활과윤리',
                         '윤리와사상', '한국지리', '세계지리', '동아시아사',
-                        '세계사', '경제', '정치와법', '사회문화'
+                        '세계사', '경제', '정치와법', '사회문화', '직업탐구1'
                     ], 'standard_score_science1')}
                     {renderInputField('standard_score_science1', '표준점수 입력', standardScoreScience1, setStandardScoreScience1, 'percentile_science1')}
                     {renderInputField('percentile_science1', '백분위 입력', percentileScience1, setPercentileScience1, 'grade_science1')}
@@ -230,7 +230,7 @@ export default function InputPage() {
                         '물리학Ⅰ', '화학Ⅰ', '생명과학Ⅰ', '지구과학Ⅰ',
                         '물리학Ⅱ', '화학Ⅱ', '생명과학Ⅱ', '생활과윤리',
                         '윤리와사상', '한국지리', '세계지리', '동아시아사',
-                        '세계사', '경제', '정치와법', '사회문화'
+                        '세계사', '경제', '정치와법', '사회문화','직업탐구2'
                     ], 'standard_score_science2')}
                     {renderInputField('standard_score_science2', '표준점수 입력', standardScoreScience2, setStandardScoreScience2, 'percentile_science2')}
                     {renderInputField('percentile_science2', '백분위 입력', percentileScience2, setPercentileScience2, 'grade_science2')}
