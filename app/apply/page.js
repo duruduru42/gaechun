@@ -362,7 +362,6 @@ const TestPage = () => {
     };
 
     const handleSave = async () => {
-    
         // Ensure all priorities are filled
         for (let priority = 1; priority <= 3; priority++) {
             if (!priorities[priority].가 || !priorities[priority].나 || !priorities[priority].다) {
@@ -372,64 +371,94 @@ const TestPage = () => {
         }
     
         const prioritiesArray = [];
-        for (let priority = 1; priority <= 3; priority++) {
-            for (let 군 in priorities[priority]) {
-                if (priorities[priority][군]) {
-                    const department = priorities[priority][군];
     
-                    // Determine `another1` and `another2` based on the current `군`
-                    let another1 = null;
-                    let another2 = null;
+        const fetchAndPushPriority = async (priority, 군) => {
+            const department = priorities[priority][군];
     
-                    if (군 === '가') {
-                        another1 = priorities[priority]['나'] ? priorities[priority]['나'].id : null;
-                        another2 = priorities[priority]['다'] ? priorities[priority]['다'].id : null;
-                    } else if (군 === '나') {
-                        another1 = priorities[priority]['가'] ? priorities[priority]['가'].id : null;
-                        another2 = priorities[priority]['다'] ? priorities[priority]['다'].id : null;
-                    } else if (군 === '다') {
-                        another1 = priorities[priority]['가'] ? priorities[priority]['가'].id : null;
-                        another2 = priorities[priority]['나'] ? priorities[priority]['나'].id : null;
-                    }
+            let another1 = null;
+            let another2 = null;
     
+            const startTime = Date.now(); // 시작 시간 기록
+            const timeout = 5000; // 최대 5초 동안만 기다림
+    
+            while (true) {
+                // `another1`과 `another2` 할당
+                if (군 === '가') {
+                    another1 = priorities[priority]['나'] ? priorities[priority]['나'].id : null;
+                    another2 = priorities[priority]['다'] ? priorities[priority]['다'].id : null;
+                } else if (군 === '나') {
+                    another1 = priorities[priority]['가'] ? priorities[priority]['가'].id : null;
+                    another2 = priorities[priority]['다'] ? priorities[priority]['다'].id : null;
+                } else if (군 === '다') {
+                    another1 = priorities[priority]['가'] ? priorities[priority]['가'].id : null;
+                    another2 = priorities[priority]['나'] ? priorities[priority]['나'].id : null;
+                }
+    
+                // 값이 확인되면 push하고 반복 종료
+                if (another1 || another2) {
                     prioritiesArray.push({
                         user_id: user.id,
                         priority,
                         군,
-                        department_id: department.id, // Ensure correct department_id
+                        department_id: department.id,
                         another1,
                         another2,
                     });
+                    break;
+                }
+    
+                // 타임아웃 체크 (5초가 지나면 alert 표시 후 종료)
+                if (Date.now() - startTime > timeout) {
+                    alert(`군 ${군}에 대한 값을 불러오는 데 실패했습니다. 잠시 후 시도해주세요.`);
+                    throw new Error(`Timeout: 군 ${군}에 대한 another1과 another2를 찾을 수 없습니다.`);
+                }
+    
+                // 비동기 반복을 위해 약간의 지연을 추가
+                await new Promise((resolve) => setTimeout(resolve, 100));
+            }
+        };
+    
+        try {
+            for (let priority = 1; priority <= 3; priority++) {
+                for (let 군 in priorities[priority]) {
+                    if (priorities[priority][군]) {
+                        await fetchAndPushPriority(priority, 군);
+                    }
                 }
             }
-        }
     
-        console.log('Priorities Array:', prioritiesArray); // Log for verification
+            console.log('Priorities Array:', prioritiesArray); // Log for verification
     
-        const { error: deleteError } = await supabase
-            .from('priorities')
-            .delete()
-            .eq('user_id', user.id);
+            // 기존 우선순위 삭제
+            const { error: deleteError } = await supabase
+                .from('priorities')
+                .delete()
+                .eq('user_id', user.id);
     
-        if (deleteError) {
-            console.error('Error deleting existing priorities:', deleteError);
-            return;
-        }
+            if (deleteError) {
+                console.error('Error deleting existing priorities:', deleteError);
+                return;
+            }
     
-        const { error } = await supabase
-            .from('priorities')
-            .insert(prioritiesArray);
+            // 새로운 우선순위 삽입
+            const { error } = await supabase
+                .from('priorities')
+                .insert(prioritiesArray);
     
-        if (error) {
-            console.error('Error saving priorities:', error);
-        } else {
-            alert('우선순위가 저장되었습니다.');
-            await fetchStoredPriorities(user.id);
-            const newCount = modificationCount - 1;
-            setModificationCount(newCount);
-            updateModificationCount(user.id, newCount);
+            if (error) {
+                console.error('Error saving priorities:', error);
+            } else {
+                alert('우선순위가 저장되었습니다.');
+                await fetchStoredPriorities(user.id);
+                const newCount = modificationCount - 1;
+                setModificationCount(newCount);
+                updateModificationCount(user.id, newCount);
+            }
+        } catch (error) {
+            console.error('Error in handleSave:', error);
         }
     };
+    
     
     
     if (loading) {
