@@ -7,8 +7,8 @@ const naturalScienceSubjects = [
 ];
 
 const humanitiesSubjects = [
-  '생활과 윤리', '윤리와 사상', '한국지리', '세계지리', 
-  '동아시아사', '세계사', '경제', '정치와 법', '사회·문화'
+  '생활과윤리', '윤리와사상', '한국지리', '세계지리', 
+  '동아시아사', '세계사', '경제', '정치와법', '사회·문화'
 ];
 
 const conversionTable = {
