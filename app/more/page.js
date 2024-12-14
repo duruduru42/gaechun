@@ -179,51 +179,62 @@ const MorePage = () => {
         </tr>
     </thead>
     <tbody className="text-black text-sm font-medium">
-        {data
-            .filter((item) => item.다른_군_지원대학1 && item.다른_군_지원대학2) // 두 값 중 하나라도 없으면 제외
-            .map((item, index) => (
-                <tr 
-                    key={index} 
-                    className={`border-b border-gray-200 hover:bg-gray-100 ${
-                        item.user_id === currentUserId ? 'bg-orange-100' : ''
-                    }`}
-                >
-                    <td className="py-3 px-6 text-center">
-                        {index + 1} 등
-                        {item.user_id === currentUserId && <span className="ml-2 text-red-500">(본인)</span>}
-                    </td>
-                    <td className="py-3 px-6 text-center">{item.score} 점</td>
-                    <td className="py-3 px-6 text-center">{item.우선순위} 순위</td>
-                    <td className="py-3 px-6 text-center">
-                        <div className="flex items-center justify-center text-center p-2 m-2">
-                            <img 
-                                src={item.다른_군_지원대학1.university.logo_url} 
-                                alt="logo" 
-                                className="w-10 h-10 mr-2 rounded-full" 
-                            />
-                            <div className='font-semibold'>
-                                {item.다른_군_지원대학1.university.name}{' '}
-                                {truncateText(item.다른_군_지원대학1.모집단위, 15)}
+        {(() => {
+            const seenUserIds = new Set(); // 이미 출력된 user_id를 저장하는 Set
+            return data
+                .filter((item) => item.다른_군_지원대학1 && item.다른_군_지원대학2) // 두 값 중 하나라도 없으면 제외
+                .filter((item) => {
+                    if (seenUserIds.has(item.user_id)) {
+                        return false; // 이미 출력된 user_id는 제외
+                    }
+                    seenUserIds.add(item.user_id);
+                    return true; // 처음 등장하는 user_id만 포함
+                })
+                .map((item, index) => (
+                    <tr 
+                        key={item.user_id} // user_id를 고유 키로 사용
+                        className={`border-b border-gray-200 hover:bg-gray-100 ${
+                            item.user_id === currentUserId ? 'bg-orange-100' : ''
+                        }`}
+                    >
+                        <td className="py-3 px-6 text-center">
+                            {index + 1} 등
+                            {item.user_id === currentUserId && <span className="ml-2 text-red-500">(본인)</span>}
+                        </td>
+                        <td className="py-3 px-6 text-center">{item.score} 점</td>
+                        <td className="py-3 px-6 text-center">{item.우선순위} 순위</td>
+                        <td className="py-3 px-6 text-center">
+                            <div className="flex items-center justify-center text-center p-2 m-2">
+                                <img 
+                                    src={item.다른_군_지원대학1.university.logo_url} 
+                                    alt="logo" 
+                                    className="w-10 h-10 mr-2 rounded-full" 
+                                />
+                                <div className='font-semibold'>
+                                    {item.다른_군_지원대학1.university.name}{' '}
+                                    {truncateText(item.다른_군_지원대학1.모집단위, 15)}
+                                </div>
                             </div>
-                        </div>
-                    </td>
-                    <td className="py-3 px-6 text-center">
-                        <div className="flex items-center justify-center text-center p-2 m-2">
-                            <img 
-                                src={item.다른_군_지원대학2.university.logo_url} 
-                                alt="logo" 
-                                className="w-10 h-10 mr-2 rounded-full" 
-                            />
-                            <div className='font-semibold'>
-                                {item.다른_군_지원대학2.university.name}{' '}
-                                {truncateText(item.다른_군_지원대학2.모집단위, 15)}
+                        </td>
+                        <td className="py-3 px-6 text-center">
+                            <div className="flex items-center justify-center text-center p-2 m-2">
+                                <img 
+                                    src={item.다른_군_지원대학2.university.logo_url} 
+                                    alt="logo" 
+                                    className="w-10 h-10 mr-2 rounded-full" 
+                                />
+                                <div className='font-semibold'>
+                                    {item.다른_군_지원대학2.university.name}{' '}
+                                    {truncateText(item.다른_군_지원대학2.모집단위, 15)}
+                                </div>
                             </div>
-                        </div>
-                    </td>
-                </tr>
-            ))}
+                        </td>
+                    </tr>
+                ));
+        })()}
     </tbody>
 </table>
+
 
         </div>
     );
