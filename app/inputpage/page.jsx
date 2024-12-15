@@ -214,7 +214,7 @@ export default function InputPage() {
                     <p className="text-2xl font-semibold mb-10 text-center">탐구 1</p>
                     {renderSelectField('science1', '선택과목 입력', science1, setScience1, [
                         '물리학Ⅰ', '화학Ⅰ', '생명과학Ⅰ', '지구과학Ⅰ',
-                        '물리학Ⅱ', '화학Ⅱ', '생명과학Ⅱ', '생활과윤리',
+                        '물리학Ⅱ', '화학Ⅱ', '생명과학Ⅱ', '지구과학Ⅱ', '생활과윤리',
                         '윤리와사상', '한국지리', '세계지리', '동아시아사',
                         '세계사', '경제', '정치와법', '사회문화', '직업탐구1'
                     ], 'standard_score_science1')}
@@ -228,7 +228,7 @@ export default function InputPage() {
                     <p className="text-2xl font-semibold mb-10 text-center">탐구 2</p>
                     {renderSelectField('science2', '선택과목 입력', science2, setScience2, [
                         '물리학Ⅰ', '화학Ⅰ', '생명과학Ⅰ', '지구과학Ⅰ',
-                        '물리학Ⅱ', '화학Ⅱ', '생명과학Ⅱ', '생활과윤리',
+                        '물리학Ⅱ', '화학Ⅱ', '생명과학Ⅱ','지구과학Ⅱ', '생활과윤리',
                         '윤리와사상', '한국지리', '세계지리', '동아시아사',
                         '세계사', '경제', '정치와법', '사회문화','직업탐구2'
                     ], 'standard_score_science2')}
