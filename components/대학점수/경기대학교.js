@@ -54,7 +54,7 @@ export const 경기대학교 = async (userId, selection) => {
     if (selection.계열 === '인문') {
         totalScore = (percentile_korean * 0.35) + (percentile_math * 0.3) + (englishScore * 0.2) + (highestInquiryScore * 0.15);
     } else if (selection.계열 === '자연') {
-        totalScore = (percentile_korean * 0.3) + (percentile_math * 0.5) + (englishScore * 0.2) + (highestInquiryScore * 0.15);
+        totalScore = (percentile_korean * 0.3) + (percentile_math * 0.35) + (englishScore * 0.2) + (highestInquiryScore * 0.15);
     } else {
         return '불가'; // Invalid 계열 value
     }
