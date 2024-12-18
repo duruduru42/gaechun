@@ -63,7 +63,32 @@ export default function Home() {
         return `${text.substring(0, maxLength)}...`;
       };
 
-      const fetchRankAndTotalUsers = async () => {
+      const calculateRank = (sortedResults, userId, scoreExtractor) => {
+        let rank = 1;
+        let previousScore = scoreExtractor(sortedResults[0]);
+        let userRank = null;
+    
+        for (let i = 0; i < sortedResults.length; i++) {
+            const currentScore = scoreExtractor(sortedResults[i]);
+    
+            // 동점이 아니면 현재 인덱스에 맞는 순위로 업데이트
+            if (currentScore !== previousScore) {
+                rank = i + 1;
+            }
+    
+            // 유저의 순위를 찾으면 저장
+            if (sortedResults[i].user_id === userId) {
+                userRank = rank;
+                break;
+            }
+    
+            previousScore = currentScore;
+        }
+    
+        return userRank;
+    };
+    
+    const fetchRankAndTotalUsers = async () => {
         const { data: results, error } = await supabase
             .from('exam_results')
             .select('id, user_id, standard_score_korean, standard_score_math, standard_score_science1, standard_score_science2, noRank')
@@ -75,34 +100,37 @@ export default function Home() {
         }
     
         if (results) {
-            // no_Rank가 'y'가 아닌 데이터만 필터링
+            // noRank가 'y'가 아닌 데이터만 필터링
             const filteredResults = results.filter((result) => result.noRank !== 'y');
             const total = filteredResults.length;
     
             const koreanResults = [...filteredResults].sort((a, b) => b.standard_score_korean - a.standard_score_korean);
-            const koreanRank = koreanResults.findIndex((result) => result.user_id === user.id) + 1;
+            const koreanRank = calculateRank(koreanResults, user.id, (result) => result.standard_score_korean);
     
             const mathResults = [...filteredResults].sort((a, b) => b.standard_score_math - a.standard_score_math);
-            const mathRank = mathResults.findIndex((result) => result.user_id === user.id) + 1;
+            const mathRank = calculateRank(mathResults, user.id, (result) => result.standard_score_math);
     
             const scienceResults = [...filteredResults].sort((a, b) => 
                 (b.standard_score_science1 + b.standard_score_science2) - (a.standard_score_science1 + a.standard_score_science2)
             );
-            const scienceRank = scienceResults.findIndex((result) => result.user_id === user.id) + 1;
+            const scienceRank = calculateRank(scienceResults, user.id, (result) => result.standard_score_science1 + result.standard_score_science2);
     
             const totalResults = [...filteredResults].sort((a, b) => 
                 (b.standard_score_korean + b.standard_score_math + b.standard_score_science1 + b.standard_score_science2) - 
                 (a.standard_score_korean + a.standard_score_math + a.standard_score_science1 + a.standard_score_science2)
             );
-            const totalRank = totalResults.findIndex((result) => result.user_id === user.id) + 1;
+            const totalRank = calculateRank(totalResults, user.id, (result) => 
+                result.standard_score_korean + result.standard_score_math + result.standard_score_science1 + result.standard_score_science2
+            );
     
-            setTotalUsers(total+13);
-            setKoreanRank(koreanRank+1);
+            setTotalUsers(total + 13);
+            setKoreanRank(koreanRank + 1);
             setMathRank(mathRank);
             setScienceRank(scienceRank);
             setTotalRank(totalRank);
         }
     };
+    
     
 
     const fetchTopUniversities = async (gun) => {
