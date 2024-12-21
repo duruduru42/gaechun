@@ -39,9 +39,6 @@ import { 경인교육대학교 } from '@/components/대학점수/경인교육대
 import { 대구교육대학교 } from '@/components/대학점수/대구교육대학교';
 import { 경기대학교 } from '@/components/대학점수/경기대학교';
 
-import Seoul from '@/components/상세정보/seoul';
-import Korea from '@/components/상세정보/korea1';
-
 import down from '@/components/caret-down.svg'
 
 import up from '@/components/caret-up.svg'
@@ -86,48 +83,6 @@ const scoreCalculators = {
 
 };
 
-const universityComponents = {
-  'seoul1': Seoul,
-  'seoul2': Seoul,
-  'korea1': Korea,
-  'korea2': Korea,
-  'korea3': Korea
-
-//   '연세대학교': 연세대학교,
-//   '고려대학교': 고려대학교,
-//   '서강대학교': 서강대학교,
-//   '한양대학교(서울)': 한양대학교,
-//   '중앙대학교' : 중앙대학교,
-//   '경희대학교(서울)' : 경희대학교서울,
-//   '경희대학교(국제)' : 경희대학교국제,
-//   '한국외국어대학교(서울)' : 한국외국어대학교서울,
-//   '한국외국어대학교(글로벌)' : 한국외국어대학교글로벌,
-//   '서울시립대학교' : 서울시립대학교,
-//   '건국대학교' : 건국대학교,
-//   '동국대학교' : 동국대학교,
-//   '홍익대학교(서울)' : 홍익대학교서울,
-//   '홍익대학교(세종)' : 홍익대학교세종,
-//   '숭실대학교' : 숭실대학교,
-//   '세종대학교' : 세종대학교, 
-//   '광운대학교' : 광운대학교,
-//   '상명대학교' : 상명대학교,
-//   '인천대학교' : 인천대학교,
-//   '아주대학교' : 아주대학교,
-//   '동덕여자대학교' : 동덕여자대학교,
-//   '성신여자대학교' : 성신여자대학교,
-//   '숙명여자대학교' : 숙명여자대학교,
-//   '이화여자대학교' : 이화여자대학교,
-//   '고려대학교(세종)' : 고려대학교세종,  
-//   '한양대학교(에리카)' : 한양대학교에리카,
-//   '한국공학대학교' : 한국공학대학교,
-//   '한국항공대학교' : 한국항공대학교,
-//   '인하대학교' : 인하대학교,  
-//   '경인교육대학교' : 경인교육대학교,
-//   '대구교육대학교' : 대구교육대학교,
-//   '경기대학교' : 경기대학교
-
-};
-
 const Detail = () => {
   const searchParams = useSearchParams();
   const name = searchParams.get('name');
@@ -137,7 +92,6 @@ const Detail = () => {
   const [applications, setApplications] = useState([]);
   const [sortOrder, setSortOrder] = useState({ column: '계열', order: 'asc' });
   const [calculatedScores, setCalculatedScores] = useState({});
-  const [activeTab, setActiveTab] = useState('합격예측');
 
   useEffect(() => {
     fetchUser();
@@ -316,62 +270,66 @@ const Detail = () => {
   };
 
   const calculateScoresForDepartments = async (departments) => {
-
     if (!user) return; // Ensure user is available
-  
-    const scores = {};
-    for (let selection of departments) {
-      const normalizedUniversityName = selection.name?.trim(); // Remove any leading/trailing whitespace
-      const calculateScore = scoreCalculators[normalizedUniversityName];
-  
-      if (calculateScore) {
-        try {
-          const score = await calculateScore(user.id, selection);
-          scores[selection.id] = score;
-        } catch (error) {
-          console.error(`Error calculating score for ${normalizedUniversityName}:`, error);
-          scores[selection.id] = 'Error';
-        }
-      } else {
-        console.warn(`No score calculator found for ${normalizedUniversityName}`);
-        scores[selection.id] = 'Unavailable';
-      }
-    }
-  
-    setCalculatedScores(scores); // Update state with calculated scores
-  };
-  
-  const UniversityComponent = universityComponents[name]
 
+    const scores = {};
+    const departmentGroups = {};
+
+    // Step 1: Group departments by 계열
+    for (let selection of departments) {
+        const 계열 = selection.계열?.trim(); // `계열` 기준으로 그룹화
+        if (!계열) {
+            console.warn(`계열 정보가 없는 모집단위:`, selection);
+            scores[selection.id] = 'Unavailable';
+            continue;
+        }
+        if (!departmentGroups[계열]) {
+            departmentGroups[계열] = [];
+        }
+        departmentGroups[계열].push(selection);
+    }
+
+    // Step 2: Calculate scores for each 계열 and assign to departments
+    for (let 계열 in departmentGroups) {
+        const group = departmentGroups[계열];
+        const referenceSelection = group[0]; // Use the first selection as reference for calculation
+        const normalizedUniversityName = referenceSelection.name?.trim();
+        const calculateScore = scoreCalculators[normalizedUniversityName];
+
+        if (calculateScore) {
+            try {
+                // Calculate score for the 계열
+                const score = await calculateScore(user.id, referenceSelection);
+
+                // Assign the calculated score to all departments in the 계열
+                for (let selection of group) {
+                    scores[selection.id] = score;
+                }
+            } catch (error) {
+                console.error(`Error calculating score for 계열 ${계열}:`, error);
+                for (let selection of group) {
+                    scores[selection.id] = 'Error';
+                }
+            }
+        } else {
+            console.warn(`No score calculator found for university ${normalizedUniversityName}`);
+            for (let selection of group) {
+                scores[selection.id] = 'Unavailable';
+            }
+        }
+    }
+
+    setCalculatedScores(scores); // Update state with calculated scores
+};
+
+  
   return (
     <div className="container mx-auto p-4">
       <div className="mt-8">
       <h2 className="text-3xl font-bold mb-4">  {selections[0]?.name}
       </h2>
 
-        <nav className="bg-gray-50 pt-2 sm:mt-8 mt-6 sm:sticky sm:top-0 top-9 z-30">
-          <div className="flex items-center sm:gap-2 gap-3 max-sm:px-4">
-            <button
-              onClick={() => setActiveTab('합격예측')}
-              className={`sm:text-xl text-lg font-bold sm:px-1 pb-1 border-b-2 duration-200  ${
-                activeTab === '합격예측' ? 'border-orange-600  text-gray-800' : 'border-transparent text-gray-300'
-              }`}
-            >
-              합격예측
-            </button>
-            {/* <button
-              onClick={() => setActiveTab('상세정보')}
-              className={`sm:text-xl text-lg font-bold sm:px-1 pb-1 border-b-2 duration-200 ${
-                activeTab === '상세정보' ? 'border-orange-600 text-gray-800' : 'border-transparent text-gray-300'
-              }`}
-            >
-              상세정보
-            </button> */}
-          </div>
-          <hr />
-        </nav>
-
-        {activeTab === '합격예측' ? (
+        {(
         <table className="min-w-full table-auto">
           <thead className="bg-gray-200 text-gray-600 uppercase text-sm leading-normal font-black">
             <tr>
@@ -445,11 +403,7 @@ const Detail = () => {
     })}          
     </tbody>
         </table>
-          ) : (
-            <div>
-            <UniversityComponent />
-            </div>
-        )}
+          )}
       </div>
     </div>
   );
