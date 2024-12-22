@@ -29,7 +29,7 @@ export const 홍익대학교서울 = async (userId, selection) => {
   
     const { data, error } = await supabase
         .from('exam_results')
-        .select('standard_score_korean, standard_score_math, standard_score_science1, standard_score_science2, grade_english, grade_history, science1, science2')
+        .select('standard_score_korean, standard_score_math, standard_score_science1, standard_score_science2, grade_english, grade_history, science1, science2, math')
         .eq('user_id', userId)
         .single();
 
@@ -45,7 +45,8 @@ export const 홍익대학교서울 = async (userId, selection) => {
         grade_english,
         grade_history,
         science1,
-        science2
+        science2,
+        math
     } = data;
 
   // 영어 점수 및 한국사 점수 계산
