@@ -58,7 +58,7 @@ export const 서강대학교 = async (userId, selection) => {
 
   const { data, error } = await supabase
     .from('exam_results')
-    .select('standard_score_korean, standard_score_math, percentile_science1, percentile_science2, grade_english, grade_history, science1, science2')
+    .select('standard_score_korean, standard_score_math, percentile_science1, percentile_science2, grade_korean, grade_math, grade_science1, grade_science2, grade_english, grade_history, science1, science2')
     .eq('user_id', userId)
     .single();
 
@@ -67,6 +67,10 @@ export const 서강대학교 = async (userId, selection) => {
   const {
     standard_score_korean,
     standard_score_math,
+    grade_korean, 
+    grade_math, 
+    grade_science1, 
+    grade_science2,
     percentile_science1,
     percentile_science2,
     grade_english,
@@ -74,6 +78,29 @@ export const 서강대학교 = async (userId, selection) => {
     science1,
     science2
   } = data;
+
+  const grades = [
+    Number(grade_korean) || 9, // 값이 없으면 최악 등급으로 설정
+    Number(grade_math) || 9,
+    Number(grade_english) || 9,
+    science1 && science2 // science1과 science2가 둘 다 있을 경우에만 평균 계산
+      ? (Number(grade_science1) + Number(grade_science2)) / 2
+      : 9, // 하나라도 없으면 최악 등급으로 설정
+  ];
+  
+  // 상위 3개 등급 합 계산 함수
+  const isEligibleForApplication = (grades) => {
+    const topThreeGrades = [...grades].sort((a, b) => a - b).slice(0, 3); // 상위 3개 추출
+    const total = topThreeGrades.reduce((sum, grade) => sum + grade, 0); // 합산
+    console.log("상위 3개 등급:", topThreeGrades, "합계:", total); // 디버깅 로그 추가
+    return total <= 9; // 상위 3개 등급 합이 7 이하여야 함
+  };
+  
+  // 지원 가능 여부 체크
+  if (Number(grade_history) >= 5) return "불가 : 최저 미충족"; // 역사 등급 조건 추가
+  if (!isEligibleForApplication(grades)) return "불가 : 최저 미충족";
+
+
 
   // Calculate science scores
   const scienceScore1 = getConvertedScore(percentile_science1, science1);
