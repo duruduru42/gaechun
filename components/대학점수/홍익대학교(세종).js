@@ -55,10 +55,10 @@ export const 홍익대학교세종 = async (userId, selection) => {
   if (selection.계열 === '인문') {
     const higherScore = Math.max(standard_score_korean, standard_score_math); // 국어와 수학 중 더 높은 점수 선택
     totalScore =
-      higherScore * 0.4 +
-      (standard_score_science1 + standard_score_science2) * 0.4 +
-      englishScore * 0.2 +
-      historyScore;
+      Number(higherScore) * 0.4 +
+      (Number(standard_score_science1) + Number(standard_score_science2)) * 0.4 +
+      Number(englishScore) * 0.2 +
+      Number(historyScore);
   } 
   // 자연계열 계산 (서울 캠퍼스와 동일한 방식)
   else if (selection.계열 === '자연') {
@@ -68,11 +68,11 @@ export const 홍익대학교세종 = async (userId, selection) => {
     }
 
     totalScore =
-      standard_score_korean * 0.2 +
-      standard_score_math * 0.35 +
-      (standard_score_science1 + standard_score_science2) * 0.3 +
-      englishScore * 0.15 +
-      historyScore;
+    Number(standard_score_korean) * 0.2 +
+    Number(standard_score_math) * 0.35 +
+      (Number(standard_score_science1) + Number(standard_score_science2)) * 0.3 +
+      Number(englishScore) * 0.15 +
+      Number(historyScore);
   } 
   else {
     return '불가'; // 잘못된 계열 값일 경우
