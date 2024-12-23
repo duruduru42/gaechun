@@ -63,7 +63,7 @@ export const 홍익대학교세종 = async (userId, selection) => {
   // 자연계열 계산 (서울 캠퍼스와 동일한 방식)
   else if (selection.계열 === '자연') {
     // 자연계열 조건: 수학이 '미적분' 또는 '기하'여야 함
-    if (math !== '미적분' && math !== '기하') {
+    if (math === '확률과 통계') {
       return '불가'; // 수학이 '확률과 통계'일 때 불가 처리
     }
 
