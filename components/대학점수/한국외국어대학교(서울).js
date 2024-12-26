@@ -85,7 +85,7 @@ export const 한국외국어대학교서울 = async (userId, selection) => {
 
   // 국어, 수학 점수 계산
   const koreanScore = standard_score_korean * 0.3 * 700 / 139;
-  const mathScore = standard_score_math * 0.3 * 700 / 140;
+  const mathScore = standard_score_math * 0.3 * 700 / 139;
 
   // 탐구 점수 환산
   const scienceScore = (scienceScore1 + scienceScore2) * 0.2 * 350;
