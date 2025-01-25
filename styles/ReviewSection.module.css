@@ -1,0 +1,55 @@
+.reviewSwiper {
+  width: 100% !important;
+  max-width: 960px !important;
+  margin: 2rem auto;
+  padding: 50px 0;
+}
+
+.reviewSwiper :global(.swiper-slide) {
+  opacity: 0.3;
+  transition: all 0.3s ease;
+  transform: scale(0.85);
+  width: 380px !important;
+  background: linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(124,58,237,0.08) 100%);
+  padding: 1px;
+  border-radius: 32px;
+  filter: brightness(0.7);
+}
+
+.reviewSwiper :global(.swiper-slide-active) {
+  opacity: 1;
+  transform: scale(1.05);
+  z-index: 2;
+  filter: brightness(1);
+}
+
+.reviewSwiper :global(.swiper-slide-prev),
+.reviewSwiper :global(.swiper-slide-next) {
+  opacity: 1;
+  z-index: 1;
+  transform: scale(0.9);
+}
+
+.reviewSwiper :global(.swiper-button-prev),
+.reviewSwiper :global(.swiper-button-next) {
+  color: #000000;
+  width: 44px;
+  height: 44px;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  z-index: 10;
+}
+
+.reviewSwiper :global(.swiper-button-prev:after),
+.reviewSwiper :global(.swiper-button-next:after) {
+  font-size: 18px;
+}
+
+.reviewSwiper :global(.swiper-button-prev) {
+  left: 5%;
+}
+
+.reviewSwiper :global(.swiper-button-next) {
+  right: 5%;
+} 

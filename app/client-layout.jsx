@@ -16,13 +16,16 @@ export default function ClientLayout({ children }) {
 
   const router = useRouter();
   const pathname = usePathname();
-  const noNavbarPages = ['/admin','/admin/grade1','/admin/dashboard1', '/admin/detail1', '/checkout', '/login', '/register', '/auth', '/authDetail', '/signup', '/submit', '/inputpage'];
-  const noSidebarPages = ['/admin', '/admin/grade1','/admin/dashboard1', '/admin/detail1', '/checkout', '/', '/login', '/register', '/auth', '/authDetail', '/signup', '/submit', '/inputpage'];
-  const restrictedPages = [ '/home', '/video', '/apply', '/dashboard', '/grade'];
+  const noNavbarPages = ['/checkout', '/login', '/register', '/auth', '/authDetail', '/signup', '/submit', '/inputpage'];
+  const noSidebarPages = ['/checkout', '/inf', "/about", '/', '/login', '/register', '/auth', '/authDetail', '/signup', '/submit', '/inputpage'];
+  const restrictedPages = ['/home', '/video', '/apply', '/dashboard', '/grade'];
   const checkExamPages = ['/apply', '/dashboard', '/grade'];
+  const noAuthPages = ["/", "/signup", "/inf", "/about"];
+
 
   const noNavbar = noNavbarPages.includes(pathname);
   const noSidebar = noSidebarPages.includes(pathname);
+  const noAuth = noAuthPages.includes(pathname);
   const isRestrictedPage = restrictedPages.includes(pathname);
   const isCheckExamPage = checkExamPages.includes(pathname);
 
@@ -30,7 +33,7 @@ export default function ClientLayout({ children }) {
     setIsClient(true);
 
     const checkUserSession = async () => {
-      if (pathname === '/' || pathname === '/signup') return;
+      if (noAuth) return;
 
       const supabase = createClient();
       const { data: sessionData } = await supabase.auth.getSession();

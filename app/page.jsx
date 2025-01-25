@@ -1,37 +1,27 @@
-import { createClient } from "@/utils/supabase/server";
-import Link from "next/link";
-import First from "@/components/First"
-import Second from "@/components/Second"
-import Third from "@/components/Third"
-import Fourth from "@/components/Fourth"
-import Fifth from "@/components/Fifth"
-import Sixth from "@/components/Sixth"
-import Seventh from "@/components/Seventh"
-import Footer from "@/components/footer"
+import HeroSection from '../components/HeroSection';
+import StatsSection from '../components/StatsSection';
+import Review from '../components/ReviewSection';
+import GoodSection from '../components/GoodSection';
+import WrongSection from '../components/WrongSection';
+import WrongSection2 from '../components/WrongSection2';
+import Footer from '../components/Footer';
+import CanSection from '../components/CanSection';
+import LastSection from '../components/LastSection';
+import QnaSection from '@/components/QnaSection';
 
-
-export default async function Index() {
-  const canInitSupabaseClient = () => {
-    try {
-      createClient();
-      return true;
-    } catch (e) {
-      return false;
-    }
-  };
-
-  const isSupabaseConnected = canInitSupabaseClient();
-
+export default function Home() {
   return (
-    <>
-    <First/>
-    <Second/>
-    <Third/>
-    <Fourth/>
-    <Sixth/>
-    <Seventh/>
-    <Footer/>
-    </>
-  
+    <div>
+      <HeroSection />
+      <WrongSection />  
+      <WrongSection2 />
+      <CanSection />
+      <StatsSection />
+      <GoodSection />
+      <Review />
+      <LastSection />
+      <QnaSection />
+      <Footer />
+    </div>
   );
 }

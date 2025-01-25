@@ -68,12 +68,6 @@ body {
   width: 100%;
 }
 
-/* globals.css */
-
-
-
-
-
 @layer base {
     :root {
       --background: 0 0% 100%;
