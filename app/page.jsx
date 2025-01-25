@@ -4,7 +4,7 @@ import Review from '../components/ReviewSection';
 import GoodSection from '../components/GoodSection';
 import WrongSection from '../components/WrongSection';
 import WrongSection2 from '../components/WrongSection2';
-import Footer from '../components/Footer';
+import Footer from '@/components/Footer';
 import CanSection from '../components/CanSection';
 import LastSection from '../components/LastSection';
 import QnaSection from '@/components/QnaSection';
