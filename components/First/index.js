@@ -1,6 +1,5 @@
 'use client'  // 클라이언트 컴포넌트로 선언
 
-import Link from "next/link";
 import home from "@/components/home.svg"
 import Image from "next/image";
 
