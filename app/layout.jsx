@@ -12,7 +12,7 @@ export const metadata = {
     image : 'www.gaechundragon.co.kr/components/opengraph.png',
     description: '성적표 인증 기반 고른기회 전형 모의지원 서비스.',
   },
-  description: "성적표 인증 기반 고른기회 전형 모의지원 서비스.",
+  description: "믿을 수 있는 고른기회 전형 전문 입시 컨설팅.",
   keywords: '',
   icons: {
     icon: "/icon.ico",

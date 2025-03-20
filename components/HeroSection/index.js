@@ -1,3 +1,5 @@
+'use client'
+
 import Image from "next/image";
 import studentImage from "@/components/home_student.svg"; // 이미지 경로를 실제 경로로 변경하세요.
 
