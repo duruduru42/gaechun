@@ -16,8 +16,8 @@ export default function ClientLayout({ children }) {
 
   const router = useRouter();
   const pathname = usePathname();
-  const noNavbarPages = ['/checkout', '/login', '/register', '/auth', '/authDetail', '/signup', '/submit', '/inputpage'];
-  const noSidebarPages = ['/checkout', '/inf', "/about", '/', '/login', '/register', '/auth', '/authDetail', '/signup', '/submit', '/inputpage'];
+  const noNavbarPages = ['/checkout', '/login', '/register', '/auth', '/authDetail', '/signup', '/submit', '/inputpage','/admin','/admin/grade1','/admin/dashboard1','/admin/detail1'];
+  const noSidebarPages = ['/checkout', '/inf', "/about", '/', '/login', '/register', '/auth', '/authDetail', '/signup', '/submit', '/inputpage', '/admin','/admin/grade1','/admin/dashboard1','/admin/detail1'];
   const restrictedPages = ['/home', '/video', '/apply', '/dashboard', '/grade'];
   const checkExamPages = ['/apply', '/dashboard', '/grade'];
   const noAuthPages = ["/", "/signup", "/inf", "/about"];
