@@ -1,4 +1,4 @@
- 'use client'
+'use client'
 
 import Channeltalk from '@/components/channel_talk'
 

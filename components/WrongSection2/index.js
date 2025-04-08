@@ -38,7 +38,7 @@ export default function HeroSection() {
             <div className={`bg-gray-800 p-6 pb-8 rounded-lg overflow-hidden transition-all duration-500 ease-in-out relative
               ${expandedBoxes[0] ? 'h-[300px]' : 'h-[180px]'}`}>
               <div className="flex flex-col items-center gap-4">
-                <Image src={KoreaLogo} alt="고려대학교 로고" width={30} height={30} />
+                <Image src={KoreaLogo} alt="로고1" width={30} height={30} />
                 <h3 className="text-2xl font-bold text-white text-center">고려대 바이오시스템학과</h3>
               </div>
               
@@ -73,7 +73,7 @@ export default function HeroSection() {
             <div className={`bg-gray-800 p-6 pb-8 rounded-lg overflow-hidden transition-all duration-500 ease-in-out relative
               ${expandedBoxes[1] ? 'h-[300px]' : 'h-[180px]'}`}>
               <div className="flex flex-col items-center gap-4">
-                <Image src={HanyangLogo} alt="한양대학교 로고" width={40} height={40} />
+                <Image src={HanyangLogo} alt="로고2" width={40} height={40} />
                 <h3 className="text-2xl font-bold text-white text-center">한양대 국어국문학과</h3>
               </div>
               
@@ -108,7 +108,7 @@ export default function HeroSection() {
             <div className={`bg-gray-800 p-6 pb-8 rounded-lg overflow-hidden transition-all duration-500 ease-in-out relative
               ${expandedBoxes[2] ? 'h-[300px]' : 'h-[180px]'}`}>
               <div className="flex flex-col items-center gap-4">
-                <Image src={KyungheeLogo} alt="경희대학교 로고" width={48} height={48} />
+                <Image src={KyungheeLogo} alt="로고3" width={48} height={48} />
                 <h3 className="text-2xl font-bold text-white text-center">경희대 산업디자인학과</h3>
               </div>
               
@@ -143,7 +143,7 @@ export default function HeroSection() {
             <div className={`bg-gray-800 p-6 pb-8 rounded-lg overflow-hidden transition-all duration-500 ease-in-out relative
               ${expandedBoxes[3] ? 'h-[300px]' : 'h-[180px]'}`}>
               <div className="flex flex-col items-center gap-4">
-                <Image src={SeoulCityLogo} alt="서울시립대학교 로고" width={40} height={40} />
+                <Image src={SeoulCityLogo} alt="로고4" width={40} height={40} />
                 <h3 className="text-2xl font-bold text-white text-center">서울시립대 행정학과</h3>
               </div>
               
@@ -178,7 +178,7 @@ export default function HeroSection() {
             <div className={`bg-gray-800 p-6 pb-8 rounded-lg overflow-hidden transition-all duration-500 ease-in-out relative
               ${expandedBoxes[4] ? 'h-[300px]' : 'h-[180px]'}`}>
               <div className="flex flex-col items-center gap-4">
-                <Image src={SeoulEduLogo} alt="서울교육대학교 로고" width={40} height={40} />
+                <Image src={SeoulEduLogo} alt="로고5" width={40} height={40} />
                 <h3 className="text-2xl font-bold text-white text-center">서울교대 초등교육학과</h3>
               </div>
               
@@ -213,7 +213,7 @@ export default function HeroSection() {
             <div className={`bg-gray-800 p-6 pb-8 rounded-lg overflow-hidden transition-all duration-500 ease-in-out relative
               ${expandedBoxes[5] ? 'h-[300px]' : 'h-[180px]'}`}>
               <div className="flex flex-col items-center gap-4">
-                <Image src={ChungnamLogo} alt="충남대학교 로고" width={40} height={40} />
+                <Image src={ChungnamLogo} alt="로고6" width={40} height={40} />
                 <h3 className="text-2xl font-bold text-white text-center">충남대 약학과</h3>
               </div>
               

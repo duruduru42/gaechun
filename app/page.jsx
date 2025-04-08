@@ -9,7 +9,7 @@ import CanSection from '../components/CanSection';
 import LastSection from '../components/LastSection';
 import QnaSection from '@/components/QnaSection';
 
-export default function Home() {
+export default async function Home() {
   return (
     <div>
       <HeroSection />
