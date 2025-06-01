@@ -16,9 +16,7 @@ export default function Navbar() {
       <div className="flex space-x-6 text-gray-600 text-sm font-semibold ml-auto mr-12">
         {[
           { label: "모의지원", href: "/inf" },
-          { label: "수시컨설팅", href: "https://open.kakao.com/o/se4mzOnf" },
-          { label: "정시컨설팅", href: "https://open.kakao.com/o/se4mzOnf" },
-          { label: "생기부컨설팅", href: "https://open.kakao.com/o/se4mzOnf" },
+          { label: "컨설팅 신청", href: "/program" },
           { label: "회사소개", href: "https://blog.naver.com/gaechun-dragon/222558713706" },
         ].map((item) => (
           <Link
