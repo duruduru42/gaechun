@@ -18,7 +18,7 @@ export default function HeroSection() {
             농어촌, 기초생활수급자 및 차상위, 국가보훈, <br />
             특성화고 등 고른기회의 모든 전형을 함께합니다.
           </p>
-          <a href="https://open.kakao.com/o/se4mzOnf">
+          <a href="/program">
           <button className="mt-12 px-6 py-3 bg-orange-500 text-white font-semibold rounded-md shadow-md hover:bg-orange-00 transition duration-200">
             상담 신청하기
           </button>

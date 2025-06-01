@@ -11,7 +11,7 @@ const Seventh = () => {
         답은 <span className="text-orange-500">개천용 컨설팅</span>에 있습니다.<br/>
         </div>
 
-        <a href="https://open.kakao.com/o/se4mzOnf">
+        <a href="/program">
         <button className="mt-12 px-6 py-3 bg-orange-500 text-white font-semibold rounded-md shadow-md hover:bg-orange-00 transition duration-200">
             상담 신청하기
           </button>
