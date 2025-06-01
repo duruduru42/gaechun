@@ -61,7 +61,7 @@ export default function WrongSection() {
                     display: false,
                 },
                 ticks: {
-                    color: '#808080',
+                    color: '#FFFFFF',
                     callback: function(val) {
                         const label = this.getLabelForValue(val);
                         const parts = label.split('(');
@@ -78,9 +78,9 @@ export default function WrongSection() {
     };
 
     const labels = [
-        '최저점 합격자\n(경희대 한약학과)',
-        '최고점 합격자\n(경희대 컴퓨터공학과)',
-        '일반전형 합격자\n(전체 모집단위 평균)',
+        '최저 합격 백분위\n(경희대 한약학과)',
+        '최고 합격 백분위\n(경희대 컴퓨터공학과)',
+        '일반전형 합격 백분위\n(전체 모집단위 평균)',
     ];
 
     const data = {
@@ -151,25 +151,25 @@ export default function WrongSection() {
                         variants={lineVariants} 
                         className="text-gray-600 text-5xl font-bold mb-6"
                     >
-                        고른기회는 유리하니까
+                        '같은 대학이면 성적 비슷하겠지'
                     </motion.p>
                     <motion.p 
                         variants={lineVariants}
                         className="text-gray-400 text-5xl font-bold mb-6"
                     >
-                        적당히 지원하면
+                        '유리하니까 적당히 넣어야지'
                     </motion.p>
                     <motion.p 
                         variants={lineVariants}
                         className="text-gray-200 text-5xl font-bold mb-16"
                     >
-                        된다는 생각
+                        라는 생각,
                     </motion.p>
                     <motion.h2 
                         variants={lineVariants}
                         className="text-white text-5xl font-bold"
                     >
-                        이젠 틀렸습니다.
+                        고른기회에선 <span className="text-red-500">손해</span>입니다.
                     </motion.h2>
                 </div>
 
