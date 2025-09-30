@@ -25,8 +25,7 @@ const tabData = [
     label: "정시 컨설팅",
     content: (
       <div className="py-8 text-lg text-gray-700">
-        {/* <Ipsi3 />      */} 
-        준비중입니다.
+        <Ipsi3 />
      </div>
     ),
   },

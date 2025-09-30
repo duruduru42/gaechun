@@ -37,9 +37,7 @@ export default function Ipsi1() {
 >
   컨설팅 구매하기
 </a></button>
-          <button className="fixed bottom-8 right-8 bg-yellow-400 rounded-full w-16 h-16 flex items-center justify-center shadow-lg text-black text-2xl font-bold z-50">
-            <span>KAKAO</span>
-          </button>
+ 
         </div>
       </div>
       {/* 고민/강조 문구 섹션 */}
