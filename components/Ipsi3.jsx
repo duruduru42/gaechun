@@ -29,8 +29,14 @@ export default function Ipsi3() {
             <span className="text-xl font-bold">정시 원서 컨설팅 : 450,000원</span>
             <span className="text-xl font-bold">프리미엄 컨설팅 (50명 한정) : 600,000원</span>
           </div>
-          <button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded transition">컨설팅 구매하기</button>
-
+          <button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded transition"><a
+            href="https://forms.gle/QpSehquRpphUvKHP6"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="...버튼 스타일..."
+            >
+            컨설팅 구매하기
+            </a></button>
         </div>
       </div>
       {/* 고민/강조 문구 섹션 */}
