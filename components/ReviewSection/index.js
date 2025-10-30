@@ -56,7 +56,8 @@ export default function SwiperComponents() {
   ];
 
   return (
-    <div className="w-full py-20 bg-[#0F0B1B] flex flex-col items-center">
+    <div>
+    <div className="hidden md:block w-full py-20 bg-[#0F0B1B] flex flex-col items-center">
       <h2 className="text-center text-white text-4xl font-bold mb-16">
         수강생들의 생생한 수강 후기
       </h2>
@@ -79,7 +80,7 @@ export default function SwiperComponents() {
         className={styles.reviewSwiper}
       >
         {reviews.map((review, index) => (
-          <SwiperSlide key={index} className="w-[400px]">
+          <SwiperSlide key={index}>
             <div className="bg-white rounded-[32px] p-8 transition-all duration-300 min-h-[500px] flex flex-col">
               <div className="flex flex-col items-center text-center gap-4 mb-8">
                 <div className="w-24 h-24 rounded-full overflow-hidden bg-gray-50 flex items-center justify-center relative">
@@ -103,6 +104,9 @@ export default function SwiperComponents() {
           </SwiperSlide>
         ))}
       </Swiper>
+    </div>
+
+
     </div>
   );
 }

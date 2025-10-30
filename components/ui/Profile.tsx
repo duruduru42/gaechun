@@ -29,7 +29,7 @@ export default function Profile(){
 
 
     return(
-        <div className="p-3 mr-16">
+        <div className="p-3 mr-16 hidden md:block">
             {!data?.id ?(      
             <Link href="/auth">          
             <Button variant="outline" className="bg-orange-500 text-white">로그인</Button>

@@ -18,10 +18,10 @@ export default async function Home() {
       <CanSection />
       <StatsSection />
       <GoodSection />
-      <Review />
-      <LastSection />
-      <QnaSection />
-      <Footer />
+      <Review/>
+      <LastSection/>
+      <QnaSection/>
+      <Footer/>
     </div>
   );
 }

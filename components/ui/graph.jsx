@@ -127,8 +127,8 @@ export default function BackgroundGraph() {
   };
 
   return (
-    <div className="relative w-full max-w-screen-lg h-[500px] mx-auto my-16" id="graph-container">
-      {/* 그래프 배경 */}
+<div className="relative w-full max-w-screen-lg h-[250px] md:h-[500px] mx-auto my-16" id="graph-container">
+{/* 그래프 배경 */}
       <div className="absolute inset-0 z-0 opacity-70">
         <Line data={chartData} options={options} />
       </div>
