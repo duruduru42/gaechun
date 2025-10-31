@@ -44,7 +44,7 @@ export default function ConsultingTabs() {
           <React.Fragment key={tab.label}>
             <button
               onClick={() => setActiveTab(idx)}
-              className={`relative text-base md:text-xl font-semibold bg-transparent border-none outline-none transition-colors duration-200
+              className={`relative text-sm md:text-xl font-semibold bg-transparent border-none outline-none transition-colors duration-200
                 ${
                   activeTab === idx
                     ? "text-orange-500"
