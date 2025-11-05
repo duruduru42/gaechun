@@ -17,7 +17,7 @@ export default function Example() {
           <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">개천용 정시 합격예측 비용</h2>
           <p className="mt-6 text-lg leading-8 text-gray-600">
             수능 성적표 기반 성적입력, 합격예측 분석결과, 모의지원, 원서영역 인강 등 <br/>
-            개천용 합격 예측의 모든 서비스를 이용하는 비용 <span className='text-orange-500 font-bold'>99,000원</span>
+            개천용 합격 예측의 모든 서비스를 이용하는 비용 <span className='text-orange-500 font-bold'>89,000원</span>
           </p>
         </div>
         <div className="mx-auto mt-16 max-w-2xl rounded-3xl ring-1 ring-gray-200 sm:mt-20 lg:mx-0 lg:flex lg:max-w-none">
@@ -47,18 +47,16 @@ export default function Example() {
               <div className="mx-auto max-w-xs px-8">
                 <p className="text-base font-semibold text-gray-600">한 번 결제로, 수능 접수 시까지 </p>
                 <p className="mt-6 flex items-baseline justify-center gap-x-2">
-                  <span className="text-5xl font-bold tracking-tight text-gray-900">₩ 99,000</span>
+                  <span className="text-5xl font-bold tracking-tight text-gray-900">₩ 89,000</span>
                   <span className="text-sm font-semibold leading-6 tracking-wide text-gray-600">원</span>
                 </p>
                 <a
-                  // href="/checkout"
-                  // className="mt-10 block w-full rounded-md bg-orange-500 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-orange-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                  href="/checkout"
+                   className="mt-10 block w-full rounded-md bg-orange-500 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-orange-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                 >
                   지금 시작하기
                 </a>
-                <p className="mt-3 text-xs leading-5 text-gray-600">
-                  (부가세 별도)
-                </p>
+
               </div>
             </div>
           </div>

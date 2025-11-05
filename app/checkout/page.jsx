@@ -20,7 +20,7 @@ const clientKey = process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY;
 
 export default function CheckoutPage() {
   const [step, setStep] = useState("initial");
-  const [amount, setAmount] = useState({ currency: "KRW", value: 108900 });
+  const [amount, setAmount] = useState({ currency: "KRW", value: 89000 });
   const [widgets, setWidgets] = useState(null);
   const [ready, setReady] = useState(false);
   const [customerKey, setCustomerKey] = useState(""); // Dynamic customerKey
@@ -135,7 +135,7 @@ export default function CheckoutPage() {
               <div className="mx-auto max-w-xs px-8">
                 <p className="text-base font-semibold text-gray-600">한 번 결제로, 수능 접수 시까지</p>
                 <p className="mt-6 flex items-baseline justify-center gap-x-2">
-                  <span className="text-5xl font-bold tracking-tight text-gray-900">₩ 99,000</span>
+                  <span className="text-5xl font-bold tracking-tight text-gray-900">₩ 89,000</span>
                   <span className="text-sm font-semibold leading-6 tracking-wide text-gray-600">
                     원
                   </span>
@@ -149,7 +149,7 @@ export default function CheckoutPage() {
                 <p className="mt-3 text-xs leading-5 text-gray-600">(부가세 별도)</p>
               </div>
             </div>
-            <p className="mt-3 text-xs leading-5 text-gray-800">- 원서 마감일까지 서비스 운영 (2025년 1월 3일)</p>
+            <p className="mt-3 text-xs leading-5 text-gray-800">- 원서 마감일까지 서비스 운영 (2026년 1월 3일)</p>
             <p className="mt-3 text-xs leading-5 text-gray-800">- 성적표 인증 완료 전까지만 환불 가능.</p>
           </div>
         </div>
