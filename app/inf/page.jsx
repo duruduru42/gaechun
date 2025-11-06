@@ -16,9 +16,7 @@ export default async function Index() {
   const { data: { session } } = await supabase.auth.getSession();
   
   // 로그인된 상태면 home으로 리다이렉트
-  if (session) {
-    redirect("/home");
-  }
+
 
   // (서버 전용 로직은 그대로)
   const canInitSupabaseClient = () => {
