@@ -100,7 +100,10 @@ export default function SignInPage() {
           <p>계정이 없으신가요? 
             <span
               className="text-blue-500 cursor-pointer ml-1"
-              onClick={() => router.push('/signup')}
+              onClick={() => alert('준비중입니다')}
+
+              // onClick={() => router.push('/signup')}
+
               >
               회원가입
             </span>

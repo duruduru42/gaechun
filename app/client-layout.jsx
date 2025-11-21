@@ -66,10 +66,15 @@ export default function ClientLayout({ children }) {
           }
 
           if (!profile || !profile.paymentkey) {
-            setShowCustomerKeyPopup(true);
+            if (pathname !== '/auth') {
+              setShowCustomerKeyPopup(true);
+            } else {
+              setShowCustomerKeyPopup(false);
+            }
           } else {
             setShowCustomerKeyPopup(false);
           }
+          
         } else {
           // /checkout 경로에서는 모든 팝업을 비활성화
           setShowPopup(false);
