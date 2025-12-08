@@ -9,14 +9,14 @@ const Hero = () => {
     <section className="bg-white break-keep max-sm:overflow-hidden relative">
       <div className="max-w-screen-xl px-4 pt-16 mx-auto text-center lg:pt-40 lg:px-6">
         
-      {/* <a href="https://forms.gle/39QaWWAFSQxqMYH67" target="_blank" rel="noopener noreferrer">
+      <a href="https://forms.gle/XucNLYhTMWuHz4Tj6" target="_blank" rel="noopener noreferrer">
     <button 
         class="inline-flex justify-between items-center p-1 sm:pr-2 mb-12 text-gray-700 bg-gray-100 rounded-full dark:bg-gray-800 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700 duration-300"
     > 
         <span class="sm:text-xs text-xxs bg-orange-600 rounded-full text-white sm:px-4 sm:py-1.5 px-3 py-1 mr-3 font-semibold">클릭</span>  
-        <span class="sm:text-sm text-xs font-semibold tracking-tight mr-3">2025학년도 정시 컨설팅 모집 중!! </span>  
+        <span class="sm:text-sm text-xs font-semibold tracking-tight mr-3">2026학년도 정시 컨설팅 모집 중!! </span>  
     </button>
-</a> */}
+</a>
 
         <h1 className="font-bold text-6xl text-black">
           고른기회 전형 
@@ -29,10 +29,10 @@ const Hero = () => {
         </p>
         <button 
         onClick={() => {
-          alert("12/8일 오픈 예정입니다.")
+          alert("12/9일 오픈 예정입니다.")
          }}
         className="rounded-2xl px-6 py-3 text-lg font-bold mt-10 mb-24 bg-black text-white">
-          바로가기
+          12/9일 OPEN
         </button>
       </div>
       <div className="flex justify-center w-full drop-shadow-xl	p-10">
