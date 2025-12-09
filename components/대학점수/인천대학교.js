@@ -60,9 +60,6 @@ export const 인천대학교 = async (userId, selection) => {
   // 자연계열 계산
   else if (selection.계열 === '자연') {
     // 자연계열은 탐구 과목이 '과학탐구'여야 함
-    if (!isNaturalScience(science1) || !isNaturalScience(science2)) {
-      return '불가'; // 과학탐구가 아닐 경우 지원 불가 처리
-    }
 
     totalScore =
       (percentile_korean * 2.5) +

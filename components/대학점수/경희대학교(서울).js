@@ -39,10 +39,7 @@ export const 경희대학교서울 = async (userId, selection) => {
   const scienceScore1 = getConvertedScore(percentile_science1, isNaturalScience(science1) ? '자연' : '인문');
   const scienceScore2 = getConvertedScore(percentile_science2, isNaturalScience(science2) ? '자연' : '인문');
 
-  // Apply additional points for specific subjects
-  let scienceBonus1 = 0;
-  if (isHumanitiesSubject(science1)) scienceBonus1 += 4;
-  if (isHumanitiesSubject(science2)) scienceBonus1 += 4;
+  // Apply additional points for specific subject
 
   let scienceBonus2 = 0;
   if (isNaturalScience(science1)) scienceBonus2 += 4;
@@ -51,17 +48,21 @@ export const 경희대학교서울 = async (userId, selection) => {
   let baseScore = 0;
 
   if (selection.계열 === '인문') {
-    baseScore = (standard_score_korean * 0.35 + standard_score_math * 0.2 + (scienceScore1 + scienceScore2 + scienceBonus1) * 0.3 + englishScore * 0.15 + historyPenalty) * 4;
+    baseScore = (standard_score_korean * 0.4 + standard_score_math * 0.25 + (scienceScore1 + scienceScore2 ) * 0.35 ) * 3;
   } else if (selection.계열 === '사회') {
-    baseScore = (standard_score_korean * 0.3 + standard_score_math * 0.3 + (scienceScore1 + scienceScore2 + scienceBonus1) * 0.25 + englishScore * 0.15 + historyPenalty) * 4;
+    baseScore = (standard_score_korean * 0.35 + standard_score_math * 0.35 + (scienceScore1 + scienceScore2) * 0.3 ) * 3;
   } else if (selection.계열 === '자연') {
-    baseScore = (standard_score_korean * 0.2 + standard_score_math * 0.35 + (scienceScore1 + scienceScore2 + scienceBonus2) * 0.3 + englishScore * 0.15 + historyPenalty) * 4;
+    baseScore = (standard_score_korean * 0.25 + standard_score_math * 0.40 + (scienceScore1 + scienceScore2 + scienceBonus2) * 0.35 ) * 3;
   } else if (selection.계열 === '예술') {
     const higherScienceScore = Math.max(scienceScore1, scienceScore2);
-    baseScore = (standard_score_korean * 0.5 + higherScienceScore * 0.3 + englishScore * 0.2 + historyPenalty) * 2;
+    baseScore = (standard_score_korean * 0.6 + higherScienceScore * 0.4) * 3/2;
+  } else if (selection.계열 === '자유') {
+      baseScore = (standard_score_korean * 0.25 + standard_score_math * 0.4 + (scienceScore1 + scienceScore2 ) * 0.35 ) * 3;
   } else {
     return '불가';
   }
+  baseScore += englishScore || 0;
+  baseScore += historyPenalty || 0;
 
   return baseScore.toFixed(1);
 };
@@ -110,21 +111,20 @@ const getConvertedScore = (percentile, subjectType) => {
   return conversionTable[subjectType][percentile] || 0;
 };
 
-const isHumanitiesSubject = (subject) => humanitiesSubjects.includes(subject);
 const isNaturalScience = (subject) => naturalScienceSubjects.includes(subject);
 
 const getEnglishScore = (grade) => {
   const englishScores = {
-    1: 200, 2: 196, 3: 188, 4: 160, 5: 120,
-    6: 80, 7: 46, 8: 22, 9: 0
+    1: 0, 2: 0, 3: -2, 4: -4, 5: -8,
+    6: -12, 7: -18, 8: -24, 9: -30
   };
   return englishScores[grade] || 0;
 };
 
 const getHistoryPenalty = (grade) => {
   const historyPenalties = {
-    1: 0, 2: 0, 3: 0, 4: 0, 5: -5,
-    6: -10, 7: -15, 8: -20, 9: -25
+    1: 0, 2: 0, 3: 0, 4: 0, 5: -2,
+    6: -4, 7: -8, 8: -14, 9: -20
   };
   return historyPenalties[grade] || 0;
 };

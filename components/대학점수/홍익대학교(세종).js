@@ -60,18 +60,32 @@ export const 홍익대학교세종 = async (userId, selection) => {
       Number(englishScore) * 0.2 +
       Number(historyScore);
   } 
-  // 자연계열 계산 (서울 캠퍼스와 동일한 방식)
   else if (selection.계열 === '자연') {
-    // 자연계열 조건: 수학이 '미적분' 또는 '기하'여야 함
-    if (math !== '미적분' && math !== '기하') {
-      return '불가'; // 수학이 '확률과 통계'일 때 불가 처리
+    // 👉 자연계열: 수학/탐구 가산만 적용 (미적/기하 필수 조건 삭제)
+
+    // 수학 3% 가산 (미적분/기하인 경우만)
+    let mathScore = Number(standard_score_math) || 0;
+    if (math === '미적분' || math === '기하') {
+      mathScore *= 1.03;
     }
+
+    // 탐구 과목별 3% 가산 (과학탐구 과목일 때만)
+    let scienceScore1 = Number(standard_score_science1) || 0;
+    let scienceScore2 = Number(standard_score_science2) || 0;
+
+    if (naturalScienceSubjects.includes(science1)) {
+      scienceScore1 *= 1.03;
+    }
+    if (naturalScienceSubjects.includes(science2)) {
+      scienceScore2 *= 1.03;
+    }
+
     totalScore =
-    Number(standard_score_korean) * 0.2 +
-    Number(standard_score_math) * 0.35 +
-      (Number(standard_score_science1) + Number(standard_score_science2)) * 0.3 +
-      Number(englishScore) * 0.15 +
-      Number(historyScore);
+      standard_score_korean * 0.2 +
+      mathScore * 0.35 +
+      (scienceScore1 + scienceScore2) * 0.3 +
+      englishScore * 0.15 +
+      historyScore;
   } 
   else {
     return '불가'; // 잘못된 계열 값일 경우

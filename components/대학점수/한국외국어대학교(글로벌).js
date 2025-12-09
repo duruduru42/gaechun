@@ -90,16 +90,16 @@ const conversionTable = {
   
     if (selection.계열 === '인문') {
       // 인문계열 계산
-      const koreanScore = standard_score_korean * 0.3 * 700 / 139;
-      const mathScore = standard_score_math * 0.3 * 700 / 140;
+      const koreanScore = standard_score_korean * 0.3 * 700 / 147;
+      const mathScore = standard_score_math * 0.3 * 700 / 139;
       const scienceScore = (scienceScore1 + scienceScore2) * 0.2 * 350;
   
       totalScore = koreanScore + mathScore + scienceScore + englishScore + historyScore;
   
     } else if (selection.계열 === '자연') {
       // 자연계열 계산
-      const koreanScore = standard_score_korean * 0.2 * 700 / 139;
-      const mathScore = standard_score_math * 0.35 * 700 / 140;
+      const koreanScore = standard_score_korean * 0.2 * 700 / 147;
+      const mathScore = standard_score_math * 0.35 * 700 / 139;
       const scienceScore = (scienceScore1 + scienceScore2) * 0.3 * 350;
   
       totalScore = koreanScore + mathScore + scienceScore + englishScore + historyScore;
@@ -131,7 +131,10 @@ const conversionTable = {
       };
       return historyScores[grade] || 0;
     } else {
-      // 자연 계열은 한국사 점수 0
-      return 0;
+      const historyScores = {
+        1: 10.0, 2: 10.0, 3: 10.0, 4: 10.0, 5: 9.8, 6: 9.6, 7: 9.4,
+        8: 9.2, 9: 9.0
+      };
+      return historyScores[grade] || 0;    
     }
   };

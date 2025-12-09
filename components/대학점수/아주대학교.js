@@ -47,10 +47,10 @@ const conversionTable = {
 // 영어 환산 점수 표
 const getEnglishScore = (grade, track) => {
   const englishScores = track === '의학' ? {
-    1: 100, 2: 96, 3: 92, 4: 84, 5: 60,
+    1: 100, 2: 98, 3: 96, 4: 84, 5: 60,
     6: 40, 7: 20, 8: 10, 9: 0
   } : {
-    1: 150, 2: 144, 3: 138, 4: 126, 5: 90,
+    1: 150, 2: 147, 3: 144, 4: 126, 5: 90,
     6: 60, 7: 30, 8: 15, 9: 0
   };
   return englishScores[grade] || 0;
@@ -132,8 +132,8 @@ export const 아주대학교 = async (userId, selection) => {
     : convertedScienceScore2;
 
     totalScore =
-      (standard_score_korean / 139 * 200) +
-      (standard_score_math / 140 * 350 * mathBonus) +
+      (standard_score_korean / 147 * 200) +
+      (standard_score_math / 139 * 350 * mathBonus) +
       englishScore +
       ((scienceScore1 + scienceScore2) / 2 * 300) +
       historyPenalty;              
@@ -156,8 +156,8 @@ export const 아주대학교 = async (userId, selection) => {
     : convertedScienceScore2;
 
       totalScore =
-        (standard_score_korean / 139 * 200) +
-        (standard_score_math / 140 * 400 * mathBonus) +
+        (standard_score_korean / 147 * 200) +
+        (standard_score_math / 139 * 400 * mathBonus) +
         englishScore +
         ((scienceScore1 + scienceScore2) / 2 * 300) +        
         historyPenalty;
@@ -167,8 +167,8 @@ export const 아주대학교 = async (userId, selection) => {
   else if (selection.계열 === '인문1' || selection.계열 === '인문2') {
 
      totalScore =
-      (standard_score_korean / 139 * (selection.계열 === '인문1' ? 250 : 350)) +
-      (standard_score_math / 140 * (selection.계열 === '인문1' ? 400 : 250)) +
+      (standard_score_korean / 147 * (selection.계열 === '인문1' ? 250 : 350)) +
+      (standard_score_math / 139 * (selection.계열 === '인문1' ? 400 : 250)) +
       englishScore +
       ((convertedScienceScore1 + convertedScienceScore2)/ 2 * (selection.계열 === '인문1' ? 200 : 250)) +
       historyPenalty;

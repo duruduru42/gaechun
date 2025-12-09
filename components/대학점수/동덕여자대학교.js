@@ -3,7 +3,7 @@ import { createClient } from "@/utils/supabase/client";
 // 영어 환산 점수 표
 const getEnglishScore = (grade) => {
   const englishScores = {
-    1: 100, 2: 97, 3: 91, 4: 82, 5: 70,
+    1: 100, 2: 99, 3: 96, 4: 85, 5: 70,
     6: 55, 7: 40, 8: 20, 9: 0
   };
   return englishScores[grade] || 0;
@@ -81,24 +81,32 @@ export const 동덕여자대학교 = async (userId, selection) => {
 
   // 계열별 계산
   if (selection.계열 === '인문') {
-    totalScore = ((percentile_korean * 0.3) +
-                 (percentile_math * 0.2) +
-                 (englishScore * 0.3) +
+    const higherKoreanMath = Math.max(percentile_korean, percentile_math);
+
+    totalScore = ((higherKoreanMath * 0.35) +
+                 (Math.min(percentile_korean, percentile_math) * 0.25) +
+                 (englishScore * 0.2) +
                  (higherScienceScore * 0.2))*10 +
                  historyBonus;
 
   } else if (selection.계열 === '자연') {
     let mathBonus = 1;
 
-    // 수학이 '미적분' 또는 '기하'일 때 10% 가산
-    if (math === '미적분' || math === '기하') {
-      mathBonus = 1.1;
+    // 수학 > 국어 & 수학 과목 미적/기하 → 5% 가산
+    if (percentile_math > percentile_korean && (math === '미적분' || math === '기하')) {
+        mathBonus = 1.05;
     }
 
-    totalScore = ((percentile_korean * 0.25) +
-                 (percentile_math * 0.3 * mathBonus) +
-                 (englishScore * 0.25) +
-                 (higherScienceScore * 0.2))*10 +
+    // 가산 적용된 수학 백분위 적용
+    const boostedMath = percentile_math * mathBonus;
+
+    const higherKoreanMath = Math.max(percentile_korean, boostedMath);
+    const lowerKoreanMath  = Math.min(percentile_korean, boostedMath);
+
+    totalScore = ((higherKoreanMath * 0.35) +
+                 (lowerKoreanMath * 0.25) +
+                 (englishScore * 0.2) +
+                 (higherScienceScore * 0.2)) * 10 +
                  historyBonus;
 
   } else if (selection.계열 === '약학') {
@@ -111,18 +119,9 @@ export const 동덕여자대학교 = async (userId, selection) => {
     }
 
     totalScore = ((percentile_korean * 0.25) +
-                 (percentile_math * 0.3) +
-                 (englishScore * 0.25) +
+                 (percentile_math * 0.35) +
+                 (englishScore * 0.20) +
                  ((Number(percentile_science1) + Number(percentile_science2)) * 0.1))*10 +
-                 historyBonus;
-
-  } else if (selection.계열 === '교양') {
-    const higherKoreanMath = Math.max(percentile_korean, percentile_math);
-
-    totalScore = ((higherKoreanMath * 0.35) +
-                 (Math.min(percentile_korean, percentile_math) * 0.25) +
-                 (englishScore * 0.2) +
-                 (higherScienceScore * 0.2))*10 +
                  historyBonus;
 
   } else {

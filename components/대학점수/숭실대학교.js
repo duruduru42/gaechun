@@ -47,13 +47,12 @@ const conversionTable = {
   }
 };
 
-  
-  const getConvertedScore = (percentile, subject) => {
-    const track = naturalScienceSubjects.includes(subject) ? '자연' : '인문';
-    const percentileScore = conversionTable[track][percentile]; // 백분위에 해당하는 점수 가져오기
-    const maxScore = conversionTable[track][100]; // 백분위 100 점수 가져오기
-    return maxScore && percentileScore ? percentileScore / maxScore : 0; // 변환 점수 계산
-  };
+const getConvertedScore = (percentile, subject) => {
+  const track = naturalScienceSubjects.includes(subject) ? '자연' : '인문';
+  const percentileScore = conversionTable[track][percentile]; // 백분위에 해당하는 점수
+  const maxScore = conversionTable[track][100];             // 백분위 100 점수
+  return maxScore && percentileScore ? percentileScore / maxScore : 0; // 0~1 스케일
+};
 
 export const 숭실대학교 = async (userId, selection) => {
   const supabase = createClient();
@@ -84,38 +83,75 @@ export const 숭실대학교 = async (userId, selection) => {
   // 한국사 감점 계산
   const historyPenalty = getHistoryPenalty(grade_history);
 
-  // 탐구 과목 변환 점수 계산
-  const scienceScore1 = getConvertedScore(percentile_science1, science1);
-  const scienceScore2 = getConvertedScore(percentile_science2, science2);
+  // 탐구 과목 변환 점수 (0~1 스케일)
+  let scienceScore1 = getConvertedScore(percentile_science1, science1);
+  let scienceScore2 = getConvertedScore(percentile_science2, science2);
 
   let totalScore = 0;
 
+  // 👉 인문/경상: 사탐 과목(= 자연탐구가 아닌 과목)은 과목당 3% 가산
+  if (selection.계열 === '인문' || selection.계열 === '경상') {
+    if (!naturalScienceSubjects.includes(science1)) {
+      scienceScore1 *= 1.025;
+    }
+    if (!naturalScienceSubjects.includes(science2)) {
+      scienceScore2 *= 1.025;
+    }
+  }
+
   // 계열별 계산
   if (selection.계열 === '인문') {
-    totalScore = (standard_score_korean / 139 * 350 + standard_score_math / 140 * 250 + englishScore + (scienceScore1 + scienceScore2) * 100) + historyPenalty;
+    totalScore =
+      (standard_score_korean / 147) * 350 +
+      (standard_score_math / 139) * 200 +
+      englishScore +
+      (scienceScore1 + scienceScore2) * 125 +
+      historyPenalty;
+
   } else if (selection.계열 === '경상') {
-    totalScore = (standard_score_korean / 139 * 250 + standard_score_math / 140 * 350 + englishScore + (scienceScore1 + scienceScore2) * 100) + historyPenalty;
+    totalScore =
+      (standard_score_korean / 147) * 250 +
+      (standard_score_math / 139) * 300 +
+      englishScore +
+      (scienceScore1 + scienceScore2) * 125 +
+      historyPenalty;
+
   } else if (selection.계열 === '자연1') {
-    // 수학 과목이 '미적분' 또는 '기하'일 때 7% 가산점 적용
     const mathBonus1 = (math === '미적분' || math === '기하') ? 0.07 : 0;
+    const scienceBonus1 =
+      (naturalScienceSubjects.includes(science1) ? 0.025 : 0) +
+      (naturalScienceSubjects.includes(science2) ? 0.025 : 0);
 
-    // 과탐 과목당 2.5% 가산점 (최대 2과목 반영)
-    const scienceBonus1 = (naturalScienceSubjects.includes(science1) ? 0.025 : 0) + (naturalScienceSubjects.includes(science2) ? 0.025 : 0);
+    const totalBonus1 =
+      mathBonus1 * standard_score_math +
+      scienceBonus1 * ((Number(percentile_science1) + Number(percentile_science2)) / 2);
 
-    const totalBonus1 = Number(mathBonus1 * standard_score_math) + Number(scienceBonus1 * (Number(percentile_science1) + Number(percentile_science2))/2)
+    totalScore =
+      (standard_score_korean / 147) * 200 +
+      (standard_score_math / 139) * 350 +
+      englishScore +
+      (scienceScore1 + scienceScore2) * 125 +
+      historyPenalty +
+      totalBonus1;
 
-    totalScore = standard_score_korean / 139 * 200 + standard_score_math / 140 * 350 + englishScore + (scienceScore1 + scienceScore2) * 125 + historyPenalty + Number(totalBonus1);
   } else if (selection.계열 === '자연2') {
-    // 수학 과목이 '미적분' 또는 '기하'일 때 5% 가산점 적용
     const mathBonus2 = (math === '미적분' || math === '기하') ? 0.05 : 0;
+    const scienceBonus2 =
+      (naturalScienceSubjects.includes(science1) ? 0.025 : 0) +
+      (naturalScienceSubjects.includes(science2) ? 0.025 : 0);
 
-    // 과탐 과목당 2.5% 가산점 (최대 2과목 반영)
-    const scienceBonus2 = (naturalScienceSubjects.includes(science1) ? 0.025 : 0) + (naturalScienceSubjects.includes(science2) ? 0.025 : 0);
+    const totalBonus2 =
+      mathBonus2 * standard_score_math +
+      scienceBonus2 * ((Number(percentile_science1) + Number(percentile_science2)) / 2);
 
-    const totalBonus2 = Number(mathBonus2 * standard_score_math) + Number(scienceBonus2 * (Number(percentile_science1) + Number(percentile_science2))/2)
+    totalScore =
+      (standard_score_korean / 147) * 200 +
+      (standard_score_math / 139) * 350 +
+      englishScore +
+      (scienceScore1 + scienceScore2) * 125 +
+      historyPenalty +
+      totalBonus2;
 
-
-    totalScore = standard_score_korean / 139 * 200 + standard_score_math / 140 * 350  + englishScore + (scienceScore1 + scienceScore2) * 125 + historyPenalty + Number(totalBonus2);
   } else {
     return '불가';
   }

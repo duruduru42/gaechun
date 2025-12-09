@@ -79,21 +79,21 @@ export const 성신여자대학교 = async (userId, selection) => {
   let totalScore = 0;
 
   // 계열별 계산
-  if (selection.계열 === '가1') {
+  if (selection.계열 === '나1') {
     totalScore = ((percentile_korean * 0.3) +
                  (percentile_math * 0.2) +
                  (englishScore * 0.3) +
                  (scienceAverage * 0.2)) * 5 +
                  historyBonus;
 
-  } else if (selection.계열 === '가2') {
+  } else if (selection.계열 === '가3') {
     totalScore = ((percentile_korean * 0.3) +
                  (percentile_math * 0.2) +
                  (englishScore * 0.2) +
                  (scienceAverage * 0.3)) * 5 +
                  historyBonus;
 
-  } else if (selection.계열 === '가3') {
+  } else if (selection.계열 === '가4') {
     if (!isNaturalScience(science1) || !isNaturalScience(science2)) {
       return '불가: 탐구 과목 조건 불충족'; // 자연탐구 필수
     }
@@ -104,42 +104,30 @@ export const 성신여자대학교 = async (userId, selection) => {
                  (scienceAverage * 0.3)) * 5 +
                  historyBonus;
 
-  } else if (selection.계열 === '가4') {
-    totalScore = ((percentile_korean * 0.2) +
-                 (percentile_math * 0.3) +
-                 (englishScore * 0.2) +
-                 (scienceAverage * 0.3)) * 5 +
-                 historyBonus;
-                 if (isNaturalScience(science1) || isNaturalScience(science2)) {
-                  const higherSciencePercentile = Math.max(percentile_science1, percentile_science2); // 높은 percentile 선택
-                  totalScore += higherSciencePercentile * 0.1; // 10% 가산
-                }
 
-
-  } else if (selection.계열 === '나1') {
+  } else if (selection.계열 === '나3') {
     totalScore = ((percentile_korean * 0.3) +
                  (percentile_math * 0.25) +
                  (englishScore * 0.2) +
                  (scienceAverage * 0.25)) * 5 +
                  historyBonus;
 
-  } else if (selection.계열 === '나2') {
-    totalScore = ((percentile_korean * 0.2) +
-                 (percentile_math * 0.3) +
-                 (englishScore * 0.2) +
-                 (scienceAverage * 0.3)) * 5 +
-                 historyBonus;
 
-  } else if (selection.계열 === '나3') {
+  } else if (selection.계열 === '가2') {
     totalScore = ((percentile_korean * 0.1) +
                  (percentile_math * 0.35) +
                  (englishScore * 0.3) +
                  (scienceAverage * 0.25)) * 5 +
                  historyBonus;
-                 if (isNaturalScience(science1) || isNaturalScience(science2)) {
-                  const higherSciencePercentile = Math.max(percentile_science1, percentile_science2); // 높은 percentile 선택
-                  totalScore += higherSciencePercentile * 0.1; // 10% 가산
-                }
+
+  
+ } else if (selection.계열 === '나2') {
+  totalScore = ((percentile_korean * 0.3) +
+                               (percentile_math * 0.25) +
+                               (englishScore * 0.2) +
+                               (scienceAverage * 0.25)) * 5 +
+                               historyBonus;
+
 
   } else {
     return '불가: 잘못된 계열 값'; // 잘못된 계열 값일 경우

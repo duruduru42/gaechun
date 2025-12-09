@@ -132,8 +132,8 @@ export const 이화여자대학교 = async (userId, selection) => {
     // 최종 점수 계산
     if (selection.계열 === '인문') {
         totalScore = (
-            (standard_score_korean / 139) * 0.3 +
-            (standard_score_math / 140) * 0.3 +
+            (standard_score_korean / 147) * 0.3 +
+            (standard_score_math / 139) * 0.3 +
             englishScore * 0.2 +
             (convertedScienceScore1+convertedScienceScore2) * 0.1
         ) * 1000 + historyBonus;    
@@ -148,8 +148,8 @@ export const 이화여자대학교 = async (userId, selection) => {
             : convertedScienceScore2;
 
         totalScore = (
-        (standard_score_korean / 139) * 0.25 +
-        (standard_score_math / 140) * 0.3 +
+        (standard_score_korean / 147) * 0.25 +
+        (standard_score_math / 139) * 0.3 +
         englishScore * 0.2 +
         (scienceScore1+scienceScore2) * 0.125 
     ) * 1000 + historyBonus;    
@@ -157,8 +157,8 @@ export const 이화여자대학교 = async (userId, selection) => {
     } else if (selection.계열 === '혼합') {
         // "인문" 점수 계산
         const humanitiesScore = (
-            (standard_score_korean / 139) * 0.3 +
-            (standard_score_math / 140) * 0.3 +
+            (standard_score_korean / 147) * 0.3 +
+            (standard_score_math / 139) * 0.3 +
             englishScore * 0.2 +
             (convertedScienceScore1 + convertedScienceScore2) * 0.1
         ) * 1000 + historyBonus;
@@ -173,8 +173,8 @@ export const 이화여자대학교 = async (userId, selection) => {
             : convertedScienceScore2;
     
         const scienceScore = (
-            (standard_score_korean / 139) * 0.25 +
-            (standard_score_math / 140) * 0.3 +
+            (standard_score_korean / 147) * 0.25 +
+            (standard_score_math / 139) * 0.3 +
             englishScore * 0.2 +
             (scienceScore1 + scienceScore2) * 0.125
         ) * 1000 + historyBonus;

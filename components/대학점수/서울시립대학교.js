@@ -64,12 +64,10 @@ const conversionTable = {
 // 영어 점수 계산 함수 (조건 4)
 const getEnglishScore = (grade, track) => {
   const englishScores = {
-    '인문1': { 1: 150, 2: 148, 3: 144, 4: 140, 5: 136, 6: 132, 7: 128, 8: 124, 9: 116 },
-    '인문2': { 1: 150, 2: 148, 3: 144, 4: 140, 5: 136, 6: 132, 7: 128, 8: 124, 9: 116 },
-    '인문3': { 1: 250, 2: 246, 3: 240, 4: 233, 5: 226, 6: 219, 7: 212, 8: 205, 9: 191 },
-    '자연1': { 1: 100, 2: 98, 3: 94, 4: 90, 5: 86, 6: 82, 7: 78, 8: 74, 9: 66 },
-    '자연2': { 1: 100, 2: 98, 3: 94, 4: 90, 5: 86, 6: 82, 7: 78, 8: 74, 9: 66 },
-    '자연3': { 1: 100, 2: 98, 3: 94, 4: 90, 5: 86, 6: 82, 7: 78, 8: 74, 9: 66 }
+    '인문1': { 1: 150, 2: 146, 3: 135, 4: 120, 5: 95, 6: 75, 7: 45, 8: 15, 9: 0 },
+    '인문2': { 1: 200, 2: 194, 3: 184, 4: 160, 5: 130, 6: 100, 7: 60, 8: 20, 9: 0 },
+    '자연1': { 1: 100, 2: 97, 3: 90, 4: 80, 5: 65, 6: 50, 7: 30, 8: 10, 9: 0 },
+    '자연2': { 1: 100, 2: 97, 3: 90, 4: 80, 5: 65, 6: 50, 7: 30, 8: 10, 9: 0 },
   };
   return englishScores[track][grade] || 0;
 };
@@ -104,13 +102,9 @@ export const 서울시립대학교 = async (userId, selection) => {
     grade_history,
     science1,
     science2,
-    math
   } = data;
 
   // 조건 3: 자연 계열에서 수학이 '확률과통계'일 경우 불가
-  if ((selection.계열 === '자연1' || selection.계열 === '자연2') && math === '확률과 통계') {
-    return '불가';
-  }
 
   // 영어 점수 계산 (조건 4)
   const englishScore = parseFloat(getEnglishScore(grade_english, selection.계열));
@@ -135,7 +129,7 @@ export const 서울시립대학교 = async (userId, selection) => {
     ? convertedScienceScore2 * 1.03
     : convertedScienceScore2;
 
-    totalScore = (standard_score_korean * 350 / 139) + (standard_score_math * 300 / 140) + englishScore + (scienceScore1+scienceScore2) * 200/2;
+    totalScore = (standard_score_korean * 350 / 147) + (standard_score_math * 350 / 139) + englishScore + (scienceScore1+scienceScore2) * 150/2;
 
   } else if (selection.계열 === '인문2') {
 
@@ -147,51 +141,30 @@ export const 서울시립대학교 = async (userId, selection) => {
     ? convertedScienceScore2 * 1.03
     : convertedScienceScore2;
 
-    totalScore = (standard_score_korean * 350 / 139) + (standard_score_math * 400 / 140) + englishScore + (scienceScore1+scienceScore2) * 100/2;
-  } else if (selection.계열 === '인문3') {
-
-    const scienceScore1 = humanitiesSubjects.includes(science1)
-    ? convertedScienceScore1 * 1.03
-    : convertedScienceScore1;
-
-    const scienceScore2 = humanitiesSubjects.includes(science2)
-    ? convertedScienceScore2 * 1.03
-    : convertedScienceScore2;
-
-    totalScore = (standard_score_korean * 350 / 139) + (standard_score_math * 250 / 140) + englishScore + (scienceScore1+scienceScore2) * 150/2;
+    totalScore = (standard_score_korean * 350 / 147) + (standard_score_math * 250 / 139) + englishScore + (scienceScore1+scienceScore2) * 200/2;
   } else if (selection.계열 === '자연1') {
 
     const scienceScore1 = naturalScienceSubjects.includes(science1)
-    ? convertedScienceScore1 * 1.07
+    ? convertedScienceScore1 * 1.03
     : convertedScienceScore1;
 
     const scienceScore2 = naturalScienceSubjects.includes(science2)
-    ? convertedScienceScore2 * 1.07
+    ? convertedScienceScore2 * 1.03
     : convertedScienceScore2;
 
-    totalScore = (standard_score_korean * 200 / 139) + (standard_score_math * 400 / 140) + englishScore + (scienceScore1+scienceScore2) * 300/2;
+    totalScore = (standard_score_korean * 300 / 147) + (standard_score_math * 400 / 139) + englishScore + (scienceScore1+scienceScore2) * 200/2;
   } else if (selection.계열 === '자연2') {
 
     const scienceScore1 = naturalScienceSubjects.includes(science1)
-    ? convertedScienceScore1 * 1.07
+    ? convertedScienceScore1 * 1.03
     : convertedScienceScore1;
 
     const scienceScore2 = naturalScienceSubjects.includes(science2)
-    ? convertedScienceScore2 * 1.07
+    ? convertedScienceScore2 * 1.03
     : convertedScienceScore2;
 
-    totalScore = (standard_score_korean * 200 / 139) + (standard_score_math * 350 / 140) + englishScore + (scienceScore1+scienceScore2) * 350/2;
-  } else if (selection.계열 === '자연3') {
-
-    const scienceScore1 = naturalScienceSubjects.includes(science1)
-    ? convertedScienceScore1 * 1.07
-    : convertedScienceScore1;
-
-    const scienceScore2 = naturalScienceSubjects.includes(science2)
-    ? convertedScienceScore2 * 1.07
-    : convertedScienceScore2;
-
-    totalScore = (standard_score_korean * 200 / 139) + (standard_score_math * 350 / 140) + englishScore + (scienceScore1+scienceScore2) * 350/2;
+    totalScore = (standard_score_korean * 300 / 147) + (standard_score_math * 350 / 139) + englishScore + (scienceScore1+scienceScore2) * 250/2;
+  
   } else {
     return '불가';
   }

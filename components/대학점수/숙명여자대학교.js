@@ -59,8 +59,8 @@ const getEnglishScore = (grade) => {
 
 // 한국사 가산점 표 (이거 바꿔야 됨!!!!!!!!!!!!!! 일단 임의로 해놓음)
 const getHistoryBonus = (grade) => {
-  if (grade >= 1 && grade <= 3) return 3;
-  if (grade >= 4 && grade <= 6) return 2;
+  if (grade >= 1 && grade <= 4) return 3;
+  if (grade >= 5 && grade <= 6) return 2;
   return 1;
 };
 
@@ -115,81 +115,57 @@ export const 숙명여자대학교 = async (userId, selection) => {
     math
   } = data;
 
-  // 영어 점수 및 한국사 가산점 계산
-  const englishScore = getEnglishScore(grade_english) / 100;
-  const historyBonus = getHistoryBonus(grade_history);
+  const koreanNorm = (standard_score_korean ?? 0) / 147; // 최대값은 기존 로직 유지
+  const mathNorm = (standard_score_math ?? 0) / 139;
+  const englishNorm = getEnglishScore(grade_english) / 100;
 
-  const scienceScore1 = getConvertedScore(percentile_science1, science1);
-  const scienceScore2 = getConvertedScore(percentile_science2, science2);
+  // 탐구 점수 (0~1)
+  let scienceScore1 = getConvertedScore(percentile_science1, science1);
+  let scienceScore2 = getConvertedScore(percentile_science2, science2);
 
-  let totalScore = 0;
-  let adjustedScienceScore1 = 0;
-  let adjustedScienceScore2 = 0;
+  const isSci1Natural = naturalScienceSubjects.includes(science1);
+  const isSci2Natural = naturalScienceSubjects.includes(science2);
 
-
-  // 계열별 계산
-  if (selection.계열 === '인문') {
-    totalScore = (
-      (standard_score_korean / 139) * 0.35 +
-      (standard_score_math / 140) * 0.25 +
-      englishScore * 0.2 +
-      ((Number(scienceScore1) + Number(scienceScore2))) * 0.1
-    ) * 1000 + historyBonus;
-  } else if (selection.계열 === '경상') {
-    totalScore = (
-      (standard_score_korean / 139) * 0.3 +
-      (standard_score_math / 140) * 0.3 +
-      englishScore * 0.2 +
-      ((scienceScore1 + scienceScore2)) * 0.1
-    ) * 1000 + historyBonus;
-  } else if (selection.계열 === '자연') {
-    if (selection.모집단위 === '신소재물리전공' && science1 === '물리학Ⅰ' && science1==='물리학Ⅱ') {
-      adjustedScienceScore1 = scienceScore1*1.05
-    }else {
-      adjustedScienceScore1 = scienceScore1; // 조건에 부합하지 않으면 원래 값 사용
-    }
-    if (selection.모집단위 === '신소재물리전공' && science2 === '물리학Ⅰ' && science1==='물리학Ⅱ') {
-      adjustedScienceScore2 = scienceScore2*1.05
-    }else {
-      adjustedScienceScore2 = scienceScore2; // 조건에 부합하지 않으면 원래 값 사용
-    }
-
-    totalScore = (
-      (standard_score_korean / 139) * 0.25 +
-      (standard_score_math / 140) * 0.35 +
-      englishScore * 0.2 +
-      ((adjustedScienceScore1 + adjustedScienceScore2)) * 0.1
-    ) * 1000 + historyBonus;
-  } else if (selection.계열 === '수학') {
-    if (!naturalScienceSubjects.includes(science1) || !naturalScienceSubjects.includes(science2) || (math !== '기하' && math !== '미적분')) {
-      return '불가: 수학 과목 조건 불충족'; // 수학 과목 조건 불충족 시
-    }
-    totalScore = (
-      (standard_score_korean / 139) * 0.15 +
-      (standard_score_math / 140) * 0.5 +
-      englishScore * 0.2 +
-      (scienceScore1 + scienceScore2) * 0.075
-    ) * 1000 + historyBonus;
-  } else if (selection.계열 === '통계') {
-    totalScore = (
-      (standard_score_korean / 139) * 0.25 +
-      (standard_score_math / 140) * 0.4 +
-      englishScore * 0.2 +
-      (scienceScore1 + scienceScore2) * 0.075
-    ) * 1000 + historyBonus;
-  } else if (selection.계열 === '자연2') {
-    if (!naturalScienceSubjects.includes(science1) && !naturalScienceSubjects.includes(science2)) {
-      return '불가: 자연 탐구 과목 조건 불충족';
-    }
-    totalScore = (
-      (standard_score_korean / 139) * 0.25 +
-      (standard_score_math / 140) * 0.35 +
-      englishScore * 0.2 +
-      (scienceScore1 + scienceScore2) * 0.1
-    ) * 1000 + historyBonus;
-  } else {
-    return '불가: 잘못된 계열 값';
+  // 🔥 탐구 3% 가산 로직
+  // 인문/경상: 사탐 과목에 3% 가산
+  if (selection.계열 === "인문" || selection.계열 === "경상") {
+    if (!isSci1Natural) scienceScore1 *= 1.03;
+    if (!isSci2Natural) scienceScore2 *= 1.03;
   }
 
+  // 자연/수학/통계/자연2: 과탐 과목에 3% 가산
+  if (["자연", "수학", "통계", "자연2"].includes(selection.계열)) {
+    if (isSci1Natural) scienceScore1 *= 1.03;
+    if (isSci2Natural) scienceScore2 *= 1.03;
+  }
+
+  // 탐구 2과목 평균
+  const scienceAvg = (scienceScore1 + scienceScore2) / 2;
+
+  const historyBonus = getHistoryBonus(grade_history);
+
+  // 📊 계열별 최종 비율 적용
+  let ratio = 0;
+
+  // 인문/경상 → 국어 35 / 수학 25 / 영어 15 / 탐구 25
+  if (selection.계열 === "인문" || selection.계열 === "경상") {
+    ratio =
+      koreanNorm * 0.35 +
+      mathNorm * 0.25 +
+      englishNorm * 0.15 +
+      scienceAvg * 0.25;
+  }
+  // 자연/수학/통계/자연2 → 국어 25 / 수학 35 / 영어 15 / 탐구 25
+  else if (["자연", "수학", "통계", "자연2"].includes(selection.계열)) {
+    ratio =
+      koreanNorm * 0.25 +
+      mathNorm * 0.35 +
+      englishNorm * 0.15 +
+      scienceAvg * 0.25;
+  } else {
+    return "불가: 잘못된 계열 값";
+  }
+
+  const totalScore = ratio * 1000 + historyBonus;
   return totalScore.toFixed(2);
 };

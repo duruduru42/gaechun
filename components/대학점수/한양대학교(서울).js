@@ -98,19 +98,19 @@ export const 한양대학교 = async (userId, selection) => {
     ? scienceScore2 * 1.03
     : scienceScore2;
 
-    baseScore = (Number(standard_score_korean) / 139) * 250 +
-      (Number(standard_score_math) / 140) * 400 +
-      ((Number(scienceBonus1) + Number(scienceBonus2))) * 125 + englishScore + historyPenalty
+    baseScore = (Number(standard_score_korean) / 147) * 225 +
+      (Number(standard_score_math) / 139) * 360 +
+      ((Number(scienceBonus1) + Number(scienceBonus2))) * 112.5 + englishScore*0.9 + historyPenalty
 
   } else if (selection.계열 === '인문') {
-    baseScore = (Number(standard_score_korean) / 139) * 350 +
-      (Number(standard_score_math) / 140) * 300 +
-      ((Number(scienceScore1) + Number(scienceScore2))) * 125 + englishScore + historyPenalty
+    baseScore = (Number(standard_score_korean) / 147) * 315 +
+      (Number(standard_score_math) / 139) * 270 +
+      ((Number(scienceScore1) + Number(scienceScore2))) * 112.5 + englishScore*0.9 + historyPenalty
 
   } else if (selection.계열 === '상경') {
-    baseScore = (Number(standard_score_korean) / 139) * 350 +
-      (Number(standard_score_math) / 140) * 350 +
-      ((Number(scienceScore1) + Number(scienceScore2))) * 100 + englishScore + historyPenalty
+    baseScore = (Number(standard_score_korean) / 147) * 315 +
+      (Number(standard_score_math) / 139) * 315 +
+      ((Number(scienceScore1) + Number(scienceScore2))) * 90 + englishScore*0.9 + historyPenalty
   } else {
     return '불가';
   }

@@ -18,7 +18,13 @@ const getHistoryScore = (grade) => {
   return historyScores[grade] || 0;
 };
 
-// 탐구 변환 점수 계산 함수
+// 과학탐구 과목 리스트
+const naturalScienceSubjects = [
+  '물리학Ⅰ', '물리학Ⅱ', '화학Ⅰ', '화학Ⅱ',
+  '지구과학Ⅰ', '지구과학Ⅱ', '생명과학Ⅰ', '생명과학Ⅱ'
+];
+
+// (현재는 사용 안하지만 남겨둔 함수)
 const getConvertedScore = (percentile, track) => {
   return conversionTable[track][percentile] || 0;
 };
@@ -27,32 +33,33 @@ const getConvertedScore = (percentile, track) => {
 export const 홍익대학교서울 = async (userId, selection) => {
   const supabase = createClient();
   
-    const { data, error } = await supabase
-        .from('exam_results')
-        .select('standard_score_korean, standard_score_math, standard_score_science1, standard_score_science2, grade_english, grade_history, science1, science2, math')
-        .eq('user_id', userId)
-        .single();
+  const { data, error } = await supabase
+    .from('exam_results')
+    .select(
+      'standard_score_korean, standard_score_math, standard_score_science1, standard_score_science2, grade_english, grade_history, science1, science2, math'
+    )
+    .eq('user_id', userId)
+    .single();
 
-    if (error || !data) {
-        return '불가'; // If there's an error or no data found
-    }
+  if (error || !data) {
+    return '불가'; // If there's an error or no data found
+  }
 
-    const {
-        standard_score_korean,
-        standard_score_math,
-        standard_score_science1,
-        standard_score_science2,
-        grade_english,
-        grade_history,
-        science1,
-        science2,
-        math
-    } = data;
+  const {
+    standard_score_korean,
+    standard_score_math,
+    standard_score_science1,
+    standard_score_science2,
+    grade_english,
+    grade_history,
+    science1,
+    science2,
+    math
+  } = data;
 
   // 영어 점수 및 한국사 점수 계산
   const englishScore = getEnglishScore(grade_english);
   const historyScore = getHistoryScore(grade_history);
-
 
   let totalScore = 0;
 
@@ -64,22 +71,35 @@ export const 홍익대학교서울 = async (userId, selection) => {
       (Number(standard_score_science1) + Number(standard_score_science2)) * 0.25 +
       englishScore * 0.15 +
       historyScore;
-  } 
-  // 자연계열 계산
-  else if (selection.계열 === '자연') {
-    // 자연계열 조건: 수학이 '미적분' 또는 '기하'여야 함
-    if (math !== '미적분' && math !== '기하') {
-      return '불가'; // 수학이 '확률과 통계'일 때 불가 처리
+
+  } else if (selection.계열 === '자연') {
+    // 👉 자연계열: 수학/탐구 가산만 적용 (미적/기하 필수 조건 삭제)
+
+    // 수학 3% 가산 (미적분/기하인 경우만)
+    let mathScore = Number(standard_score_math) || 0;
+    if (math === '미적분' || math === '기하') {
+      mathScore *= 1.03;
+    }
+
+    // 탐구 과목별 3% 가산 (과학탐구 과목일 때만)
+    let scienceScore1 = Number(standard_score_science1) || 0;
+    let scienceScore2 = Number(standard_score_science2) || 0;
+
+    if (naturalScienceSubjects.includes(science1)) {
+      scienceScore1 *= 1.03;
+    }
+    if (naturalScienceSubjects.includes(science2)) {
+      scienceScore2 *= 1.03;
     }
 
     totalScore =
       standard_score_korean * 0.2 +
-      standard_score_math * 0.35 +
-      (Number(standard_score_science1) + Number(standard_score_science2)) * 0.3 +
+      mathScore * 0.35 +
+      (scienceScore1 + scienceScore2) * 0.3 +
       englishScore * 0.15 +
       historyScore;
-  } 
-  else {
+
+  } else {
     return '불가'; // 잘못된 계열 값일 경우
   }
 

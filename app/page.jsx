@@ -1,3 +1,4 @@
+import LandingPopup from '@/components/LandingPopup';
 import HeroSection from '../components/HeroSection';
 import StatsSection from '../components/StatsSection';
 import Review from '../components/ReviewSection';
@@ -12,6 +13,7 @@ import QnaSection from '@/components/QnaSection';
 export default async function Home() {
   return (
     <div>
+      <LandingPopup />
       <HeroSection />
       <WrongSection />  
       <WrongSection2 />
