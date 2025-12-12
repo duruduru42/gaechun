@@ -123,24 +123,37 @@ export const 광운대학교 = async (userId, selection) => {
       historyScore;
   } 
   // 자연계열 계산
-  else if (selection.계열 === '자연') {
-    let mathBonus = 0;
-    let scienceBonus = 0;
-    const science1Bonus = isNaturalScience(science1) ? 0.03 : 0;
-    const science2Bonus = isNaturalScience(science2) ? 0.03 : 0;
+// 자연계열 계산
+else if (selection.계열 === '자연') {
+  let mathBonus = 0;
+  let scienceBonus = 0; // 이 변수는 사용되지 않아 제거해도 무방합니다.
+  const science1Bonus = isNaturalScience(science1) ? 0.03 : 0;
+  const science2Bonus = isNaturalScience(science2) ? 0.03 : 0;
 
-    // 모집단위가 '정보융합학부'가 아닌 경우에만 가산점 적용
-    if (math === '미적분' || math === '기하') {
-      mathBonus = (selection.모집단위 !== '정보융합학부') ? 0.03 : 0;
-    }
+  // 모집단위가 '정보융합학부'가 아닌 경우에만 가산점 적용
+  if (math === '미적분' || math === '기하') {
+    // selection.모집단위가 '정보융합학부'일 때 mathBonus는 0이 됨
+    mathBonus = 0.03 
+  }
 
-    totalScore =
-      ((standard_score_korean * 0.2) +
-      (standard_score_math * 0.35 * (1 + mathBonus)) +
-      englishScore*0.2 +
-      ((getConvertedScore(percentile_science1, science1) * (1 + science1Bonus) + getConvertedScore(percentile_science2, science2) * (1 + science2Bonus))) * 0.25 )* 5 +
-      historyScore;
-  } 
+  totalScore =
+    ((standard_score_korean * 0.2) +
+    // **** 문제 해결: mathBonus를 수식에 적용합니다. ****
+    (standard_score_math * 0.35 * (1 + mathBonus)) + 
+    englishScore*0.2 +
+    ((getConvertedScore(percentile_science1, science1) * (1 + science1Bonus) + getConvertedScore(percentile_science2, science2) * (1 + science2Bonus))) * 0.25 )* 5 +
+    historyScore;
+}
+
+else if (selection.계열 === '정보') {
+  totalScore =
+    ((standard_score_korean * 0.2) +
+    // **** 문제 해결: mathBonus를 수식에 적용합니다. ****
+    (standard_score_math * 0.35 ) + 
+    englishScore*0.2 +
+    ((getConvertedScore(percentile_science1, science1) + getConvertedScore(percentile_science2, science2))) * 0.25 )* 5 +
+    historyScore;
+} 
   else {
     return '불가'; // 잘못된 계열 값일 경우
   }

@@ -58,8 +58,8 @@ export const 대구교육대학교 = async (userId) => {
 
     // Calculate total score
     const totalScore = (
-        (Number(standard_score_korean) * 0.3 / 139) +
-        (Number(standard_score_math) * 0.3 / 140) +
+        (Number(standard_score_korean) * 0.3 / 147) +
+        (Number(standard_score_math) * 0.3 / 139) +
         adjustedInquiryScore
     ) * 1000 + Number(englishScore);
     

@@ -104,17 +104,9 @@ export const 중앙대학교 = async (userId, selection) => {
 
   } else if (selection.계열 === '사회') {
 
-    const scienceScore1 = humanitiesSubjects.includes(science1)
-    ? convertedScienceScore1 * 1.05
-    : convertedScienceScore1;
-
-    const scienceScore2 = humanitiesSubjects.includes(science2)
-    ? convertedScienceScore2 * 1.05
-    : convertedScienceScore2;
-
     baseScore = (Number(standard_score_korean) * 0.3 * 5 +
       Number(standard_score_math) * 0.4 * 5 +
-      (Number(scienceScore1) + Number(scienceScore2)) * 0.3 * 5 +
+      (Number(convertedScienceScore1) + Number(convertedScienceScore2)) * 0.3 * 5 +
       englishScore + historyScore);
 
   } else if (selection.계열 === '자연') {

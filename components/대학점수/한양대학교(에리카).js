@@ -122,11 +122,11 @@ export const 한양대학교에리카 = async (userId, selection) => {
         ? convertedScienceScore2 * 1.03
         : convertedScienceScore2;
 
-        totalScore = ((standard_score_korean * 300 / 139) + (standard_score_math * 300 / 140) + (englishScore * 1.5) + (scienceScore1+scienceScore2)*125);
+        totalScore = ((standard_score_korean * 300 / 147) + (standard_score_math * 300 / 139) + (englishScore * 1.5) + (scienceScore1+scienceScore2)*125);
 
     } else if (selection.계열 === '상경' || selection.계열 === '자연2') {
 
-        totalScore = ((standard_score_korean * 250 / 139) + (standard_score_math * 350 / 140) + (englishScore * 1.5) + (convertedScienceScore1+convertedScienceScore2)*125);
+        totalScore = ((standard_score_korean * 250 / 147) + (standard_score_math * 350 / 139) + (englishScore * 1.5) + (convertedScienceScore1+convertedScienceScore2)*125);
         
     } else if (selection.계열 === '자연1') {
 
@@ -138,7 +138,7 @@ export const 한양대학교에리카 = async (userId, selection) => {
         ? convertedScienceScore2 * 1.03
         : convertedScienceScore2;
 
-        totalScore = ((standard_score_korean * 250 / 139) + (standard_score_math * 350 / 140) + (englishScore * 1.5) + (scienceScore1+scienceScore2)*125);
+        totalScore = ((standard_score_korean * 250 / 147) + (standard_score_math * 350 / 139) + (englishScore * 1.5) + (scienceScore1+scienceScore2)*125);
 
     } else {
         return '불가'; // If the 계열 is invalid

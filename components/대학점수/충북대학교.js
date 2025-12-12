@@ -37,7 +37,6 @@ export const 충북대학교 = async (userId, selection) => {
     standard_score_science1,
     standard_score_science2,
     grade_english,
-    grade_history,
     science1,
     science2,
     math

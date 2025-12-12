@@ -38,6 +38,8 @@ import { 인하대학교 } from '@/components/대학점수/인하대학교';
 import { 경인교육대학교 } from '@/components/대학점수/경인교육대학교';
 import { 대구교육대학교 } from '@/components/대학점수/대구교육대학교';
 import { 경기대학교 } from '@/components/대학점수/경기대학교';
+import { 충북대학교 } from '@/components/대학점수/충북대학교';
+import { 계명대학교 } from '@/components/대학점수/계명대학교';
 
 
 import down from '@/components/caret-down.svg'
@@ -80,7 +82,9 @@ const scoreCalculators = {
   '인하대학교' : 인하대학교,  
   '경인교육대학교' : 경인교육대학교,
   '대구교육대학교' : 대구교육대학교,
-  '경기대학교' : 경기대학교
+  '경기대학교' : 경기대학교,
+  '충북대학교' : 충북대학교,
+  '계명대학교' : 계명대학교
 
 };
 

@@ -123,12 +123,12 @@ const Detail = () => {
 
   // 비교 결과 계산 함수
   const getComparisonResult = (score, selection) => {
-    const 진짜안정 = selection.안정 * 1.05;
+    const 진짜안정 = selection.안정 * 1.03;
     const 안정 = selection.안정;
     const 적정 = selection.적정;
     const 소신 = selection.소신;
     const 상향 = selection.상향;
-    const 진짜상향 = selection.상향 * 0.95;
+    const 진짜상향 = selection.상향 * 0.97;
                                             
     if (score >= 안정) {
       const percent = ((score - 안정) / (진짜안정 - 안정)) * 20 + 80; // 안정과 진짜안정 사이
