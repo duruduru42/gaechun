@@ -24,7 +24,7 @@ export default function Example() {
     <div className="p-8 sm:p-10 lg:flex-auto">
         <div className="flex flex-col items-start"> {/* Adjusted for vertical layout with left alignment */}
             <Image src={gaechun} alt="logo" className="mb-4" width={100} /> {/* Removed unnecessary classes */}
-            <h3 className="text-2xl font-bold tracking-tight text-gray-900">2025학년도 고른기회 전형 개천용 정시 합격예측</h3>
+            <h3 className="text-2xl font-bold tracking-tight text-gray-900">2026학년도 고른기회 전형 개천용 정시 합격예측</h3>
             </div>
             <div className="mt-10 flex items-center gap-x-4">
               <h4 className="flex-none text-sm font-semibold leading-6 text-orange-500">포함된 서비스</h4>

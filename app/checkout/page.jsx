@@ -109,7 +109,7 @@ export default function CheckoutPage() {
             <div className="flex flex-col items-start">
               <Image src={gaechun} alt="logo" className="mb-4" width={100} />
               <h3 className="text-2xl font-bold tracking-tight text-gray-900">
-                2025학년도 고른기회 전형 개천용 정시 합격예측
+                2026학년도 고른기회 전형 개천용 정시 합격예측
               </h3>
             </div>
             <div className="mt-10 flex items-center gap-x-4">
@@ -146,7 +146,7 @@ export default function CheckoutPage() {
                 >
                   구매하기
                 </button>
-                <p className="mt-3 text-xs leading-5 text-gray-600">(부가세 별도)</p>
+                <p className="mt-3 text-xs leading-5 text-gray-600">(부가세 포함)</p>
               </div>
             </div>
             <p className="mt-3 text-xs leading-5 text-gray-800">- 원서 마감일까지 서비스 운영 (2026년 1월 3일)</p>

@@ -134,8 +134,8 @@ export default function Home() {
                 result.standard_score_korean + result.standard_score_math + result.standard_score_science1 + result.standard_score_science2
             );
     
-            setTotalUsers(total + 13);
-            setKoreanRank(koreanRank + 1);
+            setTotalUsers(total );
+            setKoreanRank(koreanRank);
             setMathRank(mathRank);
             setScienceRank(scienceRank);
             setTotalRank(totalRank);
@@ -299,7 +299,7 @@ export default function Home() {
             <div className="flex-1 p-5">
                 <h1 className="text-3xl font-bold p-5">홈</h1>
                 <div className="mb-5 p-4 bg-white rounded-lg shadow-sm cursor-pointer hover:shadow-md">
-                    <p><span className='font-bold'>안내 | 12/20</span> 수정권한 리셋</p>
+                    <p><span className='font-bold'>안내 | 12/13</span> 서비스 OPEN</p>
                 </div>
 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-5">

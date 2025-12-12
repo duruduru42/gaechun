@@ -29,11 +29,9 @@ const Hero = () => {
         </p>
         <button 
         onClick={() => {
-          alert("빠른 시일 내에 오픈 예정입니다.")
-         }}
+          window.location.href = "/home";         }}
         className="rounded-2xl px-6 py-3 text-lg font-bold mt-10 mb-24 bg-black text-white">
-          준비 중입니다.
-        </button>
+          바로가기        </button>
       </div>
       <div className="flex justify-center w-full drop-shadow-xl	p-10">
       <Image src={home} alt="home" className="w-2/3" style={{ boxShadow: '0 -4px 10px rgba(0, 0, 0, 0.25)' }} /></div>

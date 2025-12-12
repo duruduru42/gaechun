@@ -100,9 +100,8 @@ export default function SignInPage() {
           <p>계정이 없으신가요? 
             <span
               className="text-blue-500 cursor-pointer ml-1"
-              onClick={() => alert('빠른 시일 내에 오픈 예정입니다.')}
 
-              // onClick={() => router.push('/signup')}
+              onClick={() => router.push('/signup')}
 
               >
               회원가입

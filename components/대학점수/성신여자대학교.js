@@ -105,11 +105,11 @@ export const 성신여자대학교 = async (userId, selection) => {
                  historyBonus;
 
 
-  } else if (selection.계열 === '나3') {
-    totalScore = ((percentile_korean * 0.3) +
-                 (percentile_math * 0.25) +
+  } else if (selection.계열 === '가1') {
+    totalScore = ((percentile_korean * 0.2) +
+                 (percentile_math * 0.3) +
                  (englishScore * 0.2) +
-                 (scienceAverage * 0.25)) * 5 +
+                 (scienceAverage * 0.3)) * 5 +
                  historyBonus;
 
 

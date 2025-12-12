@@ -10,18 +10,12 @@ const Seventh = () => {
           성공적인 입시의 꿈,<br/>
           <span className="text-orange-500 leading-loose">개천용</span>으로 이루세요.
         </div>
-        <button 
-        onClick={() => {
-          alert("빠른 시일 내에 오픈 예정입니다.")
-         }}
-        className="rounded-2xl px-6 py-3 text-lg font-bold mt-10 mb-24 bg-white text-black">
-          바로가기
-        </button>
-        {/* <Link href={'/home'}>        
+
+        <Link href={'/home'}>        
         <button className="rounded-2xl px-6 py-3 text-lg font-bold mt-10 mb-24 bg-white text-black">
           바로가기
         </button>
-        </Link> */}
+        </Link>
       </div>
       </section>
     </div>

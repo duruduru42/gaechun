@@ -117,7 +117,7 @@ const TablePage = () => {
             </tr>
           </tbody>
         </table>
-        <p className="text-center text-xl font-medium mt-6">2024. 12. 06</p>
+        <p className="text-center text-xl font-medium mt-6">2025. 12. 05</p>
         <p className="text-center text-xl font-medium tracking-widest mt-2">한국교육과정평가원장</p>
       </div>
       <div className="grid justify-items-center w-full mt-5 font-medium text-gray-400">

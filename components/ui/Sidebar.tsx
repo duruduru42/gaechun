@@ -16,7 +16,7 @@ export default function Sidebar() {
     { href: '/apply', label: '모의지원' },
     { href: '/video', label: '동영상' },
     { href: '/notice', label: '공지사항' },
-    { href: 'https://forms.gle/8PDWVfxoERfEGQj66', label: '정시 컨설팅 신청' },
+    { href: 'https://forms.gle/uF72bnZ6iFCpBZU49', label: '정시 컨설팅 신청' },
   ];
 
   return (

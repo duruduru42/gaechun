@@ -156,11 +156,11 @@ export const 아주대학교 = async (userId, selection) => {
     : convertedScienceScore2;
 
       totalScore =
-        (standard_score_korean / 147 * 200) +
+        ((standard_score_korean / 147 * 200) +
         (standard_score_math / 139 * 400 * mathBonus) +
         englishScore +
         ((scienceScore1 + scienceScore2) / 2 * 300) +        
-        historyPenalty;
+        historyPenalty)*95/100;
     }
 
   // 인문계열 계산

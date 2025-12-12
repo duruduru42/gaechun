@@ -51,9 +51,9 @@ export const 한국공학대학교 = async (userId, selection) => {
     // Calculate the total score based on the selected track
     let totalScore = 0;
     if (selection.계열 === '공학') {
-        totalScore = koreanScore + (mathScore * 1.4) + (englishScore * 0.8) + (Math.max(science1Score, science2Score) * 0.8);
+        totalScore = (koreanScore*1.25) + (mathScore * 1.75) + englishScore  + (Math.max(science1Score, science2Score) );
     } else if (selection.계열 === '경영') {
-        totalScore = (koreanScore * 1.2) + (mathScore * 1.2) + (englishScore * 0.8) + (Math.max(science1Score, science2Score) * 0.8);
+        totalScore = (koreanScore * 1.5) + (mathScore * 1.5) + englishScore  + (Math.max(science1Score, science2Score) );
     } else {
         return '불가'; // If the track is invalid
     }

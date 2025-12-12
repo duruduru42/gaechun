@@ -1,5 +1,9 @@
 import { createClient } from "@/utils/supabase/client";
 
+const naturalScienceSubjects = [
+  '물리학 I', '화학 I', '생명과학 I', '지구과학 I',
+  '물리학 II', '화학 II', '생명과학 II', '지구과학 II'
+];
 // 영어 환산 점수 표
 const getEnglishScore = (grade) => {
   const englishScores = {
@@ -25,7 +29,7 @@ export const 홍익대학교세종 = async (userId, selection) => {
   // 사용자 시험 데이터 불러오기
   const { data, error } = await supabase
     .from('exam_results')
-    .select('standard_score_korean, standard_score_math, standard_score_science1, standard_score_science2, grade_english, grade_history, science1, science2')
+    .select('standard_score_korean, standard_score_math, standard_score_science1, standard_score_science2, grade_english, grade_history, science1, science2, math')
     .eq('user_id', userId)
     .single();
 

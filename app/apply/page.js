@@ -230,7 +230,9 @@ const TestPage = () => {
                     </button>
                     </div>
                 ) : (
-                    <div className="border rounded-lg p-2 m-2 h-full">우선순위를 설정하세요</div>
+                    <div className="border rounded-lg p-2 m-2 h-full">우선순위를 설정하세요.
+                    </div>
+                    
                 )}
             </td>
         );
@@ -514,7 +516,8 @@ const TestPage = () => {
 />
                         ))}
                     </div>
-                    <h3 className="text-xl font-bold mt-8 mb-8">우선순위 설정</h3>
+                    <h3 className="text-xl font-bold mt-8 mb-8">우선순위 설정 <span className='text-red-600'>(모의지원은 3번이며, 매주 토요일 횟수가 리셋됩니다.)</span></h3>
+
                     <table className="min-w-full table-auto">
                         <thead className="bg-orange-200 text-gray-600 uppercase text-sm leading-normal font-black">
                             <tr>
