@@ -6,7 +6,7 @@ const includedFeatures = [
   '실제 성적표 인증 기반 성적입력 1회',
   '총 1130개 모집단위 분석 결과 제공',
   '군별로 3순위까지 저장, 수정권한 3회',
-  '10개 이상 원서 영역 동영상 제공',
+  '원서 영역 동영상 제공',
 ]
 
 export default function Example() {

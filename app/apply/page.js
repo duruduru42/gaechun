@@ -376,48 +376,45 @@ const TestPage = () => {
     
         const fetchAndPushPriority = async (priority, 군) => {
             const department = priorities[priority][군];
-    
+
+            // department.id 또는 department.department_id 확인
+            const departmentId = department?.id || department?.department_id;
+            if (!departmentId) {
+                console.error(`Department ID not found for priority ${priority}, 군 ${군}:`, department);
+                alert(`군 ${군}에 대한 학과 정보를 불러오는 데 실패했습니다. 다시 시도해주세요.`);
+                throw new Error(`Department ID not found for priority ${priority}, 군 ${군}`);
+            }
+
             let another1 = null;
             let another2 = null;
-    
-            const startTime = Date.now(); // 시작 시간 기록
-            const timeout = 5000; // 최대 5초 동안만 기다림
-    
-            while (true) {
-                // `another1`과 `another2` 할당
-                if (군 === '가') {
-                    another1 = priorities[priority]['나'] ? priorities[priority]['나'].id : null;
-                    another2 = priorities[priority]['다'] ? priorities[priority]['다'].id : null;
-                } else if (군 === '나') {
-                    another1 = priorities[priority]['가'] ? priorities[priority]['가'].id : null;
-                    another2 = priorities[priority]['다'] ? priorities[priority]['다'].id : null;
-                } else if (군 === '다') {
-                    another1 = priorities[priority]['가'] ? priorities[priority]['가'].id : null;
-                    another2 = priorities[priority]['나'] ? priorities[priority]['나'].id : null;
-                }
-    
-                // 값이 확인되면 push하고 반복 종료
-                if (another1 || another2) {
-                    prioritiesArray.push({
-                        user_id: user.id,
-                        priority,
-                        군,
-                        department_id: department.id,
-                        another1,
-                        another2,
-                    });
-                    break;
-                }
-    
-                // 타임아웃 체크 (5초가 지나면 alert 표시 후 종료)
-                if (Date.now() - startTime > timeout) {
-                    alert(`군 ${군}에 대한 값을 불러오는 데 실패했습니다. 잠시 후 시도해주세요.`);
-                    throw new Error(`Timeout: 군 ${군}에 대한 another1과 another2를 찾을 수 없습니다.`);
-                }
-    
-                // 비동기 반복을 위해 약간의 지연을 추가
-                await new Promise((resolve) => setTimeout(resolve, 100));
+
+            // `another1`과 `another2` 할당
+            if (군 === '가') {
+                const 나Dept = priorities[priority]['나'];
+                const 다Dept = priorities[priority]['다'];
+                another1 = 나Dept ? (나Dept.id || 나Dept.department_id) : null;
+                another2 = 다Dept ? (다Dept.id || 다Dept.department_id) : null;
+            } else if (군 === '나') {
+                const 가Dept = priorities[priority]['가'];
+                const 다Dept = priorities[priority]['다'];
+                another1 = 가Dept ? (가Dept.id || 가Dept.department_id) : null;
+                another2 = 다Dept ? (다Dept.id || 다Dept.department_id) : null;
+            } else if (군 === '다') {
+                const 가Dept = priorities[priority]['가'];
+                const 나Dept = priorities[priority]['나'];
+                another1 = 가Dept ? (가Dept.id || 가Dept.department_id) : null;
+                another2 = 나Dept ? (나Dept.id || 나Dept.department_id) : null;
             }
+
+            // 우선순위 배열에 추가
+            prioritiesArray.push({
+                user_id: user.id,
+                priority,
+                군,
+                department_id: departmentId,
+                another1,
+                another2,
+            });
         };
     
         try {
