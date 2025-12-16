@@ -5,7 +5,7 @@ import { createClient } from '@/utils/supabase/client';
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useRouter } from 'next/navigation';
-import LoadingSpinner from '@/components/ui/LoadingSpinner'; // Adjust the filename accordingly
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
 const ItemTypes = {
     APPLICATION: 'application',
@@ -14,7 +14,7 @@ const ItemTypes = {
 const truncateText = (text, maxLength) => {
     if (!text || text.length <= maxLength) return text;
     return `${text.substring(0, maxLength)}...`;
-  };
+};
 
 const Application = ({ app, handleAddToPriority, handleDelete }) => {
     const [{ isDragging }, drag] = useDrag(() => ({
@@ -64,7 +64,7 @@ const TestPage = () => {
         3: { 가: null, 나: null, 다: null }
     });
     const [storedPriorities, setStoredPriorities] = useState(null);
-    const [modificationCount, setModificationCount] = useState(null); // Default value
+    const [modificationCount, setModificationCount] = useState(null);
 
     useEffect(() => {
         fetchUser();
@@ -74,7 +74,7 @@ const TestPage = () => {
         if (user && user.id) {
             fetchApplications(user.id);
             fetchStoredPriorities(user.id);
-            fetchModificationCount(user.id); // Fetch modification count
+            fetchModificationCount(user.id);
         }
     }, [user]);
 
@@ -85,23 +85,14 @@ const TestPage = () => {
             return;
         }
         if (session) {
-            console.log('User session:', session);
             setUser(session.user);
-        } else {
-            console.log('No user session found');
         }
     };
 
-
-    
     const fetchApplications = async (user_id) => {
-        if (!user_id) {
-            console.log('No user ID provided');
-            return;
-        }
+        if (!user_id) return;
 
         setLoading(true);
-
         const { data, error } = await supabase
             .from('applications')
             .select(`
@@ -123,10 +114,8 @@ const TestPage = () => {
         if (error) {
             console.error('Error fetching applications:', error);
         } else {
-            console.log('Applications data:', data);
             setApplications(data);
         }
-
         setLoading(false);
     };
 
@@ -137,12 +126,12 @@ const TestPage = () => {
             .from('applications')
             .select('department_id, user_id')
             .in('department_id', departmentIds);
-    
+
         if (error) {
             console.error('Error fetching applicant counts:', error);
             return {};
         }
-    
+
         const counts = data.reduce((acc, { department_id }) => {
             if (!acc[department_id]) {
                 acc[department_id] = 0;
@@ -150,8 +139,7 @@ const TestPage = () => {
             acc[department_id] += 1;
             return acc;
         }, {});
-    
-        console.log('Department counts:', counts); // Debug log
+
         return counts;
     };
 
@@ -161,7 +149,6 @@ const TestPage = () => {
             fetchApplicantCounts(departmentIds).then(setDepartmentCounts);
         }
     }, [applications]);
-
 
     const PriorityCell = ({ priority, 군, selected, handleRemove, handleDrop }) => {
         const [{ isOver }, drop] = useDrop(() => ({
@@ -195,58 +182,48 @@ const TestPage = () => {
     const PriorityCell2 = ({ priority, 군, selected, departmentCounts }) => {
         const router = useRouter();
         const applicantCount = selected ? departmentCounts[selected.department_id] || 0 : 0;
-    
+
         const handleNavigate = () => {
-            if (selected) {
-                console.log("Selected Department ID:", selected.department_id);
-                if (selected.department_id) {
-                    router.push(`/more?id=${selected.department_id}`);
-                } else {
-                    console.error("department_id is undefined");
-                }
+            if (selected && selected.department_id) {
+                router.push(`/more?id=${selected.department_id}`);
             }
         };
-        
-    
+
         return (
-            <td
-                className="border w-1/3 cursor-pointer"
-                onClick={handleNavigate}
-            >
+            <td className="border w-1/3 cursor-pointer" onClick={handleNavigate}>
                 {selected ? (
                     <div className="border rounded-lg p-2 m-2 flex items-center">
                         <img src={selected.university.logo_url} alt="logo" className="w-10 h-10 mr-2 rounded-full" />
                         <div>
                             <div className="font-bold">{selected.university.name}</div>
-                            <div className="text-sm text-gray-400">{truncateText(selected.모집단위, 15)}
-                            </div>
+                            <div className="text-sm text-gray-400">{truncateText(selected.모집단위, 15)}</div>
                             <div className="text-sm text-gray-400">지원자 수: {applicantCount}</div>
                         </div>
-                        <button 
-                        onClick={handleNavigate}
-                        className="bg-orange-200 text-gray-600 font-bold p-2 rounded ml-auto"
-                        >
-                        상세 보기
-                    </button>
+                        <button onClick={handleNavigate} className="bg-orange-200 text-gray-600 font-bold p-2 rounded ml-auto">
+                            상세 보기
+                        </button>
                     </div>
                 ) : (
-                    <div className="border rounded-lg p-2 m-2 h-full">우선순위를 설정하세요.
-                    </div>
-                    
+                    <div className="border rounded-lg p-2 m-2 h-full">우선순위를 설정하세요.</div>
                 )}
             </td>
         );
     };
 
-    
-
+    // [수정] '담기' 버튼 클릭 시에도 ID를 안전하게 주입
     const handleAddToPriority = (department_id, 군) => {
         for (let priority = 1; priority <= 3; priority++) {
             if (!priorities[priority][군]) {
                 const newPriorities = { ...priorities };
-                const department = applications.find(app => app.department_id === department_id).departments;
-                department.id = department_id; // Ensure department object has department_id
-                newPriorities[priority][군] = department;
+                const app = applications.find(app => app.department_id === department_id);
+                
+                // 기존 객체 복사 후 ID 명시적 할당
+                const departmentWithId = {
+                    ...app.departments,
+                    id: department_id 
+                };
+                
+                newPriorities[priority][군] = departmentWithId;
                 setPriorities(newPriorities);
                 break;
             }
@@ -272,21 +249,16 @@ const TestPage = () => {
         setPriorities(newPriorities);
     };
 
+    // [수정] 드래그 앤 드롭 핵심 수정 부분
     const handleDrop = (priority, 군, item) => {
-        console.log('Item:', item);
-        console.log('군:', 군);
-        console.log('Applications:', applications);
-
         if (applications.length === 0) {
-            console.error('Applications data is empty');
             alert('애플리케이션 데이터가 비어 있습니다.');
-            fetchApplications(user.id); // Reload applications data
+            fetchApplications(user.id);
             return;
         }
 
         const application = applications.find(app => app.department_id === item.id);
         if (!application || !application.departments) {
-            console.error('Invalid application or departments data:', application);
             alert('해당 군에 맞는 대학을 담아주세요.');
             return;
         }
@@ -297,7 +269,14 @@ const TestPage = () => {
         }
 
         const newPriorities = { ...priorities };
-        newPriorities[priority][군] = application.departments;
+        
+        // [핵심 수정] departments 정보를 복사하면서 ID를 강제로 넣어줍니다.
+        const departmentWithId = {
+            ...application.departments,
+            id: application.department_id // 여기서 ID를 주입해야 저장할 때 오류가 안 납니다.
+        };
+
+        newPriorities[priority][군] = departmentWithId;
         setPriorities(newPriorities);
     };
 
@@ -317,7 +296,7 @@ const TestPage = () => {
                 )
             `)
             .eq('user_id', user_id);
-    
+
         if (error) {
             console.error('Error fetching stored priorities:', error);
         } else {
@@ -328,14 +307,12 @@ const TestPage = () => {
                 }
                 priorityMap[item.priority][item.군] = {
                     ...item.departments,
-                    department_id: item.department_id, // Ensure department_id is available
+                    department_id: item.department_id,
                 };
             });
-    
-            setStoredPriorities(priorityMap); // Update stored priorities
+            setStoredPriorities(priorityMap);
         }
     };
-    
 
     const fetchModificationCount = async (user_id) => {
         const { data, error } = await supabase
@@ -345,8 +322,7 @@ const TestPage = () => {
             .single();
 
         if (error) {
-            console.error('Error fetching modification count:', error);
-            setModificationCount(3); // Default to 3 if not found, for new users
+            setModificationCount(3);
         } else {
             setModificationCount(data.coins);
         }
@@ -363,103 +339,100 @@ const TestPage = () => {
         }
     };
 
+    // [수정] 안정성이 확보된 handleSave
     const handleSave = async () => {
-        // Ensure all priorities are filled
+        // 1. 유효성 검사
         for (let priority = 1; priority <= 3; priority++) {
             if (!priorities[priority].가 || !priorities[priority].나 || !priorities[priority].다) {
                 alert('모든 우선순위를 채워주세요');
                 return;
             }
         }
-    
-        const prioritiesArray = [];
-    
-        const fetchAndPushPriority = async (priority, 군) => {
-            const department = priorities[priority][군];
 
-            // department.id 또는 department.department_id 확인
-            const departmentId = department?.id || department?.department_id;
-            if (!departmentId) {
-                console.error(`Department ID not found for priority ${priority}, 군 ${군}:`, department);
-                alert(`군 ${군}에 대한 학과 정보를 불러오는 데 실패했습니다. 다시 시도해주세요.`);
-                throw new Error(`Department ID not found for priority ${priority}, 군 ${군}`);
-            }
+        if (modificationCount <= 0) {
+            alert('수정 횟수가 부족합니다.');
+            return;
+        }
 
-            let another1 = null;
-            let another2 = null;
+        setLoading(true);
 
-            // `another1`과 `another2` 할당
-            if (군 === '가') {
-                const 나Dept = priorities[priority]['나'];
-                const 다Dept = priorities[priority]['다'];
-                another1 = 나Dept ? (나Dept.id || 나Dept.department_id) : null;
-                another2 = 다Dept ? (다Dept.id || 다Dept.department_id) : null;
-            } else if (군 === '나') {
-                const 가Dept = priorities[priority]['가'];
-                const 다Dept = priorities[priority]['다'];
-                another1 = 가Dept ? (가Dept.id || 가Dept.department_id) : null;
-                another2 = 다Dept ? (다Dept.id || 다Dept.department_id) : null;
-            } else if (군 === '다') {
-                const 가Dept = priorities[priority]['가'];
-                const 나Dept = priorities[priority]['나'];
-                another1 = 가Dept ? (가Dept.id || 가Dept.department_id) : null;
-                another2 = 나Dept ? (나Dept.id || 나Dept.department_id) : null;
-            }
-
-            // 우선순위 배열에 추가
-            prioritiesArray.push({
-                user_id: user.id,
-                priority,
-                군,
-                department_id: departmentId,
-                another1,
-                another2,
-            });
-        };
-    
         try {
+            const prioritiesArray = [];
+
+            // 2. 데이터 가공 (메모리 상에서 먼저 배열 완성)
             for (let priority = 1; priority <= 3; priority++) {
-                for (let 군 in priorities[priority]) {
-                    if (priorities[priority][군]) {
-                        await fetchAndPushPriority(priority, 군);
+                const groups = ['가', '나', '다'];
+                for (const 군 of groups) {
+                    const department = priorities[priority][군];
+                    const departmentId = department?.id || department?.department_id;
+
+                    if (!departmentId) {
+                        throw new Error(`${priority}순위 ${군}군의 학과 정보를 찾을 수 없습니다. (ID 누락)`);
                     }
+
+                    // 다른 군 ID 찾기 로직
+                    let another1 = null;
+                    let another2 = null;
+
+                    if (군 === '가') {
+                        const 나Dept = priorities[priority]['나'];
+                        const 다Dept = priorities[priority]['다'];
+                        another1 = 나Dept?.id || 나Dept?.department_id;
+                        another2 = 다Dept?.id || 다Dept?.department_id;
+                    } else if (군 === '나') {
+                        const 가Dept = priorities[priority]['가'];
+                        const 다Dept = priorities[priority]['다'];
+                        another1 = 가Dept?.id || 가Dept?.department_id;
+                        another2 = 다Dept?.id || 다Dept?.department_id;
+                    } else if (군 === '다') {
+                        const 가Dept = priorities[priority]['가'];
+                        const 나Dept = priorities[priority]['나'];
+                        another1 = 가Dept?.id || 가Dept?.department_id;
+                        another2 = 나Dept?.id || 나Dept?.department_id;
+                    }
+
+                    prioritiesArray.push({
+                        user_id: user.id,
+                        priority,
+                        군,
+                        department_id: departmentId,
+                        another1,
+                        another2,
+                    });
                 }
             }
-    
-            console.log('Priorities Array:', prioritiesArray); // Log for verification
-    
-            // 기존 우선순위 삭제
+
+            // 3. 기존 우선순위 삭제
             const { error: deleteError } = await supabase
                 .from('priorities')
                 .delete()
                 .eq('user_id', user.id);
-    
-            if (deleteError) {
-                console.error('Error deleting existing priorities:', deleteError);
-                return;
-            }
-    
-            // 새로운 우선순위 삽입
-            const { error } = await supabase
+
+            if (deleteError) throw deleteError;
+
+            // 4. 새로운 우선순위 삽입
+            const { error: insertError } = await supabase
                 .from('priorities')
                 .insert(prioritiesArray);
-    
-            if (error) {
-                console.error('Error saving priorities:', error);
-            } else {
-                alert('우선순위가 저장되었습니다.');
-                await fetchStoredPriorities(user.id);
-                const newCount = modificationCount - 1;
-                setModificationCount(newCount);
-                updateModificationCount(user.id, newCount);
-            }
+
+            if (insertError) throw insertError;
+
+            // 5. 성공 시 코인 차감 및 상태 업데이트
+            const newCount = modificationCount - 1;
+            await updateModificationCount(user.id, newCount);
+            setModificationCount(newCount);
+            
+            alert('우선순위가 저장되었습니다.');
+            await fetchStoredPriorities(user.id);
+
         } catch (error) {
-            console.error('Error in handleSave:', error);
+            console.error('Save failed:', error);
+            alert(`저장 중 오류가 발생했습니다: ${error.message}`);
+        } finally {
+            setLoading(false);
         }
     };
-    
-    
-    
+
     if (loading) {
         return <LoadingSpinner />;
     }
@@ -491,80 +464,79 @@ const TestPage = () => {
                             </tbody>
                         </table>
                         <div className="flex justify-center mt-4">
-                        <button
-                            onClick={() => {
-                                if (modificationCount <= 0) {
-                                    alert('수정 횟수를 초과했습니다.');
-                                } else {
-                                    setStoredPriorities(null); // Reset priorities for editing
-                                }
-                            }}
-                            className="bg-blue-500 text-white p-2 rounded"
-                        >
-                            수정하기 ({modificationCount}/3)
-                        </button>
+                            <button
+                                onClick={() => {
+                                    if (modificationCount <= 0) {
+                                        alert('수정 횟수를 초과했습니다.');
+                                    } else {
+                                        setStoredPriorities(null);
+                                    }
+                                }}
+                                className="bg-blue-500 text-white p-2 rounded"
+                            >
+                                수정하기 ({modificationCount}/3)
+                            </button>
                         </div>
                     </div>
-                ) : (<div className="mt-8">
-                    <h2 className="text-2xl font-bold mb-4">모의지원한 대학 및 학과</h2>
-                    <div className="flex flex-wrap">
-                        {applications.map((app) => (
-                            <Application key={app.id} app={app} handleAddToPriority={handleAddToPriority} handleDelete={handleDelete} 
-/>
-                        ))}
-                    </div>
-                    <h3 className="text-xl font-bold mt-8 mb-8">우선순위 설정 <span className='text-red-600'>(모의지원은 3번이며, 매주 토요일 횟수가 리셋됩니다.)</span></h3>
-
-                    <table className="min-w-full table-auto">
-                        <thead className="bg-orange-200 text-gray-600 uppercase text-sm leading-normal font-black">
-                            <tr>
-                                <th className="py-3 px-10 text-center whitespace-nowrap">순위</th>
-                                <th className="py-3 px-6 text-center">가</th>
-                                <th className="py-3 px-6 text-center">나</th>
-                                <th className="py-3 px-6 text-center">다</th>
-                            </tr>
-                        </thead>
-                        <tbody className="text-black text-sm font-medium">
-                            {[1, 2, 3].map((priority) => (
-                                <tr key={priority} className="border-b border-gray-200 hover:bg-gray-100">
-                                    <td className="py-3 px-10 text-center flex flex-row justify-center">
-                                        <span className="mt-1 font-bold">{priority}</span>
-                                    </td>
-                                    <PriorityCell
-                                        priority={priority}
-                                        군="가"
-                                        selected={priorities[priority].가}
-                                        handleRemove={handleRemove}
-                                        handleDrop={handleDrop}
-                                    />
-                                    <PriorityCell
-                                        priority={priority}
-                                        군="나"
-                                        selected={priorities[priority].나}
-                                        handleRemove={handleRemove}
-                                        handleDrop={handleDrop}
-                                    />
-                                    <PriorityCell
-                                        priority={priority}
-                                        군="다"
-                                        selected={priorities[priority].다}
-                                        handleRemove={handleRemove}
-                                        handleDrop={handleDrop}
-                                    />
-                                </tr>
+                ) : (
+                    <div className="mt-8">
+                        <h2 className="text-2xl font-bold mb-4">모의지원한 대학 및 학과</h2>
+                        <div className="flex flex-wrap">
+                            {applications.map((app) => (
+                                <Application key={app.id} app={app} handleAddToPriority={handleAddToPriority} handleDelete={handleDelete} />
                             ))}
-                        </tbody>
-                    </table>
-                    <div className="flex justify-end space-x-4 mt-4">
+                        </div>
+                        <h3 className="text-xl font-bold mt-8 mb-8">우선순위 설정 <span className='text-red-600'>(모의지원은 3번이며, 매주 토요일 횟수가 리셋됩니다.)</span></h3>
 
-                        <button
-                            onClick={handleSave}
-                            className="bg-green-500 text-white p-2 rounded"
-                        >
-                            모의지원 저장
-                        </button>
+                        <table className="min-w-full table-auto">
+                            <thead className="bg-orange-200 text-gray-600 uppercase text-sm leading-normal font-black">
+                                <tr>
+                                    <th className="py-3 px-10 text-center whitespace-nowrap">순위</th>
+                                    <th className="py-3 px-6 text-center">가</th>
+                                    <th className="py-3 px-6 text-center">나</th>
+                                    <th className="py-3 px-6 text-center">다</th>
+                                </tr>
+                            </thead>
+                            <tbody className="text-black text-sm font-medium">
+                                {[1, 2, 3].map((priority) => (
+                                    <tr key={priority} className="border-b border-gray-200 hover:bg-gray-100">
+                                        <td className="py-3 px-10 text-center flex flex-row justify-center">
+                                            <span className="mt-1 font-bold">{priority}</span>
+                                        </td>
+                                        <PriorityCell
+                                            priority={priority}
+                                            군="가"
+                                            selected={priorities[priority].가}
+                                            handleRemove={handleRemove}
+                                            handleDrop={handleDrop}
+                                        />
+                                        <PriorityCell
+                                            priority={priority}
+                                            군="나"
+                                            selected={priorities[priority].나}
+                                            handleRemove={handleRemove}
+                                            handleDrop={handleDrop}
+                                        />
+                                        <PriorityCell
+                                            priority={priority}
+                                            군="다"
+                                            selected={priorities[priority].다}
+                                            handleRemove={handleRemove}
+                                            handleDrop={handleDrop}
+                                        />
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                        <div className="flex justify-end space-x-4 mt-4">
+                            <button
+                                onClick={handleSave}
+                                className="bg-green-500 text-white p-2 rounded"
+                            >
+                                모의지원 저장
+                            </button>
+                        </div>
                     </div>
-                </div>
                 )}
             </div>
         </DndProvider>
