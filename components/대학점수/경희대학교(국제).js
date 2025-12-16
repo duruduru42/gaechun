@@ -55,7 +55,7 @@ export const 경희대학교국제 = async (userId, selection) => {
     baseScore = (standard_score_korean * 0.25 + standard_score_math * 0.40 + (scienceScore1 + scienceScore2 + scienceBonus2) * 0.35 ) * 3;
   } else if (selection.계열 === '예술') {
     const higherScienceScore = Math.max(scienceScore1, scienceScore2);
-    baseScore = (standard_score_korean * 0.6 + (higherScienceScore * 0.4+100)) * 3/2;
+    baseScore = (standard_score_korean * 0.6 + (higherScienceScore +100)*0.4) * 3;
   } else if (selection.계열 === '자유') {
       baseScore = (standard_score_korean * 0.25 + standard_score_math * 0.4 + (scienceScore1 + scienceScore2 ) * 0.35 ) * 3;
   } else {
