@@ -92,6 +92,17 @@ export const 서울대학교 = async (userId, selection) => {
       return "불가: 수학 조건 미충족"; // '미적분' 또는 '기하'가 아니면 불가
     }
 
+    // '자연'의 경우 과탐 조건 확인
+    if (
+      selection.계열 === "자연" &&
+      !(
+        naturalScienceSubjects.includes(science1) ||
+        naturalScienceSubjects.includes(science2)
+      )
+    ) {
+      return "불가 : 과탐 조건 미충족"; // 과탐 조건이 미충족되면 불가
+    }
+
     // '자연2'의 경우 과학 조건 확인
     if (
       selection.계열 === "자연2" &&
