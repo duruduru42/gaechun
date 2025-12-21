@@ -52,6 +52,20 @@ export default function Home() {
         }
         if (session) {
             console.log('User session:', session);
+            
+            // joined_yn 확인
+            const { data: profile, error: profileError } = await supabase
+                .from('profile')
+                .select('joined_yn')
+                .eq('id', session.user.id)
+                .single();
+            
+            if (!profileError && profile?.joined_yn === 'y') {
+                // joined_yn이 'y'이면 /welcome으로 리다이렉트
+                router.push('/welcome');
+                return;
+            }
+            
             setUser(session.user);
         } else {
             console.log('No user session found');
