@@ -30,18 +30,17 @@ export default function ClientLayout({ children }) {
   const isCheckExamPage = checkExamPages.includes(pathname);
 
   useEffect(() => {
-    // 비밀번호 재설정 이메일 링크 진입 시 자동으로 /reset 페이지로 이동
+    // Supabase 인증 상태 변화 감지
     const supabase = createClient();
-    const { data: authListener } = supabase.auth.onAuthStateChange((event) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === "PASSWORD_RECOVERY") {
-        window.location.href = "/reset";
+        // 메일 링크(type=recovery)를 타고 들어오면 바로 비번 변경 페이지로 이동
+        router.push('/reset');
       }
     });
 
-    return () => {
-      authListener?.subscription?.unsubscribe();
-    };
-  }, []);
+    return () => subscription.unsubscribe();
+  }, [router]);
 
   useEffect(() => {
     setIsClient(true);
