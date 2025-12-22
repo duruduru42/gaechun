@@ -16,8 +16,8 @@ export default function ClientLayout({ children }) {
 
   const router = useRouter();
   const pathname = usePathname();
-  const noNavbarPages = ['/checkout', '/login', '/register', '/auth', '/authDetail', '/signup', '/submit', '/inputpage','/admin','/admin/grade1','/admin/dashboard1','/admin/detail1','/welcome','/welcome/grade1','/welcome/dashboard1','/welcome/detail1'];
-  const noSidebarPages = ["/program", '/checkout', '/inf', "/about", '/', '/login', '/register', '/auth', '/authDetail', '/signup', '/submit', '/inputpage', '/admin','/admin/grade1','/admin/dashboard1','/admin/detail1','/welcome','/welcome/grade1','/welcome/dashboard1','/welcome/detail1'];
+  const noNavbarPages = ['/checkout', '/login', '/register', '/auth', '/authDetail', '/signup', '/submit', '/inputpage','/admin','/admin/grade1','/admin/dashboard1','/admin/detail1','/welcome','/welcome/grade1','/welcome/dashboard1','/welcome/detail1', '/reset'];
+  const noSidebarPages = ["/program", '/checkout', '/inf', "/about", '/', '/login', '/register', '/auth', '/authDetail', '/signup', '/submit', '/inputpage', '/admin','/admin/grade1','/admin/dashboard1','/admin/detail1','/welcome','/welcome/grade1','/welcome/dashboard1','/welcome/detail1', '/reset'];
   const restrictedPages = ['/home', '/video', '/apply', '/dashboard', '/grade'];
   const checkExamPages = ['/apply', '/dashboard', '/grade'];
   const noAuthPages = ["/", "/signup", "/inf", "/about", "/program"];
@@ -46,7 +46,7 @@ export default function ClientLayout({ children }) {
     setIsClient(true);
 
     const checkUserSession = async () => {
-      if (noAuth) return;
+      if (noAuth || pathname === '/reset') return;
 
       const supabase = createClient();
       const { data: sessionData } = await supabase.auth.getSession();
@@ -59,7 +59,7 @@ export default function ClientLayout({ children }) {
           .eq("id", sessionData.session.user.id)
           .single();
 
-        if (pathname !== '/checkout') { // /checkout에서 팝업 비활성화
+        if (pathname !== '/checkout' && pathname !== '/reset') { // /checkout, /reset에서 팝업 비활성화
           if (isRestrictedPage && (!profile || !profile.image_url)) {
             setShowPopup(true);
           } else {
