@@ -106,7 +106,7 @@ export default function SignUpPage() {
             return;
         }
 
-        alert("회원가입 완료되었습니다. 로그인 부탁드립니다.");
+        alert("이메일 인증 부탁드립니다.");
         console.log("User signed up: ", data.user);
     } else {
         alert("모든 필드를 올바르게 입력해주세요.");
