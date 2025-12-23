@@ -26,8 +26,26 @@ export default function AdminLayout({ children }) {
           .eq("id", sessionData.session.user.id)
           .single();
 
-        if (error || profile?.role !== "admin") {
-          router.push("/not-authorized"); // 권한 없는 사용자 리다이렉트
+        // 디버깅을 위한 로그 추가
+        console.log("Profile data:", profile);
+        console.log("Profile error:", error);
+        console.log("Role value:", profile?.role);
+        console.log("Role type:", typeof profile?.role);
+        
+        // role 값을 trim하고 소문자로 변환하여 비교 (대소문자 및 공백 문제 방지)
+        const userRole = profile?.role?.toString().trim().toLowerCase();
+        const isAdminRole = userRole === "admin";
+        
+        console.log("Normalized role:", userRole);
+        console.log("Is admin:", isAdminRole);
+
+        // error가 발생했거나 role이 "admin"이 아닌 경우
+        if (error) {
+          console.error("Profile fetch error:", error);
+          router.push("/not-authorized");
+        } else if (!isAdminRole) {
+          console.warn("User is not admin. Role:", profile?.role);
+          router.push("/not-authorized");
         } else {
           setIsAdmin(true);
         }

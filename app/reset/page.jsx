@@ -1,12 +1,31 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
 
 export default function ResetPasswordPage() {
   const supabase = createClient();
+  const router = useRouter();
   const [password, setPassword] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data: sessionData } = await supabase.auth.getSession();
+      
+      if (!sessionData.session) {
+        // 로그인하지 않은 경우 로그인 페이지로 리다이렉트
+        router.push('/auth');
+        return;
+      }
+      
+      setLoading(false);
+    };
+
+    checkSession();
+  }, [router]);
 
   const handleUpdate = async () => {
     if (!password) {
@@ -23,9 +42,19 @@ export default function ResetPasswordPage() {
       return;
     }
 
-    alert('비밀번호가 변경되었습니다! 다시 로그인해주세요.');
-    window.location.href = '/login';
+    alert('비밀번호가 변경되었습니다!');
+    window.location.href = '/home';
   };
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <p className="text-gray-600">로딩 중...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
