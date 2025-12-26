@@ -16,8 +16,8 @@ export default function ClientLayout({ children }) {
 
   const router = useRouter();
   const pathname = usePathname();
-  const noNavbarPages = ['/checkout', '/login', '/register', '/auth', '/authDetail', '/signup', '/submit', '/inputpage','/admin','/admin/grade1','/admin/dashboard1','/admin/detail1','/welcome','/welcome/grade1','/welcome/dashboard1','/welcome/detail1', '/reset'];
-  const noSidebarPages = ["/program", '/checkout', '/inf', "/about", '/', '/login', '/register', '/auth', '/authDetail', '/signup', '/submit', '/inputpage', '/admin','/admin/grade1','/admin/dashboard1','/admin/detail1','/welcome','/welcome/grade1','/welcome/dashboard1','/welcome/detail1', '/reset'];
+  const noNavbarPages = ['/admin/ranking','/admin/final','/checkout', '/login', '/register', '/auth', '/authDetail', '/signup', '/submit', '/inputpage','/admin','/admin/grade1','/admin/dashboard1','/admin/detail1','/welcome','/welcome/grade1','/welcome/dashboard1','/welcome/detail1', '/reset', '/admin/insert', '/admin/students', '/admin/set-priority'];
+  const noSidebarPages = ['/admin/ranking','/admin/final',"/program", '/checkout', '/inf', "/about", '/', '/login', '/register', '/auth', '/authDetail', '/signup', '/submit', '/inputpage', '/admin','/admin/grade1','/admin/dashboard1','/admin/detail1','/welcome','/welcome/grade1','/welcome/dashboard1','/welcome/detail1', '/reset', '/admin/insert', '/admin/students', '/admin/set-priority'];
   const restrictedPages = ['/home', '/video', '/apply', '/dashboard', '/grade'];
   const checkExamPages = ['/apply', '/dashboard', '/grade'];
   const noAuthPages = ["/", "/signup", "/inf", "/about", "/program"];

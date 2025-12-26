@@ -37,32 +37,36 @@ const isNaturalScience = (subject) => {
 };
 
 // 계명대학교 점수 계산 함수
-export const 계명대학교 = async (userId, selection) => {
+export const 계명대학교 = async (userId, selection, isAdmin = false) => {
   const supabase = createClient();
+
+  // isAdmin 여부에 따라 테이블과 ID 컬럼 결정
+  const tableName = isAdmin ? 'admin_managed_students' : 'exam_results';
+  const idColumn = isAdmin ? 'id' : 'user_id';
 
   // 사용자 시험 데이터 불러오기
   const { data, error } = await supabase
-    .from("exam_results")
+    .from(tableName)
     .select(
       "percentile_korean, percentile_math, percentile_science1, percentile_science2, grade_english, grade_history, science1, science2, math"
     )
-    .eq("user_id", userId)
+    .eq(idColumn, userId)
     .single();
 
   if (error || !data) {
     return "불가"; // 데이터가 없거나 에러일 경우 처리
   }
-
+  
   const {
     percentile_korean,
     percentile_math,
     percentile_science1,
     percentile_science2,
-    grade_english,
+    grade_english, // 추출!
     grade_history,
     science1,
     science2,
-    math,
+    math
   } = data;
 
   // 영어 점수 계산

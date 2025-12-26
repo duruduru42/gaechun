@@ -25,15 +25,18 @@ const naturalScienceSubjects = [
   '생명과학Ⅰ', '생명과학Ⅱ', '지구과학Ⅰ', '지구과학Ⅱ'
 ];
 
-export const 서울대학교 = async (userId, selection) => {
+export const 서울대학교 = async (userId, selection, isAdmin = false) => {
   const supabase = createClient();
 
+  const tableName = isAdmin ? 'admin_managed_students' : 'exam_results';
+  const idColumn = isAdmin ? 'id' : 'user_id';
+
   const { data, error } = await supabase
-    .from("exam_results")
+    .from(tableName)
     .select(
       "math, standard_score_korean, grade_history, standard_score_math, standard_score_science1, standard_score_science2, foreign_language, grade_korean, grade_math, grade_english, grade_science1, grade_science2, grade_foreign_language, science1, science2"
     )
-    .eq("user_id", userId)
+    .eq(idColumn, userId)
     .single();
 
   if (error || !data) return "불가1";
@@ -56,7 +59,6 @@ export const 서울대학교 = async (userId, selection) => {
     math
   } = data;
 
-
   if (
     selection.계열 === "인문" &&
     !foreign_language &&
@@ -64,71 +66,65 @@ export const 서울대학교 = async (userId, selection) => {
   ) {
     return "불가";
   }
+
   const grades = [
-    Number(grade_korean) || 9, // 값이 없으면 최악 등급으로 설정
+    Number(grade_korean) || 9,
     Number(grade_math) || 9,
     Number(grade_english) || 9,
-    science1 && science2 // science1과 science2가 둘 다 있을 경우에만 평균 계산
+    science1 && science2
       ? (Number(grade_science1) + Number(grade_science2)) / 2
-      : 9, // 하나라도 없으면 최악 등급으로 설정
+      : 9,
   ];
-  
-  // 상위 3개 등급 합 계산 함수
-  const isEligibleForApplication = (grades) => {
-    const topThreeGrades = [...grades].sort((a, b) => a - b).slice(0, 3); // 상위 3개 추출
-    const total = topThreeGrades.reduce((sum, grade) => sum + grade, 0); // 합산
-    console.log("상위 3개 등급:", topThreeGrades, "합계:", total); // 디버깅 로그 추가
-    return total <= 7; // 상위 3개 등급 합이 7 이하여야 함
-  };
-  
-  // 지원 가능 여부 체크
-  if (!isEligibleForApplication(grades)) return "불가";
-  
 
-  // 자연 계열 추가 조건
+  const isEligibleForApplication = (grades) => {
+    const topThreeGrades = [...grades].sort((a, b) => a - b).slice(0, 3);
+    const total = topThreeGrades.reduce((sum, grade) => sum + grade, 0);
+    return total <= 7;
+  };
+
+  if (!isEligibleForApplication(grades)) return "불가";
+
+  // --- 자연 계열 조건 체크 시작 ---
   if (selection.계열 === "자연" || selection.계열 === "자연2") {
     // 수학 조건 확인
     if (!advancedMathSubjects.includes(math)) {
-      return "불가: 수학 조건 미충족"; // '미적분' 또는 '기하'가 아니면 불가
+      return "불가: 수학 조건 미충족";
     }
 
-    // '자연'의 경우 과탐 조건 확인
+    // '자연' 계열의 경우: 과탐1, 과탐2 모두 조건에 포함되어야 함 (&& 로 수정)
     if (
       selection.계열 === "자연" &&
       !(
-        naturalScienceSubjects.includes(science1) ||
+        naturalScienceSubjects.includes(science1) &&
         naturalScienceSubjects.includes(science2)
       )
     ) {
-      return "불가 : 과탐 조건 미충족"; // 과탐 조건이 미충족되면 불가
+      return "불가 : 과탐 조건 미충족";
     }
 
-    // '자연2'의 경우 과학 조건 확인
+    // '자연2' 계열의 경우: 과학1, 과학2 모두 조건에 포함되어야 함 (&& 로 수정)
     if (
       selection.계열 === "자연2" &&
       !(
-        requiredScienceSubjects.includes(science1) ||
+        requiredScienceSubjects.includes(science1) &&
         requiredScienceSubjects.includes(science2)
       )
     ) {
-      return "불가: 과학 조건 미충족"; // 과학 조건이 미충족되면 불가
+      return "불가: 과학 조건 미충족";
     }
-  }
+  } // <--- 여기가 빠져있던 닫는 중괄호입니다.
+  // --- 자연 계열 조건 체크 끝 ---
 
-  // 감점 계산
   let penalty = 0;
 
-  // 영어 감점
   if (grade_english > 1) {
     penalty += penaltyTable.english[grade_english] || 0;
   }
 
-  // 한국사 감점
   if (grade_history > 3) {
     penalty += penaltyTable.history[grade_history] || 0;
   }
 
-  // 제2외국어/한문 감점
   if (
     selection.계열 === "인문" &&
     selection.모집단위 !== "자유전공학부" &&
@@ -137,20 +133,18 @@ export const 서울대학교 = async (userId, selection) => {
     penalty += penaltyTable.foreignLanguage[grade_foreign_language] || 0;
   }
 
-  // 기본 점수 계산
   let score =
     (Number(standard_score_korean) || 0) +
     (Number(standard_score_math) * 1.2 || 0) +
     ((Number(standard_score_science1) + Number(standard_score_science2)) * 0.8 || 0);
 
-  // Check for advanced science subjects and apply bonus
   const advancedScienceSubjects = ['물리학Ⅱ', '지구과학Ⅱ', '화학Ⅱ', '생명과학Ⅱ'];
   let advancedCount = 0;
-  if (selection.계열 === "자연" && advancedScienceSubjects.includes(science1) || selection.계열 === "자연2" && advancedScienceSubjects.includes(science1)) advancedCount++;
-  if (selection.계열 === "자연" && advancedScienceSubjects.includes(science2) || selection.계열 === "자연2" && advancedScienceSubjects.includes(science2)) advancedCount++;
+  if ((selection.계열 === "자연" || selection.계열 === "자연2") && advancedScienceSubjects.includes(science1)) advancedCount++;
+  if ((selection.계열 === "자연" || selection.계열 === "자연2") && advancedScienceSubjects.includes(science2)) advancedCount++;
+  
   score += advancedCount === 2 ? 5 : advancedCount === 1 ? 3 : 0;
 
-  // 감점 적용
   score -= penalty;
 
   return score.toFixed(1);

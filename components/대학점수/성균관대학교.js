@@ -19,14 +19,19 @@ const getHistoryPenalty = (grade) => {
 };
 
 // 성균관대학교 점수 계산 함수
-export const 성균관대학교 = async (userId, selection) => {
+// 핵심 수정: 세 번째 인자 isAdmin 추가 (기본값 false)
+export const 성균관대학교 = async (userId, selection, isAdmin = false) => {
   const supabase = createClient();
+
+  // isAdmin 여부에 따라 테이블과 ID 컬럼 결정
+  const tableName = isAdmin ? 'admin_managed_students' : 'exam_results';
+  const idColumn = isAdmin ? 'id' : 'user_id';
 
   // 사용자 시험 데이터 불러오기
   const { data, error } = await supabase
-    .from('exam_results')
+    .from(tableName)
     .select('percentile_korean, percentile_math, percentile_science1, percentile_science2, grade_english, grade_history')
-    .eq('user_id', userId)
+    .eq(idColumn, userId)
     .single();
 
   if (error || !data) {
@@ -41,7 +46,6 @@ export const 성균관대학교 = async (userId, selection) => {
     grade_english,
     grade_history
   } = data;
-
   const englishScore = getEnglishScore(grade_english);
   const historyPenalty = getHistoryPenalty(grade_history);
   const bestScience = Math.max(Number(percentile_science1), Number(percentile_science2));

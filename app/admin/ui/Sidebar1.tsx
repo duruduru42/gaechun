@@ -11,7 +11,9 @@ export function Sidebar1() {
   const menuItems = [
     { href: '/admin', label: '성적 입력' },
     { href: '/admin/grade1', label: '성적' },
-    { href: '/admin/dashboard1', label: '대학 합격률' },
+    { href: '/admin/students', label: '등록 학생들' },
+    { href: '/admin/final', label: '표본분석' },
+
   ];
 
   return (

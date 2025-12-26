@@ -16,19 +16,24 @@ const naturalScienceSubjects = [
 ];
 
 
-export const 충북대학교 = async (userId, selection) => {
+// 핵심 수정: 세 번째 인자 isAdmin 추가 (기본값 false)
+export const 충북대학교 = async (userId, selection, isAdmin = false) => {
   const supabase = createClient();
-  
+
+  // isAdmin 여부에 따라 테이블과 ID 컬럼 결정
+  const tableName = isAdmin ? 'admin_managed_students' : 'exam_results';
+  const idColumn = isAdmin ? 'id' : 'user_id';
+
   const { data, error } = await supabase
-    .from('exam_results')
+    .from(tableName)
     .select(
       'standard_score_korean, standard_score_math, standard_score_science1, standard_score_science2, grade_english, grade_history, science1, science2, math'
     )
-    .eq('user_id', userId)
+    .eq(idColumn, userId)
     .single();
 
   if (error || !data) {
-    return '불가'; // If there's an error or no data found
+    return '불가'; // 데이터가 없거나 에러일 경우 처리
   }
 
   const {
@@ -41,7 +46,6 @@ export const 충북대학교 = async (userId, selection) => {
     science2,
     math
   } = data;
-
   // 영어 점수 계산
   const englishScore = getEnglishScore(grade_english);
 

@@ -1,7 +1,7 @@
 'use client'
 
 import { useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react'; // Suspense 추가import { createClient } from '@/utils/supabase/client';
 import { createClient } from '@/utils/supabase/client';
 import Calculate from '@/components/ui/Calculate'; // Adjust the filename accordingly
 import { 서울대학교 } from '@/components/대학점수/서울대학교';
@@ -89,10 +89,11 @@ const scoreCalculators = {
   '계명대학교' : 계명대학교,
   '성균관대학교' : 성균관대학교,
 };
-
-const Detail = () => {
+const DetailContent = () => {
   const searchParams = useSearchParams();
   const name = searchParams.get('name');
+  const studentId = searchParams.get('studentId'); // 1. URL 파라미터에서 studentId 추출
+  
   const supabase = createClient();
   const [user, setUser] = useState(null);
   const [selections, setSelections] = useState([]);
@@ -117,10 +118,11 @@ const Detail = () => {
   }, [name, sortOrder]);
 
   useEffect(() => {
+    // 2. studentId가 있더라도 user(관리자 세션)가 로드된 후 계산 시작
     if (user && selections.length > 0) {
       calculateScoresForDepartments(selections);
     }
-  }, [user, selections]);
+  }, [user, selections, studentId])
 
 
   // 비교 결과 계산 함수
@@ -243,16 +245,20 @@ const Detail = () => {
   };
 
   const calculateScoresForDepartments = async (departments) => {
-    if (!user) return; // Ensure user is available
+    if (!user) return;
 
     const scores = {};
     const departmentGroups = {};
 
-    // Step 1: Group departments by 계열
+    // 3. 대상 ID와 모드 플래그 설정
+    // studentId가 있으면 그 UUID를 사용하고 isAdmin 모드를 true로 설정
+    const targetId = studentId || user.id;
+    const isAdmin = !!studentId; 
+
+    // Step 1: Group departments by 계열 (기존 로직)
     for (let selection of departments) {
-        const 계열 = selection.계열?.trim(); // `계열` 기준으로 그룹화
+        const 계열 = selection.계열?.trim();
         if (!계열) {
-            console.warn(`계열 정보가 없는 모집단위:`, selection);
             scores[selection.id] = 'Unavailable';
             continue;
         }
@@ -262,19 +268,19 @@ const Detail = () => {
         departmentGroups[계열].push(selection);
     }
 
-    // Step 2: Calculate scores for each 계열 and assign to departments
+    // Step 2: Calculate scores
     for (let 계열 in departmentGroups) {
         const group = departmentGroups[계열];
-        const referenceSelection = group[0]; // Use the first selection as reference for calculation
+        const referenceSelection = group[0];
         const normalizedUniversityName = referenceSelection.name?.trim();
         const calculateScore = scoreCalculators[normalizedUniversityName];
 
         if (calculateScore) {
             try {
-                // Calculate score for the 계열
-                const score = await calculateScore(user.id, referenceSelection);
+                // 4. 대학 계산기에 targetId와 isAdmin 플래그 전달
+                // 수정하신 건국대학교(targetId, referenceSelection, isAdmin) 형식에 맞춤
+                const score = await calculateScore(targetId, referenceSelection, isAdmin);
 
-                // Assign the calculated score to all departments in the 계열
                 for (let selection of group) {
                     scores[selection.id] = score;
                 }
@@ -292,8 +298,8 @@ const Detail = () => {
         }
     }
 
-    setCalculatedScores(scores); // Update state with calculated scores
-};
+    setCalculatedScores(scores);
+  };
 
   
   return (
@@ -376,4 +382,10 @@ const Detail = () => {
   );
 };
 
-export default Detail;
+export default function Detail() {
+  return (
+    <Suspense fallback={<div className="p-20 text-center font-bold text-gray-500 text-xl">데이터 분석 중...</div>}>
+      <DetailContent />
+    </Suspense>
+  );
+}

@@ -23,14 +23,19 @@ const getHistoryScore = (grade) => {
 
 
 // 홍익대학교(서울) 점수 계산 함수
-export const 홍익대학교세종 = async (userId, selection) => {
+// 핵심 수정: 세 번째 인자 isAdmin 추가 (기본값 false)
+export const 홍익대학교세종 = async (userId, selection, isAdmin = false) => {
   const supabase = createClient();
   
+  // isAdmin 여부에 따라 테이블과 ID 컬럼 결정
+  const tableName = isAdmin ? 'admin_managed_students' : 'exam_results';
+  const idColumn = isAdmin ? 'id' : 'user_id';
+
   // 사용자 시험 데이터 불러오기
   const { data, error } = await supabase
-    .from('exam_results')
+    .from(tableName)
     .select('standard_score_korean, standard_score_math, standard_score_science1, standard_score_science2, grade_english, grade_history, science1, science2, math')
-    .eq('user_id', userId)
+    .eq(idColumn, userId)
     .single();
 
   if (error || !data) {

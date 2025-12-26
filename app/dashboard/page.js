@@ -87,13 +87,19 @@ export default function Dashboard() {
     return counts;
 };
 
-  const filterAndSortUniversities = () => {
-    let filtered = universities.filter(
-      (university) => university.selection_type_name === selectionType
-    );
+// ... 기존 코드 동일
 
-    setFilteredUniversities(filtered);
-  };
+const filterAndSortUniversities = () => {
+  let filtered = universities.filter(
+    (university) => 
+      university.selection_type_name === selectionType && 
+      university.id !== 'susi1' && 
+      university.id !== 'susi2'
+  );
+  setFilteredUniversities(filtered);
+};
+
+// ... 이하 코드 동일
 
   const handleUniversityClick = (university) => {
     router.push(`/detail?name=${encodeURIComponent(university.id)}&selectionTypeName=${encodeURIComponent(university.selection_type_name)}`);

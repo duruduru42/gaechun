@@ -1,6 +1,6 @@
 import { createClient } from "@/utils/supabase/client";
 
-// English and Korean History score tables
+// 영어 및 한국사 점수 표 (기존과 동일)
 const getEnglishScore = (grade) => {
     const englishScores = {
         1: 100, 2: 95, 3: 90, 4: 85, 5: 80,
@@ -17,19 +17,23 @@ const getHistoryPenalty = (grade) => {
     return historyPenalties[grade] || 0;
 };
 
-// Gyeongin National University of Education score calculation function
-export const 경인교육대학교 = async (userId) => {
+// 핵심 수정: 세 번째 인자 isAdmin 추가 (기본값 false)
+export const 경인교육대학교 = async (userId, selection, isAdmin = false) => {
     const supabase = createClient();
+
+    // isAdmin 여부에 따라 테이블과 ID 컬럼 결정
+    const tableName = isAdmin ? 'admin_managed_students' : 'exam_results';
+    const idColumn = isAdmin ? 'id' : 'user_id';
 
     // Fetch user exam data
     const { data, error } = await supabase
-        .from('exam_results')
+        .from(tableName)
         .select('percentile_korean, percentile_math, percentile_science1, percentile_science2, grade_english, grade_history, math')
-        .eq('user_id', userId)
+        .eq(idColumn, userId)
         .single();
 
     if (error || !data) {
-        return '불가'; // Error handling if no data found
+        return '불가'; // 데이터가 없는 경우 에러 처리
     }
 
     const {
@@ -42,17 +46,17 @@ export const 경인교육대학교 = async (userId) => {
         math
     } = data;
 
-    // Calculate English and Korean History scores
+    // 영어 및 한국사 점수 계산
     const englishScore = getEnglishScore(grade_english);
     const historyPenalty = getHistoryPenalty(grade_history);
 
-    // Calculate average of exploration subjects
+    // 탐구 영역 평균 계산
     const avgExplorationScore = (Number(percentile_science1) + Number(percentile_science2)) / 2;
 
-    // Apply 3% bonus if math is '미적분' or '기하'
+    // 수학 '미적분' 또는 '기하' 선택 시 3% 가산점 적용
     const mathScore = (math === '미적분' || math === '기하') ? percentile_math * 1.03 : percentile_math;
 
-    // Calculate total score
+    // 최종 환산 점수 계산
     const totalScore = (Number(percentile_korean) + Number(mathScore) + Number(englishScore) + avgExplorationScore) * 2.5 - historyPenalty;
 
     return totalScore.toFixed(2);
