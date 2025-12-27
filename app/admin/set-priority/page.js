@@ -104,10 +104,10 @@ function PriorityContent() {
     const { data: deptData } = await supabase.from('departments').select('*').order('name', { ascending: true });
     if (deptData) {
       const suffix = student.selection_type === '기회균형전형' ? '1' : student.selection_type === '농어촌전형' ? '2' : '';
-      const filteredByType = suffix ? deptData.filter(d => String(d.university_id).endsWith(suffix)) : deptData;
+      const filteredByType = suffix ? deptData.filter(d => String(d.university_id || '').endsWith(suffix)) : deptData;
       setDepartments(filteredByType);
 
-      const { data: globalChoices } = await supabase.from('student_choices').select('*');
+      const { data: globalChoices } = await supabase.from('student_choices').select('*, departments(university_id, 모집단위, sum)');
       setAllAppliedData(globalChoices || []);
 
       const { data: myExisting } = await supabase.from('student_choices').select('*, departments(*)').eq('student_id', studentId);
@@ -134,8 +134,11 @@ function PriorityContent() {
 
     for (const key in deptGroups) {
       const group = deptGroups[key];
+      if (!group || group.length === 0) continue;
       const ref = group[0];
-      const calculateScore = scoreCalculators[ref.name?.trim()];
+      if (!ref?.name) continue;
+
+      const calculateScore = scoreCalculators[ref.name.trim()];
       if (calculateScore) {
         try {
           const score = await calculateScore(studentId, ref, true); 
@@ -161,12 +164,24 @@ function PriorityContent() {
   };
 
   const reorderAllStudents = async () => {
-    const { data: allChoices } = await supabase.from('student_choices').select('*, departments(모집인원, 군)');
+    const { data: allChoices } = await supabase.from('student_choices').select('*, departments(id, 모집인원, 군, university_id, 모집단위, sum)');
     if (!allChoices) return;
 
     const deptGroups = allChoices.reduce((acc, curr) => {
-      if (!acc[curr.department_id]) acc[curr.department_id] = [];
-      acc[curr.department_id].push(curr);
+      const deptId = curr.department_id;
+      if (!acc[deptId]) acc[deptId] = [];
+      acc[deptId].push(curr);
+
+      if (curr.departments?.sum === 'y') {
+        const currentBase = String(curr.departments.university_id || '').replace(/[12]/, '');
+        allChoices.forEach(other => {
+          if (other.id !== curr.id && 
+              other.departments?.모집단위 === curr.departments?.모집단위 &&
+              String(other.departments?.university_id || '').replace(/[12]/, '') === currentBase) {
+            acc[deptId].push(other);
+          }
+        });
+      }
       return acc;
     }, {});
 
@@ -186,8 +201,10 @@ function PriorityContent() {
 
         choicesInGroup.forEach(choice => {
           const isDGroup = choice.departments?.군 === '다';
-          const applicantsInDept = (deptGroups[choice.department_id] || []).sort((a, b) => b.converted_score - a.converted_score);
-          const myRank = applicantsInDept.findIndex(x => x.id === choice.id);
+          const competitors = Array.from(new Set(deptGroups[choice.department_id] || []))
+            .sort((a, b) => (Number(b.converted_score) || 0) - (Number(a.converted_score) || 0));
+          
+          const myRank = competitors.findIndex(x => x.id === choice.id);
           const capacity = Math.round((choice.departments?.모집인원 || 0) * 0.5);
 
           const isEligible = isDGroup || myRank < capacity;
@@ -236,7 +253,7 @@ function PriorityContent() {
       await supabase.from('student_choices').delete().eq('student_id', studentId);
       if (insertData.length > 0) await supabase.from('student_choices').insert(insertData);
       await reorderAllStudents();
-      alert("전체 배정 조정이 완료되었습니다.");
+      alert("배정 알고리즘 및 저장이 완료되었습니다.");
       router.push('/admin/students');
     } catch (e) {
       alert("오류 발생");
@@ -256,9 +273,13 @@ function PriorityContent() {
     }));
   };
 
-  const filteredList = departments.filter(d => 
-    d.군 === activeSelection.group && (d.name.includes(searchTerm) || d.모집단위.includes(searchTerm))
-  );
+  const filteredList = (departments || []).filter(d => {
+    const isGroupMatch = d?.군 === activeSelection.group;
+    const univName = d?.name || '';
+    const deptName = d?.모집단위 || '';
+    const isSearchMatch = univName.includes(searchTerm) || deptName.includes(searchTerm);
+    return isGroupMatch && isSearchMatch;
+  });
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6 md:p-12 font-sans">
@@ -327,15 +348,25 @@ function PriorityContent() {
               const myScore = calculatedScores[dept.id] || 0;
               const isDGroup = dept.군 === '다';
               
-              // 확정 인원 계산
-              const confirmedCount = allAppliedData.filter(a => a.department_id === dept.id && a.status === '확정').length;
+              let confirmedCount = 0;
+              let betterCompetitors = 0;
+
+              if (dept.sum === 'y') {
+                const currentBase = String(dept.university_id || '').replace(/[12]/, '');
+                const integratedApps = allAppliedData.filter(a => 
+                  a.status === '확정' &&
+                  a.departments?.모집단위 === dept.모집단위 &&
+                  String(a.departments?.university_id || '').replace(/[12]/, '') === currentBase
+                );
+                confirmedCount = integratedApps.length;
+                betterCompetitors = integratedApps.filter(a => (Number(a.converted_score) || 0) > myScore).length;
+              } else {
+                const standardApps = allAppliedData.filter(a => a.department_id === dept.id && a.status === '확정');
+                confirmedCount = standardApps.length;
+                betterCompetitors = standardApps.filter(a => (Number(a.converted_score) || 0) > myScore).length;
+              }
               
-              // 나보다 점수 높은 확정 인원 계산 (가, 나군용)
-              const betterCompetitors = allAppliedData.filter(a => a.department_id === dept.id && a.status === '확정' && a.converted_score > myScore).length;
-              
-              const capacity = Math.round(dept.모집인원 * 0.5);
-              
-              // 마감 여부: 다군이면 마감 없음, 가/나군은 경쟁자 수가 capacity 이상이면 마감
+              const capacity = Math.round((dept.모집인원 || 0) * 0.5);
               const isFull = !isDGroup && betterCompetitors >= capacity;
 
               return (
@@ -345,16 +376,18 @@ function PriorityContent() {
                 >
                   <div className="flex-1">
                     <p className="text-[10px] font-black text-blue-500 uppercase">{dept.name}</p>
-                    <p className="text-xl font-black text-gray-800">{dept.모집단위}</p>
+                    <p className="text-xl font-black text-gray-800">
+                      {dept.모집단위}
+                      {dept.sum === 'y' && <span className="ml-2 text-[9px] bg-purple-100 text-purple-600 px-2 py-0.5 rounded-full">통합모집</span>}
+                    </p>
                     <div className="flex items-center gap-3 mt-1">
                       <p className="text-xs font-bold text-gray-400">모집인원: {dept.모집인원}명</p>
-                      {/* 다군이 아닐 때만 배정제한 정보 표시 */}
                       {!isDGroup && (
-                        <p className="text-xs font-bold text-blue-600">확정 {confirmedCount}명 / 제한 {capacity}명</p>
+                        <p className={`text-xs font-bold ${isFull ? 'text-red-500' : 'text-blue-600'}`}>
+                          확정 {confirmedCount}명 / 제한 {capacity}명
+                        </p>
                       )}
-                      {isDGroup && (
-                        <p className="text-xs font-bold text-green-600">제한 없음</p>
-                      )}
+                      {isDGroup && <p className="text-xs font-bold text-green-600">제한 없음</p>}
                     </div>
                   </div>
                   <div className="text-right flex items-center gap-8">
