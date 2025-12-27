@@ -42,18 +42,33 @@ function RankingDashboardContent() {
 
       // 3. 확정 인원 데이터 집계
       // student_choices에서 status가 '확정'인 것들을 가져와서 대학별로 카운트합니다.
-      const { data: choicesData } = await supabase
-        .from('student_choices')
-        .select('*, departments(university_id)')
-        .eq('status', '확정');
+// 3. 확정 인원 데이터 집계 (수정 버전)
+const { data: choicesData, error: choicesError } = await supabase
+  .from('student_choices')
+  .select(`
+    status,
+    departments!inner (
+      university_id
+    ),
+    admin_managed_students!inner (
+      selection_type
+    )         
+  `)
+  .eq('status', '확정')
+  .eq('admin_managed_students.selection_type', type); // 관리자 전형 타입과 일치하는 데이터만
 
-      const counts = (choicesData || []).reduce((acc, curr) => {
-        const univId = curr.departments?.university_id;
-        if (univId) {
-          acc[univId] = (acc[univId] || 0) + 1;
-        }
-        return acc;
-      }, {});
+if (choicesError) {
+  console.error("집계 에러:", choicesError);
+}
+
+const counts = (choicesData || []).reduce((acc, curr) => {
+  // 조인 구조에 따라 접근 경로를 정확히 지정
+  const univId = curr.departments?.university_id; 
+  if (univId) {
+    acc[univId] = (acc[univId] || 0) + 1;
+  }
+  return acc;
+}, {});
 
       setConfirmedCounts(counts);
       setUniversities(filtered);

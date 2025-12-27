@@ -9,17 +9,17 @@ import { 서울대학교 } from '@/components/대학점수/서울대학교';
 import { 고려대학교 } from '@/components/대학점수/고려대학교';
 import { 연세대학교 } from '@/components/대학점수/연세대학교';
 import { 서강대학교 } from '@/components/대학점수/서강대학교';
-import { 한양대학교 } from '@/components/대학점수/한양대학교(서울)';
+import { 한양대학교 } from '@/components/대학점수/한양대학교';
 import { 중앙대학교 } from '@/components/대학점수/중앙대학교';
-import { 경희대학교서울 } from '@/components/대학점수/경희대학교(서울)';
-import { 경희대학교국제 } from '@/components/대학점수/경희대학교(국제)';
-import { 한국외국어대학교서울 } from '@/components/대학점수/한국외국어대학교(서울)';
-import { 한국외국어대학교글로벌 } from '@/components/대학점수/한국외국어대학교(글로벌)';
+import { 경희대학교서울 } from '@/components/대학점수/경희대학교';
+import { 경희대학교국제 } from '@/components/대학점수/경희대학교국제';
+import { 한국외국어대학교서울 } from '@/components/대학점수/한국외국어대학교';
+import { 한국외국어대학교글로벌 } from '@/components/대학점수/한국외국어대학교글로벌';
 import { 서울시립대학교 } from '@/components/대학점수/서울시립대학교';
 import { 건국대학교 } from '@/components/대학점수/건국대학교';
 import { 동국대학교 } from '@/components/대학점수/동국대학교';
-import { 홍익대학교서울 } from '@/components/대학점수/홍익대학교(서울)';
-import { 홍익대학교세종 } from '@/components/대학점수/홍익대학교(세종)';
+import { 홍익대학교서울 } from '@/components/대학점수/홍익대학교';
+import { 홍익대학교세종 } from '@/components/대학점수/홍익대학교세종';
 import { 숭실대학교 } from '@/components/대학점수/숭실대학교';
 import { 세종대학교 } from '@/components/대학점수/세종대학교';
 import { 광운대학교 } from '@/components/대학점수/광운대학교';
@@ -31,8 +31,8 @@ import { 동덕여자대학교 } from '@/components/대학점수/동덕여자대
 import { 성신여자대학교 } from '@/components/대학점수/성신여자대학교';
 import { 숙명여자대학교 } from '@/components/대학점수/숙명여자대학교';
 import { 이화여자대학교 } from '@/components/대학점수/이화여자대학교';
-import { 고려대학교세종 } from '@/components/대학점수/고려대학교(세종)';
-import { 한양대학교에리카 } from '@/components/대학점수/한양대학교(에리카)';
+import { 고려대학교세종} from '@/components/대학점수/고려대학교세종';
+import { 한양대학교에리카} from '@/components/대학점수/한양대학교에리카';
 import { 한국공학대학교 } from '@/components/대학점수/한국공학대학교';
 import { 한국항공대학교 } from '@/components/대학점수/한국항공대학교';
 import { 인하대학교 } from '@/components/대학점수/인하대학교';
@@ -44,22 +44,46 @@ import { 계명대학교 } from '@/components/대학점수/계명대학교';
 import { 성균관대학교 } from '@/components/대학점수/성균관대학교';
 
 const scoreCalculators = {
-  '서울대학교': 서울대학교, '연세대학교': 연세대학교, '고려대학교': 고려대학교,
-  '서강대학교': 서강대학교, '한양대학교(서울)': 한양대학교, '중앙대학교': 중앙대학교,
-  '경희대학교(서울)': 경희대학교서울, '경희대학교(국제)': 경희대학교국제,
-  '한국외국어대학교(서울)': 한국외국어대학교서울, '한국외국어대학교(글로벌)': 한국외국어대학교글로벌,
-  '서울시립대학교': 서울시립대학교, '건국대학교': 건국대학교, '동국대학교': 동국대학교,
-  '홍익대학교(서울)': 홍익대학교서울, '홍익대학교(세종)': 홍익대학교세종,
-  '숭실대학교': 숭실대학교, '세종대학교': 세종대학교, '광운대학교': 광운대학교,
-  '삼육대학교': 삼육대학교, '상명대학교': 상명대학교, '인천대학교': 인천대학교,
-  '아주대학교': 아주대학교, '동덕여자대학교': 동덕여자대학교, '성신여자대학교': 성신여자대학교,
-  '숙명여자대학교': 숙명여자대학교, '이화여자대학교': 이화여자대학교,
-  '고려대학교(세종)': 고려대학교세종, '한양대학교(에리카)': 한양대학교에리카,
-  '한국공학대학교': 한국공학대학교, '한국항공대학교': 한국항공대학교,
-  '인하대학교': 인하대학교, '경인교육대학교': 경인교육대학교, '대구교육대학교': 대구교육대학교,
-  '경기대학교': 경기대학교, '충북대학교': 충북대학교, '계명대학교': 계명대학교,
-  '성균관대학교': 성균관대학교,
+  '서울대학교': 서울대학교,
+  '연세대학교': 연세대학교,
+  '고려대학교': 고려대학교,
+  '서강대학교': 서강대학교,
+  '한양대학교': 한양대학교,
+  '중앙대학교' : 중앙대학교,
+  '경희대학교' : 경희대학교서울,
+  '경희대학교국제' : 경희대학교국제,
+  '한국외국어대학교' : 한국외국어대학교서울,
+  '한국외국어대학교글로벌' : 한국외국어대학교글로벌,
+  '서울시립대학교' : 서울시립대학교,
+  '건국대학교' : 건국대학교,
+  '동국대학교' : 동국대학교,
+  '홍익대학교' : 홍익대학교서울,
+  '홍익대학교세종' : 홍익대학교세종,
+  '숭실대학교' : 숭실대학교,
+  '세종대학교' : 세종대학교, 
+  '광운대학교' : 광운대학교,
+  '삼육대학교' : 삼육대학교,
+  '상명대학교' : 상명대학교,
+  '인천대학교' : 인천대학교,
+  '아주대학교' : 아주대학교,
+  '동덕여자대학교' : 동덕여자대학교,
+  '성신여자대학교' : 성신여자대학교,
+  '숙명여자대학교' : 숙명여자대학교,
+  '이화여자대학교' : 이화여자대학교,
+  '고려대학교세종' : 고려대학교세종,  
+  '한양대학교에리카' : 한양대학교에리카,
+  '한국공학대학교' : 한국공학대학교,
+  '한국항공대학교' : 한국항공대학교,
+  '인하대학교' : 인하대학교,  
+  '경인교육대학교' : 경인교육대학교,
+  '대구교육대학교' : 대구교육대학교,
+  '경기대학교' : 경기대학교,
+  '충북대학교' : 충북대학교,
+  '계명대학교' : 계명대학교,
+  '성균관대학교' : 성균관대학교,
 };
+
+
 
 function PriorityContent() {
   const searchParams = useSearchParams();
@@ -67,6 +91,7 @@ function PriorityContent() {
   const router = useRouter();
   const supabase = createClient();
 
+  
   const [studentInfo, setStudentInfo] = useState(null);
   const [departments, setDepartments] = useState([]);
   const [allAppliedData, setAllAppliedData] = useState([]);
@@ -74,6 +99,7 @@ function PriorityContent() {
   const [activeSelection, setActiveSelection] = useState({ group: '가', priority: 1 });
   const [calculatedScores, setCalculatedScores] = useState({});
   const [isProcessing, setIsProcessing] = useState(false);
+  
   
   const [choices, setChoices] = useState({
     '가': { 1: null, 2: null, 3: null },
@@ -97,32 +123,65 @@ function PriorityContent() {
   }, [studentId, departments]);
 
   const fetchInitialData = async () => {
-    const { data: student } = await supabase.from('admin_managed_students').select('*').eq('id', studentId).single();
-    if (!student) return;
+    // 1. 학생 데이터를 가져옵니다. 
+    // 여기서 { data: student }로 이름을 지정했으므로 아래에서 student 변수를 쓸 수 있습니다.
+    const { data: student, error: studentError } = await supabase
+      .from('admin_managed_students')
+      .select('*')
+      .eq('id', studentId)
+      .single();
+
+    if (studentError || !student) {
+      console.error("학생 정보 로드 실패:", studentError);
+      return;
+    }
+    
+    // 상태 업데이트
     setStudentInfo(student);
     
-    const { data: deptData } = await supabase.from('departments').select('*').order('name', { ascending: true });
-    if (deptData) {
-      const suffix = student.selection_type === '기회균형전형' ? '1' : student.selection_type === '농어촌전형' ? '2' : '';
-      const filteredByType = suffix ? deptData.filter(d => String(d.university_id || '').endsWith(suffix)) : deptData;
-      setDepartments(filteredByType);
+    // 2. 학과 데이터를 가져옵니다.
+    const { data: deptData, error: deptError } = await supabase
+      .from('departments')
+      .select('*')
+      .order('name', { ascending: true });
 
-      const { data: globalChoices } = await supabase.from('student_choices').select('*, departments(university_id, 모집단위, sum)');
-      setAllAppliedData(globalChoices || []);
+    if (deptError || !deptData) {
+      console.error("학과 정보 로드 실패:", deptError);
+      return;
+    }
 
-      const { data: myExisting } = await supabase.from('student_choices').select('*, departments(*)').eq('student_id', studentId);
-      if (myExisting) {
-        const loaded = { '가': { 1: null, 2: null, 3: null }, '나': { 1: null, 2: null, 3: null }, '다': { 1: null, 2: null, 3: null } };
-        myExisting.forEach(c => {
-          if (c.group_type && c.priority) {
-            loaded[c.group_type][c.priority] = { ...c.departments, id: c.department_id, score: c.converted_score, status: c.status };
-          }
-        });
-        setChoices(loaded);
-      }
+    // 3. 전형에 따른 필터링 (Suffix 로직)
+    const suffix = student.selection_type === '기회균형전형' ? '1' : student.selection_type === '농어촌전형' ? '2' : '';
+    
+    // [중요] university_id가 suffix로 끝나는 것들만 필터링
+    const filteredByType = suffix 
+      ? deptData.filter(d => String(d.university_id || '').endsWith(suffix)) 
+      : deptData;
+
+    console.log(`[디버깅] 전형: ${student.selection_type}, Suffix: ${suffix}, 결과 수: ${filteredByType.length}`);
+
+    setDepartments(filteredByType);
+
+    // 4. 기존 지망 데이터 로드 (나머지 로직은 동일)
+    const { data: globalChoices } = await supabase.from('student_choices').select('*, departments(university_id, 모집단위, sum)');
+    setAllAppliedData(globalChoices || []);
+
+    const { data: myExisting } = await supabase.from('student_choices').select('*, departments(*)').eq('student_id', studentId);
+    if (myExisting) {
+      const loaded = { '가': { 1: null, 2: null, 3: null }, '나': { 1: null, 2: null, 3: null }, '다': { 1: null, 2: null, 3: null } };
+      myExisting.forEach(c => {
+        if (c.group_type && c.priority && c.departments) {
+          loaded[c.group_type][c.priority] = { 
+            ...c.departments, 
+            id: c.department_id, 
+            score: c.converted_score, 
+            status: c.status 
+          };
+        }
+      });
+      setChoices(loaded);
     }
   };
-
   const runCalculation = async () => {
     const scores = {};
     const deptGroups = {};

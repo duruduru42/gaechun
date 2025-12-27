@@ -169,7 +169,6 @@ export default function AddStudentPage() {
                         <input type="text" placeholder="학생 이름" value={name} onChange={(e) => setName(e.target.value)} className="w-2/3 p-3 border-2 rounded-lg focus:border-blue-600 outline-none" id="name" />
                         <select value={selection_type} onChange={(e) => setSelectionType(e.target.value)} className="w-2/3 p-3 border-2 rounded-lg bg-white focus:border-blue-600 outline-none">
                             <option value="">전형을 선택하세요</option>
-                            <option value="일반전형">일반전형</option>
                             <option value="기회균형전형">기회균형전형</option>
                             <option value="농어촌전형">농어촌전형</option>
                         </select>
