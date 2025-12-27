@@ -100,8 +100,14 @@ const DeptCard = memo(({
     if (!calculatedScore && !isCalculating) {
       const calculate = async () => {
         setIsCalculating(true);
-        const calculator = scoreCalculators[dept.name.trim()];
-        if (calculator) {
+        const name = dept?.name?.trim();
+
+        if (!name) {
+          console.warn("name 없는 학과 스킵:", dept);
+          return; // 또는 continue (for문일 경우)
+        }
+        
+        const calculator = scoreCalculators[name];        if (calculator) {
           try {
             const score = await calculator(studentId, dept, true);
             onCalculate(dept.id, score);
@@ -191,38 +197,111 @@ function PriorityContent() {
   }, [studentId, selectionTypeParam]);
 
   const fetchInitialData = async () => {
-    const { data: student } = await supabase.from('admin_managed_students').select('*').eq('id', studentId).single();
+    // 1. 학생 정보
+    const { data: student } = await supabase
+      .from('admin_managed_students')
+      .select('*')
+      .eq('id', studentId)
+      .single();
+  
     if (!student) return;
     setStudentInfo(student);
-
+  
     const targetType = selectionTypeParam || student.selection_type;
-    const suffix = targetType === '기회균형전형' ? '1' : targetType === '농어촌전형' ? '2' : '';
-
-    const { data: deptData } = await supabase.from('departments').select('*').order('name', { ascending: true });
-    if (!deptData) return;
-
-    setDepartments(suffix ? deptData.filter(d => String(d.university_id || '').endsWith(suffix)) : deptData);
-
-    const { data: globalChoices } = await supabase.from('student_choices').select('*, departments(university_id, 모집단위, sum)');
+    const suffix =
+      targetType === '기회균형전형'
+        ? '1'
+        : targetType === '농어촌전형'
+        ? '2'
+        : '';
+  
+    // 2. 🔥 departments 전체 pagination fetch
+    const deptData = await fetchAllDepartments(supabase);
+  
+    console.log('departments count (final):', deptData.length); // ← 여기서 1500 찍혀야 정상
+  
+    setDepartments(
+      suffix
+        ? deptData.filter(d =>
+            String(d.university_id || '').endsWith(suffix)
+          )
+        : deptData
+    );
+  
+    // 3. 전체 지원 데이터 (여전히 range 필요)
+    const { data: globalChoices } = await supabase
+      .from('student_choices')
+      .select('*, departments(university_id, 모집단위, sum)')
+      .range(0, 1999);
+  
     setAllAppliedData(globalChoices || []);
-
-    const { data: myExisting } = await supabase.from('student_choices').select('*, departments(*)').eq('student_id', studentId);
+  
+    // 4. 내 지원 데이터
+    const { data: myExisting } = await supabase
+      .from('student_choices')
+      .select('*, departments(*)')
+      .eq('student_id', studentId)
+      .range(0, 999);
+  
     if (myExisting) {
-      const loaded = { '가': { 1: null, 2: null, 3: null }, '나': { 1: null, 2: null, 3: null }, '다': { 1: null, 2: null, 3: null } };
+      const loaded = {
+        '가': { 1: null, 2: null, 3: null },
+        '나': { 1: null, 2: null, 3: null },
+        '다': { 1: null, 2: null, 3: null },
+      };
+  
       myExisting.forEach(c => {
         if (c.group_type && c.priority && c.departments) {
-          loaded[c.group_type][c.priority] = { ...c.departments, id: c.department_id, score: c.converted_score, status: c.status };
+          loaded[c.group_type][c.priority] = {
+            ...c.departments,
+            id: c.department_id,
+            score: c.converted_score,
+            status: c.status,
+          };
         }
       });
+  
       setChoices(loaded);
     }
   };
-
+  
+  
+  const fetchAllDepartments = async (supabase) => {
+    let all = [];
+    let from = 0;
+    const size = 500; // Supabase 안정 구간
+  
+    while (true) {
+      const { data, error } = await supabase
+        .from('departments')
+        .select('*')
+        .order('name', { ascending: true })
+        .range(from, from + size - 1);
+  
+      if (error) {
+        console.error('departments fetch error:', error);
+        break;
+      }
+  
+      if (!data || data.length === 0) break;
+  
+      all = all.concat(data);
+  
+      // 마지막 페이지면 종료
+      if (data.length < size) break;
+  
+      from += size;
+    }
+  
+    return all;
+  };
+  
   // [중요] 일괄 계산 runCalculation 함수 제거 (DeptCard에서 개별 수행)
 
   const reorderAllStudents = async () => {
     // ... (기존 병렬 업데이트 로직 유지) ...
-    const { data: allChoices } = await supabase.from('student_choices').select('*, departments(id, 모집인원, 군, university_id, 모집단위, sum)');
+    const { data: allChoices } = await supabase.from('student_choices').select('*, departments(id, 모집인원, 군, university_id, 모집단위, sum)')  .range(0, 1999); // ✅ 반드시 추가
+    ;
     if (!allChoices) return;
     const updatePayload = new Map();
     // [알고리즘 로직 생략: 기존과 동일]
