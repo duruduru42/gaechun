@@ -4,6 +4,7 @@ import { useSearchParams } from 'next/navigation';
 import { useEffect, useState, Suspense } from 'react'; // Suspense 추가import { createClient } from '@/utils/supabase/client';
 import { createClient } from '@/utils/supabase/client';
 import Calculate from '@/components/ui/Calculate'; // Adjust the filename accordingly
+
 import { 서울대학교 } from '@/components/대학점수/서울대학교';
 import { 고려대학교 } from '@/components/대학점수/고려대학교';
 import { 연세대학교 } from '@/components/대학점수/연세대학교';

@@ -1,5 +1,10 @@
 'use client'
 
+// 기존 import 문들 아래에 추가
+import { useSearchParams } from 'next/navigation';
+import { useState, useEffect } from 'react'; // useState, useEffect도 사용 중이시므로 확인 필요
+import { createClient } from '@/utils/supabase/client'; // supabase 클라이언트 생성 함수 위치 확인
+import  Calculate  from '@/components/ui/Calculate';
 import { 서울대학교 } from '@/components/대학점수/서울대학교';
 import { 고려대학교 } from '@/components/대학점수/고려대학교';
 import { 연세대학교 } from '@/components/대학점수/연세대학교';
