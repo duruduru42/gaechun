@@ -1,6 +1,6 @@
 'use client'
 import { useSearchParams } from 'next/navigation';
-import { useState, useEffect } from 'react'; // useState, useEffect도 사용 중이시므로 확인 필요
+import { useState, useEffect, Suspense } from 'react'; // useState, useEffect도 사용 중이시므로 확인 필요
 import { createClient } from '@/utils/supabase/client'; // supabase 클라이언트 생성 함수 위치 확인
 import  Calculate  from '@/components/ui/Calculate';
 
