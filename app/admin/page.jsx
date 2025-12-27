@@ -108,7 +108,7 @@ export default function AddStudentPage() {
             alert(`${name} 학생이 성공적으로 등록되었습니다.`);
             
             // 등록 완료 후 지망 대학 설정 페이지로 이동
-            router.push(`/admin/set-priority?studentId=${newStudentId}`); 
+            router.push(`/admin/students`); 
             
         } catch (error) {
             console.error('Error:', error);

@@ -10,7 +10,7 @@ const naturalScienceSubjects = [
   '지구과학Ⅰ', '지구과학Ⅱ', '생명과학Ⅰ', '생명과학Ⅱ'
 ];
 
-export const 경희대학교서울 = async (userId, selection, isAdmin = false) => {
+export const 경희대학교 = async (userId, selection, isAdmin = false) => {
   const supabase = createClient();
 
   // isAdmin 여부에 따라 테이블과 ID 컬럼 결정

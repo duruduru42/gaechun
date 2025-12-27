@@ -1,23 +1,19 @@
 'use client'
 
-import { useSearchParams } from 'next/navigation';
-import { useEffect, useState, Suspense } from 'react'; // Suspense 추가import { createClient } from '@/utils/supabase/client';
-import { createClient } from '@/utils/supabase/client';
-import Calculate from '@/components/ui/Calculate'; // Adjust the filename accordingly
 import { 서울대학교 } from '@/components/대학점수/서울대학교';
 import { 고려대학교 } from '@/components/대학점수/고려대학교';
 import { 연세대학교 } from '@/components/대학점수/연세대학교';
 import { 서강대학교 } from '@/components/대학점수/서강대학교';
 import { 한양대학교 } from '@/components/대학점수/한양대학교';
 import { 중앙대학교 } from '@/components/대학점수/중앙대학교';
-import { 경희대학교서울 } from '@/components/대학점수/경희대학교';
+import { 경희대학교 } from '@/components/대학점수/경희대학교';
 import { 경희대학교국제 } from '@/components/대학점수/경희대학교국제';
 import { 한국외국어대학교서울 } from '@/components/대학점수/한국외국어대학교';
 import { 한국외국어대학교글로벌 } from '@/components/대학점수/한국외국어대학교글로벌';
 import { 서울시립대학교 } from '@/components/대학점수/서울시립대학교';
 import { 건국대학교 } from '@/components/대학점수/건국대학교';
 import { 동국대학교 } from '@/components/대학점수/동국대학교';
-import { 홍익대학교서울 } from '@/components/대학점수/홍익대학교';
+import { 홍익대학교 } from '@/components/대학점수/홍익대학교';
 import { 홍익대학교세종 } from '@/components/대학점수/홍익대학교세종';
 import { 숭실대학교 } from '@/components/대학점수/숭실대학교';
 import { 세종대학교 } from '@/components/대학점수/세종대학교';
@@ -42,8 +38,6 @@ import { 충북대학교 } from '@/components/대학점수/충북대학교';
 import { 계명대학교 } from '@/components/대학점수/계명대학교';
 import { 성균관대학교 } from '@/components/대학점수/성균관대학교';
 
-
-
 import down from '@/components/caret-down.svg'
 
 import up from '@/components/caret-up.svg'
@@ -57,15 +51,15 @@ const scoreCalculators = {
   '서강대학교': 서강대학교,
   '한양대학교': 한양대학교,
   '중앙대학교' : 중앙대학교,
-  '경희대학교' : 경희대학교서울,
-  '경희대학교국제' : 경희대학교국제,
-  '한국외국어대학교' : 한국외국어대학교서울,
-  '한국외국어대학교글로벌' : 한국외국어대학교글로벌,
-  '서울시립대학교' : 서울시립대학교,
+  '경희대학교' : 경희대학교,
+  '경희국제' : 경희대학교국제,
+  '한국외대' : 한국외국어대학교서울,
+  '외대글로벌' : 한국외국어대학교글로벌,
+  '서울시립대' : 서울시립대학교,
   '건국대학교' : 건국대학교,
   '동국대학교' : 동국대학교,
-  '홍익대학교' : 홍익대학교서울,
-  '홍익대학교세종' : 홍익대학교세종,
+  '홍익대' : 홍익대학교,
+  '홍익세종' : 홍익대학교세종,
   '숭실대학교' : 숭실대학교,
   '세종대학교' : 세종대학교, 
   '광운대학교' : 광운대학교,
@@ -73,21 +67,21 @@ const scoreCalculators = {
   '상명대학교' : 상명대학교,
   '인천대학교' : 인천대학교,
   '아주대학교' : 아주대학교,
-  '동덕여자대학교' : 동덕여자대학교,
-  '성신여자대학교' : 성신여자대학교,
-  '숙명여자대학교' : 숙명여자대학교,
-  '이화여자대학교' : 이화여자대학교,
-  '고려대학교세종' : 고려대학교세종,  
-  '한양대학교에리카' : 한양대학교에리카,
-  '한국공학대학교' : 한국공학대학교,
-  '한국항공대학교' : 한국항공대학교,
+  '동덕여대' : 동덕여자대학교,
+  '성신여대' : 성신여자대학교,
+  '숙명여대' : 숙명여자대학교,
+  '이화여대' : 이화여자대학교,
+  '고려세종' : 고려대학교세종,  
+  '한양에리카' : 한양대학교에리카,
+  '공학대' : 한국공학대학교,
+  '항공대' : 한국항공대학교,
   '인하대학교' : 인하대학교,  
-  '경인교육대학교' : 경인교육대학교,
-  '대구교육대학교' : 대구교육대학교,
+  '경인교대' : 경인교육대학교,
+  '대구교대' : 대구교육대학교,
   '경기대학교' : 경기대학교,
   '충북대학교' : 충북대학교,
   '계명대학교' : 계명대학교,
-  '성균관대학교' : 성균관대학교,
+  '성균관대' : 성균관대학교,
 };
 
 const Detail = () => {

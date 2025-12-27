@@ -31,7 +31,7 @@ const getConvertedScore = (percentile, track) => {
 
 // 홍익대학교(서울) 점수 계산 함수
 // 핵심 수정: 세 번째 인자 isAdmin 추가 (기본값 false)
-export const 홍익대학교서울 = async (userId, selection, isAdmin = false) => {
+export const 홍익대학교 = async (userId, selection, isAdmin = false) => {
   const supabase = createClient();
   
   // isAdmin 여부에 따라 테이블과 ID 컬럼 결정

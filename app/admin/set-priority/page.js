@@ -11,14 +11,14 @@ import { 연세대학교 } from '@/components/대학점수/연세대학교';
 import { 서강대학교 } from '@/components/대학점수/서강대학교';
 import { 한양대학교 } from '@/components/대학점수/한양대학교';
 import { 중앙대학교 } from '@/components/대학점수/중앙대학교';
-import { 경희대학교서울 } from '@/components/대학점수/경희대학교';
+import { 경희대학교 } from '@/components/대학점수/경희대학교';
 import { 경희대학교국제 } from '@/components/대학점수/경희대학교국제';
 import { 한국외국어대학교서울 } from '@/components/대학점수/한국외국어대학교';
 import { 한국외국어대학교글로벌 } from '@/components/대학점수/한국외국어대학교글로벌';
 import { 서울시립대학교 } from '@/components/대학점수/서울시립대학교';
 import { 건국대학교 } from '@/components/대학점수/건국대학교';
 import { 동국대학교 } from '@/components/대학점수/동국대학교';
-import { 홍익대학교서울 } from '@/components/대학점수/홍익대학교';
+import { 홍익대학교 } from '@/components/대학점수/홍익대학교';
 import { 홍익대학교세종 } from '@/components/대학점수/홍익대학교세종';
 import { 숭실대학교 } from '@/components/대학점수/숭실대학교';
 import { 세종대학교 } from '@/components/대학점수/세종대학교';
@@ -50,15 +50,15 @@ const scoreCalculators = {
   '서강대학교': 서강대학교,
   '한양대학교': 한양대학교,
   '중앙대학교' : 중앙대학교,
-  '경희대학교' : 경희대학교서울,
-  '경희대학교국제' : 경희대학교국제,
-  '한국외국어대학교' : 한국외국어대학교서울,
-  '한국외국어대학교글로벌' : 한국외국어대학교글로벌,
-  '서울시립대학교' : 서울시립대학교,
+  '경희대학교' : 경희대학교,
+  '경희국제' : 경희대학교국제,
+  '한국외대' : 한국외국어대학교서울,
+  '외대글로벌' : 한국외국어대학교글로벌,
+  '서울시립대' : 서울시립대학교,
   '건국대학교' : 건국대학교,
   '동국대학교' : 동국대학교,
-  '홍익대학교' : 홍익대학교서울,
-  '홍익대학교세종' : 홍익대학교세종,
+  '홍익대' : 홍익대학교,
+  '홍익세종' : 홍익대학교세종,
   '숭실대학교' : 숭실대학교,
   '세종대학교' : 세종대학교, 
   '광운대학교' : 광운대학교,
@@ -66,21 +66,21 @@ const scoreCalculators = {
   '상명대학교' : 상명대학교,
   '인천대학교' : 인천대학교,
   '아주대학교' : 아주대학교,
-  '동덕여자대학교' : 동덕여자대학교,
-  '성신여자대학교' : 성신여자대학교,
-  '숙명여자대학교' : 숙명여자대학교,
-  '이화여자대학교' : 이화여자대학교,
-  '고려대학교세종' : 고려대학교세종,  
-  '한양대학교에리카' : 한양대학교에리카,
-  '한국공학대학교' : 한국공학대학교,
-  '한국항공대학교' : 한국항공대학교,
+  '동덕여대' : 동덕여자대학교,
+  '성신여대' : 성신여자대학교,
+  '숙명여대' : 숙명여자대학교,
+  '이화여대' : 이화여자대학교,
+  '고려세종' : 고려대학교세종,  
+  '한양에리카' : 한양대학교에리카,
+  '공학대' : 한국공학대학교,
+  '항공대' : 한국항공대학교,
   '인하대학교' : 인하대학교,  
-  '경인교육대학교' : 경인교육대학교,
-  '대구교육대학교' : 대구교육대학교,
+  '경인교대' : 경인교육대학교,
+  '대구교대' : 대구교육대학교,
   '경기대학교' : 경기대학교,
   '충북대학교' : 충북대학교,
   '계명대학교' : 계명대학교,
-  '성균관대학교' : 성균관대학교,
+  '성균관대' : 성균관대학교,
 };
 
 
@@ -88,6 +88,7 @@ const scoreCalculators = {
 function PriorityContent() {
   const searchParams = useSearchParams();
   const studentId = searchParams.get('studentId');
+  const selectionTypeParam = searchParams.get('type');
   const router = useRouter();
   const supabase = createClient();
 
@@ -114,7 +115,7 @@ function PriorityContent() {
       return;
     }
     fetchInitialData();
-  }, [studentId]);
+  }, [studentId, selectionTypeParam]); // type 파라미터가 바뀌면 다시 로드
 
   useEffect(() => {
     if (studentId && departments.length > 0) {
@@ -123,23 +124,29 @@ function PriorityContent() {
   }, [studentId, departments]);
 
   const fetchInitialData = async () => {
-    // 1. 학생 데이터를 가져옵니다. 
-    // 여기서 { data: student }로 이름을 지정했으므로 아래에서 student 변수를 쓸 수 있습니다.
+    // 1. 학생 기본 정보 로드
     const { data: student, error: studentError } = await supabase
       .from('admin_managed_students')
       .select('*')
       .eq('id', studentId)
       .single();
 
+      
     if (studentError || !student) {
       console.error("학생 정보 로드 실패:", studentError);
       return;
     }
+
     
-    // 상태 업데이트
     setStudentInfo(student);
+
+    // 2. [핵심] 파라미터로 받은 전형(type)을 기준으로 학과 데이터 필터링 로드
+    // URL에 type이 있으면 그 값을 쓰고, 없으면 학생 DB의 전형 정보를 기본값으로 사용합니다.
+    const targetType = selectionTypeParam || student.selection_type;
     
-    // 2. 학과 데이터를 가져옵니다.
+    // suffix 로직 (기존 호환성 유지)
+    const suffix = targetType === '기회균형전형' ? '1' : targetType === '농어촌전형' ? '2' : '';
+
     const { data: deptData, error: deptError } = await supabase
       .from('departments')
       .select('*')
@@ -150,23 +157,25 @@ function PriorityContent() {
       return;
     }
 
-    // 3. 전형에 따른 필터링 (Suffix 로직)
-    const suffix = student.selection_type === '기회균형전형' ? '1' : student.selection_type === '농어촌전형' ? '2' : '';
-    
-    // [중요] university_id가 suffix로 끝나는 것들만 필터링
+    // 3. 필터링 로직: university_id 접미사 매칭 (또는 필요시 selection_type 컬럼 직접 매칭 가능)
     const filteredByType = suffix 
       ? deptData.filter(d => String(d.university_id || '').endsWith(suffix)) 
       : deptData;
 
-    console.log(`[디버깅] 전형: ${student.selection_type}, Suffix: ${suffix}, 결과 수: ${filteredByType.length}`);
-
+    console.log(`[필터링] 대상 전형: ${targetType}, 결과 수: ${filteredByType.length}`);
     setDepartments(filteredByType);
 
-    // 4. 기존 지망 데이터 로드 (나머지 로직은 동일)
-    const { data: globalChoices } = await supabase.from('student_choices').select('*, departments(university_id, 모집단위, sum)');
+    // 4. 지망 현황 데이터 로드
+    const { data: globalChoices } = await supabase
+      .from('student_choices')
+      .select('*, departments(university_id, 모집단위, sum)');
     setAllAppliedData(globalChoices || []);
 
-    const { data: myExisting } = await supabase.from('student_choices').select('*, departments(*)').eq('student_id', studentId);
+    const { data: myExisting } = await supabase
+      .from('student_choices')
+      .select('*, departments(*)')
+      .eq('student_id', studentId);
+
     if (myExisting) {
       const loaded = { '가': { 1: null, 2: null, 3: null }, '나': { 1: null, 2: null, 3: null }, '다': { 1: null, 2: null, 3: null } };
       myExisting.forEach(c => {
@@ -333,6 +342,7 @@ function PriorityContent() {
   };
 
   const filteredList = (departments || []).filter(d => {
+    // 탭에서 선택한 군(가/나/다)과 학과의 군이 일치해야 함
     const isGroupMatch = d?.군 === activeSelection.group;
     const univName = d?.name || '';
     const deptName = d?.모집단위 || '';

@@ -17,7 +17,7 @@ import { 한국외국어대학교글로벌 } from '@/components/대학점수/한
 import { 서울시립대학교 } from '@/components/대학점수/서울시립대학교';
 import { 건국대학교 } from '@/components/대학점수/건국대학교';
 import { 동국대학교 } from '@/components/대학점수/동국대학교';
-import { 홍익대학교서울 } from '@/components/대학점수/홍익대학교';
+import { 홍익대학교 } from '@/components/대학점수/홍익대학교';
 import { 홍익대학교세종 } from '@/components/대학점수/홍익대학교세종';
 import { 숭실대학교 } from '@/components/대학점수/숭실대학교';
 import { 세종대학교 } from '@/components/대학점수/세종대학교';
@@ -64,7 +64,7 @@ const scoreCalculators = {
   '서울시립대학교' : 서울시립대학교,
   '건국대학교' : 건국대학교,
   '동국대학교' : 동국대학교,
-  '홍익대학교' : 홍익대학교서울,
+  '홍익대학교' : 홍익대학교,
   '홍익대학교세종' : 홍익대학교세종,
   '숭실대학교' : 숭실대학교,
   '세종대학교' : 세종대학교, 

@@ -203,7 +203,7 @@ export default function StudentSimpleListPage() {
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            router.push(`/admin/set-priority?studentId=${student.id}`);
+                            router.push(`/admin/set-priority?studentId=${student.id}&type=${encodeURIComponent(student.selection_type)}`);
                           }}
                           className="bg-gray-900 text-white px-5 py-2 rounded-xl text-xs font-black hover:bg-blue-600 transition shadow-sm"
                         >
