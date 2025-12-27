@@ -31,19 +31,17 @@ function RankingDashboardContent() {
       const type = profile?.selection_type || '기회균형전형';
       setUserSelectionType(type);
 
-      // 2. 대학 리스트 가져오기 (문자열 ID: "chungang1", "dongguk1" 등)
+      // 2. 대학 리스트 가져오기
       const { data: univData } = await supabase
         .from('university')
         .select('*')
         .order('name', { ascending: true })
         .range(0, 999);
 
-      // 접미사 필터링 (기균은 1, 농어촌은 2로 끝나는 ID)
       const suffix = type === '기회균형전형' ? '1' : '2';
       const filteredUniversities = univData?.filter(u => String(u.id).endsWith(suffix)) || [];
 
-      // 3. 확정 인원 데이터 집계 (관계형 조인 활용)
-      // student_choices -> departments (university_id 추출)
+      // 3. 확정 인원 데이터 집계 (중요 수정 포인트)
       const { data: choicesData, error: choicesError } = await supabase
         .from('student_choices')
         .select(`
@@ -53,24 +51,33 @@ function RankingDashboardContent() {
           ),
           admin_managed_students!inner (
             selection_type
-          )          
+          )
         `)
         .eq('status', '확정')
-        .eq('admin_managed_students.selection_type', type)
-        .range(0, 999); // 데이터 유실 방지
+        .eq('admin_managed_students.selection_type', type) // 해당 전형 학생들만 필터링
+        .range(0, 999);
 
-      if (choicesError) console.error("집계 에러:", choicesError);
+      if (choicesError) {
+        console.error("집계 에러:", choicesError);
+      }
 
-      // 4. Counts 맵 생성 (key: "university_id", value: count)
+      // 4. Counts 맵 생성 (데이터 구조 안정성 강화)
       const countsMap = (choicesData || []).reduce((acc, curr) => {
-        // departments를 통해 가져온 상위 university_id
-        const uId = curr.departments?.university_id; 
+        // Supabase의 조인 방식에 따라 객체 또는 배열로 올 수 있으므로 모두 대응
+        const deptSource = curr.departments;
+        const uId = Array.isArray(deptSource) 
+          ? deptSource[0]?.university_id 
+          : deptSource?.university_id;
+
         if (uId) {
           const key = String(uId).trim();
           acc[key] = (acc[key] || 0) + 1;
         }
         return acc;
       }, {});
+
+      // 확인용 로그 (개발자 도구에서 확인 가능)
+      console.log("📊 매칭된 확정 인원 맵:", countsMap);
 
       setConfirmedCounts(countsMap);
       setUniversities(filteredUniversities);
@@ -88,7 +95,7 @@ function RankingDashboardContent() {
     <div className="flex items-center justify-center h-screen">
       <div className="text-center">
         <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-        <p className="font-black text-gray-500">전형 데이터를 분석 중입니다...</p>
+        <p className="font-black text-gray-500 italic">RANKING DATA ANALYZING...</p>
       </div>
     </div>
   );
@@ -138,7 +145,7 @@ function RankingDashboardContent() {
                           src={univ.logo_url} 
                           alt="logo" 
                           className="w-full h-full object-contain"
-                          onError={(e) => e.target.src = '/fallback-logo.png'} 
+                          onError={(e) => { e.target.src = 'https://via.placeholder.com/100?text=LOGO'; }} 
                         />
                       </div>
                       <span className="font-black text-gray-800 text-xl group-hover:text-blue-600 transition-colors">
