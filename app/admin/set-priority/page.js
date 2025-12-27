@@ -228,6 +228,7 @@ function PriorityContent() {
         : deptData
     );
   
+    
     // 3. 전체 지원 데이터 (여전히 range 필요)
     const { data: globalChoices } = await supabase
       .from('student_choices')
@@ -265,16 +266,51 @@ function PriorityContent() {
     }
   };
   
+  useEffect(() => {
+    if (!studentInfo) return;
   
-  const fetchAllDepartments = async (supabase) => {
+    const fetchByGroup = async () => {
+      const targetType = selectionTypeParam || studentInfo.selection_type;
+      const suffix =
+        targetType === '기회균형전형'
+          ? '1'
+          : targetType === '농어촌전형'
+          ? '2'
+          : '';
+  
+      const deptData = await fetchAllDepartments(
+        supabase,
+        activeSelection.group
+      );
+  
+      setDepartments(
+        suffix
+          ? deptData.filter(d =>
+              String(d.university_id || '').endsWith(suffix)
+            )
+          : deptData
+      );
+  
+      console.log(
+        `${activeSelection.group}군 departments count:`,
+        deptData.length
+      );
+    };
+  
+    fetchByGroup();
+  }, [activeSelection.group, studentInfo]);
+  
+
+  const fetchAllDepartments = async (supabase, group) => {
     let all = [];
     let from = 0;
-    const size = 500; // Supabase 안정 구간
+    const size = 500;
   
     while (true) {
       const { data, error } = await supabase
         .from('departments')
         .select('*')
+        .eq('군', group) // ✅ 핵심
         .order('name', { ascending: true })
         .range(from, from + size - 1);
   
@@ -287,14 +323,13 @@ function PriorityContent() {
   
       all = all.concat(data);
   
-      // 마지막 페이지면 종료
       if (data.length < size) break;
-  
       from += size;
     }
   
     return all;
   };
+  
   
   // [중요] 일괄 계산 runCalculation 함수 제거 (DeptCard에서 개별 수행)
 
@@ -358,11 +393,11 @@ function PriorityContent() {
     }));
   };
 
-  const filteredList = (departments || []).filter(d => {
-    const isGroupMatch = d?.군 === activeSelection.group;
-    const isSearchMatch = (d?.name || '').includes(searchTerm) || (d?.모집단위 || '').includes(searchTerm);
-    return isGroupMatch && isSearchMatch;
-  });
+  const filteredList = (departments || []).filter(d =>
+    (d?.name || '').includes(searchTerm) ||
+    (d?.모집단위 || '').includes(searchTerm)
+  );
+  
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6 md:p-12 font-sans">
