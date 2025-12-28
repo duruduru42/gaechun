@@ -215,100 +215,133 @@ function PriorityContent() {
   };
 
   // --- [마스터 알고리즘: 전 수험생 재배정] ---
-  const reorderAllStudents = async () => {
-    const { data: allChoices } = await supabase.from('student_choices').select('*, departments(*)').range(0, 2500);
-    if (!allChoices) return;
+// --- [마스터 알고리즘: 전 수험생 재배정] ---
+const reorderAllStudents = async () => {
+  const { data: allChoices } = await supabase.from('student_choices').select('*, departments(*)').range(0, 2500);
+  if (!allChoices) return;
 
-    // 학과별 그룹화 (sum=y 통합)
-    const deptGroups = allChoices.reduce((acc, curr) => {
-      const dId = curr.department_id;
-      if (!acc[dId]) acc[dId] = [];
-      acc[dId].push(curr);
-      if (curr.departments?.sum === 'y') {
-        const base = String(curr.departments.university_id).replace(/[12]$/, '');
-        allChoices.forEach(o => {
-          if (o.id !== curr.id && o.departments?.모집단위 === curr.departments.모집단위 && String(o.departments?.university_id).replace(/[12]$/, '') === base) {
-            acc[dId].push(o);
-          }
-        });
-      }
-      return acc;
-    }, {});
-
-    const stdMap = allChoices.reduce((acc, curr) => {
-      if (!acc[curr.student_id]) acc[curr.student_id] = { '가':[], '나':[], '다':[] };
-      acc[curr.student_id][curr.group_type].push(curr);
-      return acc;
-    }, {});
-
-    const updatePayload = new Map();
-
-    for (const sId in stdMap) {
-      ['가', '나', '다'].forEach(group => {
-        const sortedChoices = stdMap[sId][group].sort((a,b) => a.priority - b.priority);
-        let hasConfirmed = false;
-
-        sortedChoices.forEach(choice => {
-          const comp = Array.from(new Set(deptGroups[choice.department_id] || []))
-            .sort((a,b) => Number(b.converted_score) - Number(a.converted_score));
-          const rank = comp.findIndex(x => x.id === choice.id);
-          const cap = Math.round((choice.departments?.모집인원 || 0) * 0.5);
-          const isEligible = choice.departments?.군 === '다' || (rank !== -1 && rank < cap);
-
-          if (!hasConfirmed && isEligible) {
-            updatePayload.set(choice.id, '확정');
-            hasConfirmed = true;
-          } else if (!isEligible) {
-            updatePayload.set(choice.id, '변경');
-          } else {
-            updatePayload.set(choice.id, '보류');
-          }
-        });
-      });
+  // 1. 학과별 그룹화 (sum=y 통합 로직 포함)
+  const deptGroups = allChoices.reduce((acc, curr) => {
+    const dId = curr.department_id;
+    if (!acc[dId]) acc[dId] = [];
+    
+    // 해당 학과에 신청한 모든 데이터를 일단 수집
+    if (curr.departments?.sum === 'y') {
+      const base = String(curr.departments.university_id).replace(/[12]$/, '');
+      const relatives = allChoices.filter(o => 
+        o.departments?.모집단위 === curr.departments.모집단위 && 
+        String(o.departments?.university_id).replace(/[12]$/, '') === base
+      );
+      acc[dId] = relatives;
+    } else {
+      acc[dId] = allChoices.filter(o => o.department_id === dId);
     }
+    return acc;
+  }, {});
 
-    const promises = Array.from(updatePayload).map(([id, status]) => supabase.from('student_choices').update({ status }).eq('id', id));
-    await Promise.all(promises);
-  };
+  // 2. 학생별로 지망 리스트 그룹화
+  const stdMap = allChoices.reduce((acc, curr) => {
+    if (!acc[curr.student_id]) acc[curr.student_id] = { '가': [], '나': [], '다': [] };
+    acc[curr.student_id][curr.group_type].push(curr);
+    return acc;
+  }, {});
 
-  const savePriorities = async () => {
-    setIsProcessing(true);
-    try {
-      const insertData = [];
-      // 2번 요청사항 반영: 같은 군 내 동일 department_id 중복 방지 로직
-      for (const group in choices) {
-        const seenInThisGroup = new Set(); // 군별 중복 체크용 셋
-        
-        // 1순위부터 3순위까지 순회 (이미 choices는 p 순서대로 들어있음)
-        for (const p of [1, 2, 3]) {
-          const item = choices[group][p];
-          if (item) {
-            // 해당 군(가,나,다)에서 이미 추가된 department_id인지 확인
-            if (!seenInThisGroup.has(item.id)) {
-              insertData.push({ 
-                student_id: studentId, 
-                group_type: group, 
-                priority: parseInt(p), 
-                department_id: item.id, 
-                converted_score: parseFloat(item.score) || 0, 
-                status: '보류' 
-              });
-              seenInThisGroup.add(item.id); // 추가된 ID 기록
-            } else {
-              console.log(`중복 학과 제외: ${group}군 내 ${item.name} (${p}순위)`);
-            }
+  const updatePayload = new Map();
+
+  // 3. 재배정 로직 실행
+  for (const sId in stdMap) {
+    ['가', '나', '다'].forEach(group => {
+      const sortedChoices = stdMap[sId][group].sort((a, b) => a.priority - b.priority);
+      let hasConfirmedInGroup = false; // 해당 군(가,나,다)에서 이미 확정된 지망이 있는지 체크
+
+      sortedChoices.forEach(choice => {
+        // [핵심 수정 부분]: '확정' 상태인 경쟁자들만 필터링 (나 자신 포함)
+        const competitors = (deptGroups[choice.department_id] || []).filter(user => 
+          user.status === '확정' || user.id === choice.id
+        );
+
+        // 중복 제거 후 점수 순 정렬
+        const sortedComp = Array.from(new Set(competitors.map(JSON.stringify)))
+          .map(JSON.parse)
+          .sort((a, b) => Number(b.converted_score) - Number(a.converted_score));
+
+        // 내 등수 계산
+        const rank = sortedComp.findIndex(x => x.id === choice.id);
+        const cap = Math.round((choice.departments?.모집인원 || 0) * 0.5);
+
+        // '다'군은 순위 제한 없음, 그 외는 정원 내(rank < cap)여야 함
+        const isRankEligible = choice.departments?.군 === '다' || (rank !== -1 && rank < cap);
+
+        if (!hasConfirmedInGroup && isRankEligible) {
+          // 1) 아직 이 군에서 확정된 상위지망이 없고 + 성적이 정원 내라면 -> '확정'
+          updatePayload.set(choice.id, '확정');
+          hasConfirmedInGroup = true; 
+        } else if (!isRankEligible) {
+          // 2) 성적 자체가 확정자들 사이에서 밀려난다면 -> '변경' (보류는 고려하지 않음)
+          updatePayload.set(choice.id, '변경');
+        } else {
+          // 3) 성적은 정원 내이지만, 이미 상위 우선순위에서 확정되었다면 -> '보류'
+          updatePayload.set(choice.id, '보류');
+        }
+      });
+    });
+  }
+
+  // 4. DB 일괄 업데이트
+  const promises = Array.from(updatePayload).map(([id, status]) => 
+    supabase.from('student_choices').update({ status }).eq('id', id)
+  );
+  await Promise.all(promises);
+};
+
+const savePriorities = async () => {
+  setIsProcessing(true);
+  try {
+    const insertData = [];
+    for (const group in choices) {
+      const seenInThisGroup = new Set();
+      
+      // 1순위부터 3순위까지 순회하며 데이터 준비
+      for (const p of [1, 2, 3]) {
+        const item = choices[group][p];
+        if (item) {
+          if (!seenInThisGroup.has(item.id)) {
+            insertData.push({ 
+              student_id: studentId, 
+              group_type: group, 
+              priority: parseInt(p), 
+              department_id: item.id, 
+              converted_score: parseFloat(item.score) || 0, 
+              // 초기 상태는 '보류'나 '대기'로 넣어도 reorderAllStudents가 정렬해줍니다.
+              status: '보류' 
+            });
+            seenInThisGroup.add(item.id);
           }
         }
       }
-      
-      await supabase.from('student_choices').delete().eq('student_id', studentId);
-      if (insertData.length > 0) await supabase.from('student_choices').insert(insertData);
-      await reorderAllStudents();
-      alert("배정 알고리즘 실행 완료");
-      router.push('/admin/students');
-    } catch (e) { alert("오류 발생"); }
+    }
+    
+    // 1. 기존 내 선택 삭제
+    await supabase.from('student_choices').delete().eq('student_id', studentId);
+    
+    // 2. 새로운 선택 저장
+    if (insertData.length > 0) {
+      await supabase.from('student_choices').insert(insertData);
+    }
+
+    // 3. [핵심] 수정된 로직으로 전체 수험생 상태 재배정
+    // 이 함수 안에서 '확정' 인원 기준으로 '변경' 여부를 판단합니다.
+    await reorderAllStudents();
+    
+    alert("지망 리스트 저장 및 배정 알고리즘이 완료되었습니다.");
+    router.push('/admin/students');
+  } catch (e) { 
+    console.error(e);
+    alert("오류 발생: " + e.message); 
+  } finally {
     setIsProcessing(false);
-  };
+  }
+};
 
   const handleDeptSelect = useCallback((dept, score) => {
     setChoices(prev => ({
