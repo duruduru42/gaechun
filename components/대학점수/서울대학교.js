@@ -106,8 +106,7 @@ export const 서울대학교 = async (userId, selection, isAdmin = false) => {
     if (
       selection.계열 === "자연2" &&
       !(
-        requiredScienceSubjects.includes(science1) &&
-        requiredScienceSubjects.includes(science2)
+        requiredScienceSubjects.includes(science1) || requiredScienceSubjects.includes(science2)
       )
     ) {
       return "불가: 과학 조건 미충족";
