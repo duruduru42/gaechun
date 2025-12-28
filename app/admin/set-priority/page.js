@@ -74,7 +74,7 @@ const scoreCalculators = {
   '한양에리카' : 한양대학교에리카,
   '공학대' : 한국공학대학교,
   '항공대' : 한국항공대학교,
-  '인하대학교' : 인하대학교,  
+  '인하대학교' : 인하대학교,   
   '경인교대' : 경인교육대학교,
   '대구교대' : 대구교육대학교,
   '경기대학교' : 경기대학교,
@@ -275,12 +275,32 @@ function PriorityContent() {
     setIsProcessing(true);
     try {
       const insertData = [];
+      // 2번 요청사항 반영: 같은 군 내 동일 department_id 중복 방지 로직
       for (const group in choices) {
-        for (const p in choices[group]) {
+        const seenInThisGroup = new Set(); // 군별 중복 체크용 셋
+        
+        // 1순위부터 3순위까지 순회 (이미 choices는 p 순서대로 들어있음)
+        for (const p of [1, 2, 3]) {
           const item = choices[group][p];
-          if (item) insertData.push({ student_id: studentId, group_type: group, priority: parseInt(p), department_id: item.id, converted_score: parseFloat(item.score) || 0, status: '보류' });
+          if (item) {
+            // 해당 군(가,나,다)에서 이미 추가된 department_id인지 확인
+            if (!seenInThisGroup.has(item.id)) {
+              insertData.push({ 
+                student_id: studentId, 
+                group_type: group, 
+                priority: parseInt(p), 
+                department_id: item.id, 
+                converted_score: parseFloat(item.score) || 0, 
+                status: '보류' 
+              });
+              seenInThisGroup.add(item.id); // 추가된 ID 기록
+            } else {
+              console.log(`중복 학과 제외: ${group}군 내 ${item.name} (${p}순위)`);
+            }
+          }
         }
       }
+      
       await supabase.from('student_choices').delete().eq('student_id', studentId);
       if (insertData.length > 0) await supabase.from('student_choices').insert(insertData);
       await reorderAllStudents();
