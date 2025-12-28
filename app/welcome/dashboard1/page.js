@@ -62,8 +62,31 @@ export default function Dashboard() {
     }
   };
 
+  const fetchApplicantCounts = async (departmentIds) => {
+    if (departmentIds.length === 0) return {};
 
-  
+    const { data, error } = await supabase
+        .from('applications')
+        .select('department_id, user_id')
+        .in('department_id', departmentIds);
+
+    if (error) {
+        console.error('Error fetching applicant counts:', error);
+        return {};
+    }
+
+    const counts = data.reduce((acc, { department_id }) => {
+        if (!acc[department_id]) {
+            acc[department_id] = 0;
+        }
+        acc[department_id] += 1;
+        return acc;
+    }, {});
+
+    console.log('Department counts:', counts); // Debug log
+    return counts;
+};
+
 // ... 기존 코드 동일
 
 const filterAndSortUniversities = () => {
@@ -79,7 +102,7 @@ const filterAndSortUniversities = () => {
 // ... 이하 코드 동일
 
   const handleUniversityClick = (university) => {
-    router.push(`/welcome/detail1?name=${encodeURIComponent(university.id)}&selectionTypeName=${encodeURIComponent(university.selection_type_name)}`);
+    router.push(`/detail?name=${encodeURIComponent(university.id)}&selectionTypeName=${encodeURIComponent(university.selection_type_name)}`);
   };
 
   return (
@@ -94,6 +117,7 @@ const filterAndSortUniversities = () => {
         <th className="py-3 px-4 text-center">모집군</th>
         <th className="py-3 px-4 text-center">전체 모집인원(명)</th>
         <th className="py-3 px-4 text-center">변수등급</th>
+        <th className="py-3 px-4 text-center"></th>
       </tr>
     </thead>
     <tbody className="text-gray-600 text-m">
@@ -111,6 +135,9 @@ const filterAndSortUniversities = () => {
           <td className="py-3 px-4 text-center">{university.모집군}</td>
           <td className="py-3 px-4 text-center">{university.recruited_number}</td>
           <td className={`py-3 px-4 text-center ${getGradeColor(university.변수등급)}`}>{university.변수등급}</td>
+          <td className="py-3 px-4 text-center">
+
+          </td>
         </tr>
       ))}
     </tbody>
@@ -136,4 +163,3 @@ function getGradeColor(grade){
       return 'text-black';
   }
 };
-
