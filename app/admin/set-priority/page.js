@@ -295,50 +295,97 @@ const reorderAllStudents = async () => {
 };
 
 const savePriorities = async () => {
-  setIsProcessing(true);
+  setIsProcessing(true); // 로딩 시작 (스피너 활성화)
   try {
+    // 1. 현재 선택한 지망 리스트 데이터 준비
     const insertData = [];
     for (const group in choices) {
       const seenInThisGroup = new Set();
-      
-      // 1순위부터 3순위까지 순회하며 데이터 준비
       for (const p of [1, 2, 3]) {
         const item = choices[group][p];
-        if (item) {
-          if (!seenInThisGroup.has(item.id)) {
-            insertData.push({ 
-              student_id: studentId, 
-              group_type: group, 
-              priority: parseInt(p), 
-              department_id: item.id, 
-              converted_score: parseFloat(item.score) || 0, 
-              // 초기 상태는 '보류'나 '대기'로 넣어도 reorderAllStudents가 정렬해줍니다.
-              status: '보류' 
-            });
-            seenInThisGroup.add(item.id);
-          }
+        if (item && !seenInThisGroup.has(item.id)) {
+          insertData.push({ 
+            student_id: studentId, 
+            group_type: group, 
+            priority: parseInt(p), 
+            department_id: item.id, 
+            converted_score: parseFloat(item.score) || 0, 
+            status: '대기' // 초기 상태
+          });
+          seenInThisGroup.add(item.id);
         }
       }
     }
     
-    // 1. 기존 내 선택 삭제
+    // 2. 기존 기록 삭제 및 새 기록 삽입 완료 대기
     await supabase.from('student_choices').delete().eq('student_id', studentId);
     
-    // 2. 새로운 선택 저장
     if (insertData.length > 0) {
-      await supabase.from('student_choices').insert(insertData);
+      const { data: inserted, error: insErr } = await supabase.from('student_choices').insert(insertData).select();
+      if (insErr) throw insErr;
     }
 
-    // 3. [핵심] 수정된 로직으로 전체 수험생 상태 재배정
-    // 이 함수 안에서 '확정' 인원 기준으로 '변경' 여부를 판단합니다.
+    // 3. 최신 데이터 불러오기 (DB 반영 시간 고려)
+    const { data: allChoices, error: fetchErr } = await supabase.from('student_choices').select('*, departments(*)').range(0, 2500);
+    if (fetchErr) throw fetchErr;
+    if (!allChoices) return;
+
+    // 4. 내 상태 결정을 위한 경쟁자(확정자) 분류
+    const confirmedOthers = allChoices.filter(c => c.status === '확정' && c.student_id !== studentId);
+    const myChoices = allChoices.filter(c => c.student_id === studentId);
+    const updatePayload = [];
+
+    ['가', '나', '다'].forEach(group => {
+      const myGroupChoices = myChoices.filter(c => c.group_type === group).sort((a, b) => a.priority - b.priority);
+      let hasConfirmedInGroup = false;
+
+      myGroupChoices.forEach(choice => {
+        const deptConfirmed = confirmedOthers.filter(other => other.department_id === choice.department_id);
+        const compList = [...deptConfirmed, choice].sort((a, b) => Number(b.converted_score) - Number(a.converted_score));
+        
+        const myRank = compList.findIndex(x => x.id === choice.id);
+        const capacity = Math.round((choice.departments?.모집인원 || 0) * 0.5);
+
+        const isDGroup = group === '다';
+        const isWithinCapacity = myRank !== -1 && myRank < capacity;
+
+        let finalStatus = '보류';
+
+        if (!hasConfirmedInGroup && (isDGroup || isWithinCapacity)) {
+          finalStatus = '확정';
+          hasConfirmedInGroup = true;
+        } else if (!isDGroup && !isWithinCapacity) {
+          finalStatus = '변경';
+        } else {
+          finalStatus = '보류';
+        }
+
+        updatePayload.push({ id: choice.id, status: finalStatus });
+      });
+    });
+
+    // 5. [중요] 결정된 내 상태들 업데이트 완료될 때까지 대기
+    // map + Promise.all 보다 for...of 가 순차 처리에 더 안정적입니다.
+    for (const item of updatePayload) {
+      const { error: upErr } = await supabase.from('student_choices').update({ status: item.status }).eq('id', item.id);
+      if (upErr) console.error("Update Error:", upErr);
+    }
+
+    // 6. [중요] 내가 확정됨에 따라 밀려날 타인이 있는지 전체 재계산 완료 대기
     await reorderAllStudents();
+
+    // 모든 작업이 끝난 후 알림
+    alert("지망 리스트 확정 및 전체 동기화가 완료되었습니다.");
     
-    alert("지망 리스트 저장 및 배정 알고리즘이 완료되었습니다.");
+    // 7. 페이지 이동 (이동 후 finally에서 로딩이 꺼짐)
+    router.refresh(); 
     router.push('/admin/students');
+
   } catch (e) { 
-    console.error(e);
+    console.error("Save Error:", e);
     alert("오류 발생: " + e.message); 
   } finally {
+    // 모든 처리가 끝났거나 에러가 났을 때만 로딩 스피너 종료
     setIsProcessing(false);
   }
 };
