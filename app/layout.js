@@ -7,7 +7,10 @@ const inter = Inter({ subsets: ['latin'] })
 export const metadata = {
   title: '개천용 입시컨설팅',
   description: '고른기회 전형 전문 입시컨설팅',
-  robots: 'noindex'
+  robots: 'noindex',
+  openGraph: {
+    images: [],
+  },
 }
 
 export default function RootLayout({ children }) {
