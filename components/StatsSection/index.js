@@ -1,38 +1,69 @@
+'use client'
+
+import { useEffect, useRef, useState } from 'react';
+import { useInView } from 'framer-motion';
 import StudentGraph from "@/components/ui/graph.jsx";
+
+const STATS = [
+  { label: '누적 상담 학생수', value: 1600 },
+  { label: '누적 합격 학생수', value: 1200 },
+  { label: '매년 실표본 수 (상담 학생 수)', value: 400 },
+];
+
+function CountUp({ to, duration = 1.6, className }) {
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true, margin: '-80px' });
+  const [val, setVal] = useState(0);
+
+  useEffect(() => {
+    if (!inView) return;
+    let raf;
+    const start = performance.now();
+    const tick = (now) => {
+      const p = Math.min((now - start) / (duration * 1000), 1);
+      const eased = 1 - Math.pow(1 - p, 3); // easeOutCubic
+      setVal(Math.round(to * eased));
+      if (p < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [inView, to, duration]);
+
+  return (
+    <span ref={ref} className={className}>
+      {val.toLocaleString()}
+    </span>
+  );
+}
 
 export default function StatsSection() {
   return (
-    <section className="relative bg-black text-white min-h-screen flex flex-col justify-center items-center">
-      {/* Section Title */}
-      <div className="w-full max-w-screen-lg px-4 text-left text-2xl sm:text-3xl md:text-4xl font-bold mt-16 md:mt-48 mb-12 md:mb-24 leading-normal md:leading-normal">
-        진정한 고른기회 실현을 위해<br/>
-        다년 간 많은 학생들을 상담하고 있습니다.<br/> 
-      </div>
+    <section className="relative bg-black text-white">
+      <div className="max-w-screen-lg mx-auto px-4 py-28 md:py-40">
+        {/* Section Title */}
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold leading-snug md:leading-normal mb-14 md:mb-24">
+          진정한 고른기회 실현을 위해<br />
+          다년 간 많은 학생들을 상담하고 있습니다.
+        </h2>
 
-      {/* Statistics */}
-      <div className="w-full max-w-screen-lg px-4 mx-auto grid grid-cols-1 md:grid-cols-2 gap-y-8 md:gap-y-12 text-left">
-        {/* Stat 1 */}
-        <div>
-          <p className="text-base md:text-lg mb-2">누적 상담 학생수</p>
-          <h3 className="text-4xl md:text-6xl font-extrabold">1,600명 +</h3>
+        {/* Statistics — 3열 균등 + 구분선 */}
+        <div className="grid grid-cols-1 md:grid-cols-3 md:divide-x divide-white/10">
+          {STATS.map((s, i) => (
+            <div key={s.label} className={`py-6 md:py-0 ${i === 0 ? 'md:pr-8' : 'md:px-8'}`}>
+              <p className="text-sm md:text-base text-gray-400 mb-3">{s.label}</p>
+              <h3 className="text-5xl md:text-6xl font-extrabold tracking-tight">
+                <CountUp to={s.value} />
+                <span className="text-gray-400">명</span>
+                <span className="text-orange-500"> +</span>
+              </h3>
+            </div>
+          ))}
         </div>
 
-        {/* Stat 2 */}
-        <div>
-          <p className="text-base md:text-lg mb-2">누적 합격 학생수</p>
-          <h3 className="text-4xl md:text-6xl font-extrabold">1,200명 +</h3>
+        {/* 그래프 */}
+        <div className="mt-16 md:mt-24">
+          <StudentGraph />
         </div>
-
-        {/* Stat 3 */}
-        <div>
-          <p className="text-base md:text-lg mt-2 md:mt-6 mb-2">매년 실표본 수 (상담 학생 수)</p>
-          <h3 className="text-4xl md:text-6xl font-extrabold">400명 +</h3>
-        </div>
-      </div>
-
-      {/* 그래프: 모바일 좌우 여백 보호 */}
-      <div className="w-full max-w-screen-lg px-4">
-        <StudentGraph />
       </div>
     </section>
   );

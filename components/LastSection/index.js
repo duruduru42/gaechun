@@ -1,41 +1,45 @@
 import Link from "next/link";
 
-const Seventh = () => {
+const LastSection = () => {
   return (
-    <div className="bg-white pt-2 md:pt-0">
-      <section className="relative">
-        <div className="max-w-screen-lg pt-32 pb-32 mx-auto text-center lg:pt-60 lg:px-6">
-          {/* 텍스트 */}
-          <div className="font-extrabold text-2xl sm:text-3xl md:text-4xl leading-relaxed md:leading-normal text-black tracking-tight">
-            <p className="mb-6">
-              고른기회 전형으로 <br className="sm:hidden" />
-              대학을 입학하고 싶으신가요?
-            </p>
-            <p>
-              답은{" "}
-              <span className="text-orange-500">개천용 컨설팅</span>에
-              있습니다.
-            </p>
-          </div>
+    <section className="bg-gray-50 py-28 md:py-36">
+      <div className="max-w-screen-lg mx-auto px-6 text-center">
+        <p className="text-orange-500 font-bold text-sm md:text-base mb-5">
+          마지막으로
+        </p>
 
-          {/* 버튼 */}
-          <Link href="/program">
-            <button
-              className="
-                mt-12 px-6 py-3
-                w-1/2 sm:w-auto
-                bg-orange-500 text-white font-semibold
-                rounded-md shadow-md
-                hover:bg-orange-600 transition duration-200
-              "
-            >
-              상담 신청하기
-            </button>
-          </Link>
-        </div>
-      </section>
-    </div>
+        <h2 className="font-extrabold text-2xl sm:text-3xl md:text-4xl leading-relaxed md:leading-snug text-black tracking-tight">
+          고른기회 전형으로 <br className="sm:hidden" />
+          대학을 입학하고 싶으신가요?
+          <br />
+          답은{" "}
+          <span className="relative inline-block">
+            <span className="relative z-10 text-orange-500">개천용 컨설팅</span>
+            <span className="absolute left-0 bottom-0.5 z-0 h-3 w-full bg-orange-200/70 -rotate-1" />
+          </span>
+          에 있습니다.
+        </h2>
+
+        <Link href="/program" className="inline-block">
+          <button
+            className="
+              group inline-flex items-center justify-center gap-2
+              mt-12 px-8 py-4
+              w-auto text-base md:text-lg
+              bg-orange-500 text-white font-semibold
+              rounded-xl shadow-lg shadow-orange-500/25
+              hover:bg-orange-600 hover:shadow-orange-500/35
+              active:scale-[0.98] transition-all duration-200
+            "
+          >
+            상담 신청하기
+            <span className="transition-transform duration-200 group-hover:translate-x-0.5">→</span>
+          </button>
+        </Link>
+
+      </div>
+    </section>
   );
 };
 
-export default Seventh;
+export default LastSection;

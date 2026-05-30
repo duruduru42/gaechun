@@ -1,6 +1,42 @@
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* 합격생 마퀴(자동 흐름) 애니메이션 */
+@keyframes marquee-left {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+@keyframes marquee-right {
+  from { transform: translateX(-50%); }
+  to { transform: translateX(0); }
+}
+.animate-marquee {
+  animation: marquee-left var(--marquee-duration, 40s) linear infinite;
+}
+.animate-marquee-rev {
+  animation: marquee-right var(--marquee-duration, 50s) linear infinite;
+}
+/* 마우스 올리면 일시정지 */
+.marquee-group:hover .animate-marquee,
+.marquee-group:hover .animate-marquee-rev {
+  animation-play-state: paused;
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee, .animate-marquee-rev { animation: none; }
+}
+
+/* 브랜드 타입 파운데이션: Pretendard (한글 최적화 모던 산세리프) */
+html, body {
+  font-family: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont,
+    system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', 'Apple SD Gothic Neo',
+    'Malgun Gothic', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  word-break: keep-all; /* 한글 단어 단위 줄바꿈으로 가독성 향상 */
+}
 
 
 /* globals.css */
