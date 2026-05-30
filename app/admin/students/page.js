@@ -1,36 +1,84 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from 'next/navigation';
+
+// 모듈 수준 싱글톤으로 클라이언트 생성 (#4)
+const supabase = createClient();
+
+// 공통 데이터 변환 헬퍼 (#6)
+function normalizeChoice(curr) {
+  return {
+    ...curr,
+    display_univ: curr.university_name || curr.departments?.name,
+    display_dept: curr.department_name || curr.departments?.모집단위,
+    is_integrated: curr.departments?.sum === 'y',
+  };
+}
+
+// 컴포넌트 분리 (#8)
+function StatusBadge({ status, isIntegrated }) {
+  const statusStyles = {
+    '확정': 'bg-blue-100 text-blue-700 border-blue-200',
+    '보류': 'bg-yellow-100 text-yellow-700 border-yellow-200',
+    '변경': 'bg-red-100 text-red-700 border-red-200',
+  };
+  const style = statusStyles[status] || 'bg-gray-100 text-gray-600 border-gray-200';
+  return (
+    <div className="flex items-center gap-1">
+      <span className={`text-[10px] px-2 py-0.5 rounded-full border font-black ml-2 ${style}`}>
+        {status || '대기'}
+      </span>
+      {isIntegrated && (
+        <span className="text-[9px] bg-purple-100 text-purple-600 border border-purple-200 px-1.5 py-0.5 rounded-md font-black">통합</span>
+      )}
+    </div>
+  );
+}
+
+// 컴포넌트 분리 (#8)
+function ChoiceItem({ choice }) {
+  if (!choice) return <span className="text-gray-300 text-xs italic">미선택</span>;
+  return (
+    <div className="text-sm">
+      <div className="flex items-center mb-1 justify-between">
+        <span className="font-bold text-gray-800 truncate max-w-[120px]">{choice.display_univ}</span>
+        <StatusBadge status={choice.status} isIntegrated={choice.is_integrated} />
+      </div>
+      <div className="text-gray-500 text-xs font-normal">({choice.display_dept})</div>
+      <div className="text-[10px] text-blue-600 font-bold mt-1">{choice.converted_score?.toLocaleString()}점</div>
+    </div>
+  );
+}
 
 export default function StudentSimpleListPage() {
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [expandedId, setExpandedId] = useState(null);
   const [studentChoices, setStudentChoices] = useState({});
-  const [expandAll, setExpandAll] = useState(false); // [추가] 전체 펼치기 상태
-  
-  const supabase = createClient();
+  const [expandAll, setExpandAll] = useState(false);
+
   const router = useRouter();
 
-  // 특정 군의 모든 지망이 '변경'인지 체크
-  const hasCriticalChange = (studentId) => {
-    const choices = studentChoices[studentId];
-    if (!choices) return false;
+  // #7: studentChoices 변경 시에만 경고 학생 목록 재계산
+  const warningSet = useMemo(() => {
+    const set = new Set();
+    for (const [studentId, choices] of Object.entries(studentChoices)) {
+      const isCritical = ['가', '나', '다'].some((group) => {
+        const groupChoices = choices[group];
+        if (!groupChoices) return false;
+        const activePriorities = Object.values(groupChoices).filter(item => item !== null);
+        if (activePriorities.length === 0) return false;
+        return activePriorities.every(choice => choice.status === '변경');
+      });
+      if (isCritical) set.add(studentId);
+    }
+    return set;
+  }, [studentChoices]);
 
-    return ['가', '나', '다'].some((group) => {
-      const groupChoices = choices[group];
-      if (!groupChoices) return false;
-
-      const activePriorities = Object.values(groupChoices).filter(item => item !== null);
-      if (activePriorities.length === 0) return false;
-
-      return activePriorities.every(choice => choice.status === '변경');
-    });
-  };
-
-  const fetchStudents = async () => {
+  // #5: useCallback으로 메모이제이션
+  const fetchStudents = useCallback(async () => {
     setLoading(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -40,9 +88,10 @@ export default function StudentSimpleListPage() {
         return;
       }
 
+      // #9: 필요한 컬럼만 명시적으로 선택
       const { data, error } = await supabase
         .from('admin_managed_students')
-        .select(`*`)
+        .select('id, student_name, selection_type, created_at, percentile_korean, percentile_math, percentile_science1, percentile_science2, manager_id')
         .eq('manager_id', user.id)
         .order('created_at', { ascending: false });
 
@@ -53,59 +102,60 @@ export default function StudentSimpleListPage() {
     } finally {
       setLoading(false);
     }
-  };
-
-  useEffect(() => {
-    fetchStudents();
   }, [router]);
 
-  // [추가] 전체 토글 기능
-  const toggleAll = async () => {
+  // #1: 실제 의존성인 fetchStudents를 배열에 포함
+  useEffect(() => {
+    fetchStudents();
+  }, [fetchStudents]);
+
+  const toggleAll = useCallback(async () => {
     if (expandAll) {
       setExpandedId(null);
       setExpandAll(false);
-    } else {
-      setLoading(true);
-      try {
-        // 1. 아직 로드되지 않은 학생 ID 추출
-        const unloadedIds = students
-          .filter(s => !studentChoices[s.id])
-          .map(s => s.id);
-
-        if (unloadedIds.length > 0) {
-          const { data, error } = await supabase
-            .from('student_choices')
-            .select(`*, departments (university_id, name, 모집단위, sum)`)
-            .in('student_id', unloadedIds);
-
-          if (!error && data) {
-            const newChoices = data.reduce((acc, curr) => {
-              if (!acc[curr.student_id]) acc[curr.student_id] = {};
-              if (!acc[curr.student_id][curr.group_type]) acc[curr.student_id][curr.group_type] = {};
-              
-              acc[curr.student_id][curr.group_type][curr.priority] = {
-                ...curr,
-                display_univ: curr.university_name || curr.departments?.name,
-                display_dept: curr.department_name || curr.departments?.모집단위,
-                is_integrated: curr.departments?.sum === 'y'
-              };
-              return acc;
-            }, {});
-
-            setStudentChoices(prev => ({ ...prev, ...newChoices }));
-          }
-        }
-        setExpandedId('ALL'); // 특수 키값으로 전체 펼침 표시
-        setExpandAll(true);
-      } catch (error) {
-        console.error("Expand all error:", error);
-      } finally {
-        setLoading(false);
-      }
+      return;
     }
-  };
 
-  const handleDeleteStudent = async (studentId, studentName) => {
+    setLoading(true);
+    try {
+      const unloadedIds = students
+        .filter(s => !studentChoices[s.id])
+        .map(s => s.id);
+
+      if (unloadedIds.length > 0) {
+        // #9: 필요한 컬럼만 명시적으로 선택, #10: priority 정렬 추가
+        const { data, error } = await supabase
+          .from('student_choices')
+          .select('id, student_id, group_type, priority, status, university_name, department_name, converted_score, departments (name, 모집단위, sum)')
+          .in('student_id', unloadedIds)
+          .order('priority', { ascending: true });
+
+        if (error) throw error;
+
+        if (data) {
+          const newChoices = data.reduce((acc, curr) => {
+            if (!acc[curr.student_id]) acc[curr.student_id] = {};
+            if (!acc[curr.student_id][curr.group_type]) acc[curr.student_id][curr.group_type] = {};
+            // #6: 공통 헬퍼 사용
+            acc[curr.student_id][curr.group_type][curr.priority] = normalizeChoice(curr);
+            return acc;
+          }, {});
+
+          setStudentChoices(prev => ({ ...prev, ...newChoices }));
+        }
+      }
+
+      // #3: 상태를 함께 설정해 불일치 방지
+      setExpandedId('ALL');
+      setExpandAll(true);
+    } catch (error) {
+      console.error("Expand all error:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [expandAll, students, studentChoices]);
+
+  const handleDeleteStudent = useCallback(async (studentId, studentName) => {
     if (!confirm(`정말로 ${studentName} 학생의 모든 데이터를 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`)) {
       return;
     }
@@ -124,72 +174,52 @@ export default function StudentSimpleListPage() {
       console.error("Delete error:", error);
       alert("삭제 중 오류가 발생했습니다.");
     }
-  };
+  }, []);
 
-  const toggleExpand = async (studentId) => {
-    setExpandAll(false); // 개별 클릭 시 전체 모드 해제
+  const toggleExpand = useCallback(async (studentId) => {
+    // #2: 전체 모드 해제 시 해당 학생만 유지
+    if (expandedId === 'ALL') {
+      setExpandAll(false);
+      setExpandedId(studentId);
+      // 데이터가 이미 로드됐으면 별도 fetch 불필요
+      if (!studentChoices[studentId]) {
+        // 전체 로드 시 포함됐어야 하지만 누락된 경우 fallback fetch
+        await fetchChoicesForStudent(studentId);
+      }
+      return;
+    }
+
     if (expandedId === studentId) {
       setExpandedId(null);
       return;
     }
 
+    setExpandAll(false);
     setExpandedId(studentId);
 
     if (!studentChoices[studentId]) {
-      const { data, error } = await supabase
-        .from('student_choices')
-        .select(`*, departments (university_id, name, 모집단위, sum)`)
-        .eq('student_id', studentId);
-
-      if (!error && data) {
-        const organized = data.reduce((acc, curr) => {
-          if (!acc[curr.group_type]) acc[curr.group_type] = {};
-          acc[curr.group_type][curr.priority] = {
-            ...curr,
-            display_univ: curr.university_name || curr.departments?.name,
-            display_dept: curr.department_name || curr.departments?.모집단위,
-            is_integrated: curr.departments?.sum === 'y'
-          };
-          return acc;
-        }, {});
-        setStudentChoices(prev => ({ ...prev, [studentId]: organized }));
-      }
+      await fetchChoicesForStudent(studentId);
     }
-  };
+  }, [expandedId, studentChoices]);
 
-  const renderStatusBadge = (status, isIntegrated) => {
-    const statusStyles = {
-      '확정': 'bg-blue-100 text-blue-700 border-blue-200',
-      '보류': 'bg-yellow-100 text-yellow-700 border-yellow-200',
-      '변경': 'bg-red-100 text-red-700 border-red-200',
-    };
-    const style = statusStyles[status] || 'bg-gray-100 text-gray-600 border-gray-200';
-    return (
-      <div className="flex items-center gap-1">
-        <span className={`text-[10px] px-2 py-0.5 rounded-full border font-black ml-2 ${style}`}>
-          {status || '대기'}
-        </span>
-        {isIntegrated && (
-          <span className="text-[9px] bg-purple-100 text-purple-600 border border-purple-200 px-1.5 py-0.5 rounded-md font-black">통합</span>
-        )}
-      </div>
-    );
-  };
+  const fetchChoicesForStudent = useCallback(async (studentId) => {
+    // #9: 필요한 컬럼만 선택, #10: priority 정렬 추가
+    const { data, error } = await supabase
+      .from('student_choices')
+      .select('id, student_id, group_type, priority, status, university_name, department_name, converted_score, departments (name, 모집단위, sum)')
+      .eq('student_id', studentId)
+      .order('priority', { ascending: true });
 
-  const renderChoice = (studentId, group, priority) => {
-    const choice = studentChoices[studentId]?.[group]?.[priority];
-    if (!choice) return <span className="text-gray-300 text-xs italic">미선택</span>;
-    return (
-      <div className="text-sm">
-        <div className="flex items-center mb-1 justify-between">
-          <span className="font-bold text-gray-800 truncate max-w-[120px]">{choice.display_univ}</span>
-          {renderStatusBadge(choice.status, choice.is_integrated)}
-        </div>
-        <div className="text-gray-500 text-xs font-normal">({choice.display_dept})</div>
-        <div className="text-[10px] text-blue-600 font-bold mt-1">{choice.converted_score?.toLocaleString()}점</div>
-      </div>
-    );
-  };
+    if (!error && data) {
+      const organized = data.reduce((acc, curr) => {
+        if (!acc[curr.group_type]) acc[curr.group_type] = {};
+        // #6: 공통 헬퍼 사용
+        acc[curr.group_type][curr.priority] = normalizeChoice(curr);
+        return acc;
+      }, {});
+      setStudentChoices(prev => ({ ...prev, [studentId]: organized }));
+    }
+  }, []);
 
   if (loading) return <div className="p-20 text-center text-gray-500 font-bold">학생 목록을 불러오는 중...</div>;
 
@@ -198,12 +228,11 @@ export default function StudentSimpleListPage() {
       <div className="flex justify-between items-center mb-10">
         <h1 className="text-3xl font-black text-gray-800 tracking-tighter italic">ADMIN <span className="text-blue-600">STUDENTS</span></h1>
         <div className="flex gap-3">
-          {/* [추가] 전체 토글 버튼 */}
           <button
             onClick={toggleAll}
             className={`px-6 py-2.5 rounded-xl font-bold border transition shadow-sm ${
-              expandAll 
-                ? 'bg-gray-800 text-white border-gray-800' 
+              expandAll
+                ? 'bg-gray-800 text-white border-gray-800'
                 : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
             }`}
           >
@@ -233,12 +262,13 @@ export default function StudentSimpleListPage() {
             </thead>
             <tbody className="divide-y divide-gray-50">
               {students.map((student) => {
-                const isWarning = hasCriticalChange(student.id);
+                // #7: useMemo로 캐싱된 warningSet 사용
+                const isWarning = warningSet.has(student.id);
                 const isExpanded = expandedId === 'ALL' || expandedId === student.id;
 
                 return (
                   <React.Fragment key={student.id}>
-                    <tr 
+                    <tr
                       onClick={() => toggleExpand(student.id)}
                       className={`hover:bg-blue-50/30 transition-all cursor-pointer group ${isExpanded ? 'bg-blue-50/20' : ''}`}
                     >
@@ -284,7 +314,8 @@ export default function StudentSimpleListPage() {
                                   {[1, 2, 3].map((p) => (
                                     <div key={p} className="relative pl-5 border-l-2 border-gray-50 hover:border-blue-100 transition-colors">
                                       <p className="text-[9px] font-black text-blue-400 uppercase tracking-[0.2em] mb-2 leading-none">0{p} Choice</p>
-                                      {renderChoice(student.id, group, p)}
+                                      {/* #8: ChoiceItem 컴포넌트 사용 */}
+                                      <ChoiceItem choice={studentChoices[student.id]?.[group]?.[p]} />
                                     </div>
                                   ))}
                                 </div>
