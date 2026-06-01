@@ -1,4 +1,4 @@
-// import LandingPopup from '../components/LandingPopup' // [임시 숨김] 공지사항 팝업 - 나중에 복구 시 주석 해제
+import LandingPopup from '../components/LandingPopup'
 import HeroSection from '../components/HeroSection';
 import StatsSection from '../components/StatsSection';
 import Review from '../components/ReviewSection';
@@ -13,7 +13,7 @@ import QnaSection from '@/components/QnaSection';
 export default async function Home() {
   return (
     <div>
-      {/* <LandingPopup/> */}  {/* [임시 숨김] 공지사항 팝업 - 나중에 복구 시 주석 해제 */}
+      <LandingPopup/>
       <HeroSection />
       <WrongSection />  
       <WrongSection2 />

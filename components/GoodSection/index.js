@@ -22,7 +22,7 @@ const PROMISES = [
 
 export default function GoodSection() {
   return (
-    <section className="bg-black py-28 md:py-40">
+    <section className="bg-black py-20 md:py-40">
       <div className="max-w-screen-lg mx-auto px-4 md:px-0">
         <h2 className="text-3xl md:text-5xl font-extrabold leading-snug md:leading-snug text-white mb-14 md:mb-20">
           <span className="text-orange-400">개천용 입시 컨설팅</span>을

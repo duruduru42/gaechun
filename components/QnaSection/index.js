@@ -42,7 +42,7 @@ const QnaSection = () => {
   const toggle = (i) => setOpenIndex((prev) => (prev === i ? null : i));
 
   return (
-    <section className="bg-black py-24 md:py-32 px-4 sm:px-5">
+    <section className="bg-black py-20 md:py-32 px-4 sm:px-5">
       <div className="max-w-screen-lg mx-auto">
         {/* 헤더 */}
         <div className="text-center mb-12 md:mb-16">

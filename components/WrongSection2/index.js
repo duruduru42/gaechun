@@ -90,7 +90,7 @@ export default function WrongSection2() {
 
   return (
     <section className="bg-black overflow-hidden">
-      <div className="max-w-screen-lg mx-auto px-4 md:px-0 pt-24 md:pt-36">
+      <div className="max-w-screen-lg mx-auto px-4 md:px-0 pt-20 md:pt-36">
         {/* 섹션 타이틀 */}
         <h2 className="text-3xl md:text-5xl leading-snug font-extrabold text-white mb-20 md:mb-32">
           <span className="text-gray-500">합격확률을 높이는 것은,</span>
@@ -102,7 +102,7 @@ export default function WrongSection2() {
         <p className="text-orange-400 font-bold text-sm md:text-base mb-5 md:mb-6">
           낮은 성적, 표본분석으로 뒤집은 상향 합격
         </p>
-        <div ref={ref} className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-28 md:mb-40">
+        <div ref={ref} className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 mb-16 md:mb-40">
           {featured.map((c, i) => (
             <motion.div
               key={`${c.univ}-${c.dept}`}
@@ -147,7 +147,7 @@ export default function WrongSection2() {
         </div>
 
         {/* ─────────── 2단계: 표본은 왜 중요한가? ─────────── */}
-        <div className="mb-28 md:mb-40">
+        <div className="mb-16 md:mb-40">
           <p className="text-orange-400 font-bold text-sm md:text-base mb-4 md:mb-5">
             표본은 왜 중요한가?
           </p>
@@ -189,7 +189,7 @@ export default function WrongSection2() {
         </div>
 
         {/* ─────────── 3단계: 개천용의 해법 ─────────── */}
-        <div className="mb-28 md:mb-40">
+        <div className="mb-16 md:mb-40">
           <p className="text-orange-400 font-bold text-sm md:text-base mb-4 md:mb-5">
             그래서, 개천용의 해법
           </p>
@@ -245,7 +245,7 @@ export default function WrongSection2() {
       </div>
 
       {/* ─────────── 3단계: 물량 — 합격생 마퀴 (전체 폭) ─────────── */}
-      <div className="pt-20 md:pt-28 pb-24 md:pb-36 w-full overflow-hidden">
+      <div className="pt-16 md:pt-28 pb-20 md:pb-36 w-full overflow-hidden">
         <div className="max-w-screen-lg mx-auto px-4 md:px-0 mb-8 md:mb-10">
           <p className="text-orange-400 font-bold text-sm md:text-base mb-2">
             한두 명이 아닙니다

@@ -92,7 +92,7 @@ export default function WrongSection() {
                 style={{ left: `${POINTS.min.value}%` }}
                 initial={{ width: 0 }}
                 animate={isInView ? { width: `${POINTS.max.value - POINTS.min.value}%` } : { width: 0 }}
-                transition={{ duration: 1, delay: 1.6, ease: 'easeOut' }}
+                transition={{ duration: 0.9, delay: 0.3, ease: 'easeOut' }}
               />
 
               {/* 점: 최저 백분위 = 유리한 좋은 선택 */}
@@ -136,32 +136,28 @@ export default function WrongSection() {
   );
 }
 
-/* 트랙 위의 점 */
-function Dot({ position, color, ring, isInView, delay = 0 }) {
+/* 트랙 위의 점 — transform(translate)로 정확히 중앙 정렬해야 하므로 framer-motion 미사용
+   (motion의 scale/transform이 Tailwind translate를 덮어쓰는 충돌 방지) */
+function Dot({ position, color, ring }) {
   return (
-    <motion.div
+    <div
       className={`absolute top-1/2 w-5 h-5 md:w-6 md:h-6 -translate-x-1/2 -translate-y-1/2 rounded-full ${color} ring-4 ${ring}`}
       style={{ left: `${position}%` }}
-      initial={{ scale: 0 }}
-      animate={isInView ? { scale: 1 } : { scale: 0 }}
-      transition={{ duration: 0.4, delay: 1.6 + delay, type: 'spring', stiffness: 300 }}
     />
   );
 }
 
-/* 트랙 위쪽 마커 (일반전형) — 오른쪽 끝에 가까워 우측 정렬로 카드 밖 넘침 방지 */
-function Marker({ position, children, isInView, color }) {
+/* 트랙 위쪽 마커 (일반전형) — 우측 정렬(-translate-x-full)로 카드 밖 넘침 방지.
+   translate 충돌 방지를 위해 framer-motion 미사용 */
+function Marker({ position, children, color }) {
   return (
-    <motion.div
+    <div
       className="absolute top-0 flex flex-col items-end -translate-x-full"
       style={{ left: `${position}%` }}
-      initial={{ opacity: 0, y: -8 }}
-      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: -8 }}
-      transition={{ duration: 0.4, delay: 2 }}
     >
       {children}
       <span className={`text-base leading-none ${color} pr-1`}>▾</span>
-    </motion.div>
+    </div>
   );
 }
 

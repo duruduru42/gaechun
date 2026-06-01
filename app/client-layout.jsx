@@ -118,11 +118,12 @@ export default function ClientLayout({ children }) {
 
   return (
     <QueryProvider>
-      <div className="flex h-screen">
+      {/* 모바일: 자연 세로 흐름(문서 스크롤) / 데스크탑(md+): 기존 앱셸(100vh + main 내부 스크롤) */}
+      <div className="flex flex-col md:flex-row md:h-screen">
         {!noSidebar && <Sidebar />}
-        <div className="flex-1 flex flex-col">
+        <div className="flex-1 flex flex-col min-w-0">
           {!noNavbar && <Navbar />}
-          <main className="flex-1 bg-gray-50 overflow-y-auto">
+          <main className="flex-1 bg-gray-50 md:overflow-y-auto">
             {children}
           </main>
         </div>

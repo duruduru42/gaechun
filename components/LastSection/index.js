@@ -2,7 +2,7 @@ import Link from "next/link";
 
 const LastSection = () => {
   return (
-    <section className="bg-gray-50 py-28 md:py-36">
+    <section className="bg-gray-50 py-20 md:py-36">
       <div className="max-w-screen-lg mx-auto px-6 text-center">
         <p className="text-orange-500 font-bold text-sm md:text-base mb-5">
           마지막으로

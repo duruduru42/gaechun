@@ -82,7 +82,7 @@ function ReviewCard({ review }) {
 
 export default function ReviewSection() {
   return (
-    <section className="w-full bg-black py-24 md:py-32">
+    <section className="w-full bg-black py-20 md:py-32">
       <h2 className="text-center text-white text-3xl md:text-4xl font-extrabold mb-12 md:mb-16 px-4">
         수강생들의 생생한 수강 후기
       </h2>

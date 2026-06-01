@@ -2,7 +2,7 @@ import Link from "next/link";
 
 const CanSection = () => {
   return (
-    <section className="bg-gray-50 py-28 md:py-40">
+    <section className="bg-gray-50 py-20 md:py-40">
       <div className="max-w-screen-lg mx-auto px-6 text-center">
         <p className="text-2xl md:text-4xl font-bold text-black leading-relaxed md:leading-relaxed tracking-tight">
           성공적인{" "}

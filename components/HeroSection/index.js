@@ -5,7 +5,7 @@ import studentImage from "@/components/home_student.svg";
 
 export default function HeroSection() {
   return (
-    <section className="relative bg-gray-50 min-h-[calc(100vh-4rem)] pt-12 md:pt-6 overflow-hidden">
+    <section className="relative bg-gray-50 overflow-hidden">
       {/* 배경 액센트: 은은한 오렌지 글로우 (브랜드 컬러 강조) */}
       <div
         aria-hidden
@@ -18,14 +18,15 @@ export default function HeroSection() {
           max-w-screen-lg mx-auto
           flex flex-col md:flex-row
           items-center
-          justify-center md:justify-between
+          md:justify-between
           gap-10 md:gap-0
           px-4 sm:px-6
-          min-h-[70vh] md:min-h-screen
+          py-16 md:py-0
+          md:min-h-[calc(100vh-4rem)]
         "
       >
         {/* 텍스트 섹션 */}
-        <div className="flex-1 text-left">
+        <div className="w-full md:flex-1 text-left">
           {/* 아이브로우 배지 */}
           <span
             className="
@@ -78,19 +79,19 @@ export default function HeroSection() {
               <button
                 className="
                   group
-                  inline-flex items-center justify-center gap-2
-                  w-full sm:w-auto
-                  px-6 py-3.5
-                  text-base font-semibold
+                  inline-flex items-center justify-center gap-1.5
+                  w-auto
+                  px-4 py-2
+                  text-sm font-semibold
                   bg-orange-500 text-white
-                  rounded-xl shadow-lg shadow-orange-500/25
+                  rounded-lg shadow-md shadow-orange-500/25
                   hover:bg-orange-600 hover:shadow-orange-500/35
                   active:scale-[0.98]
                   transition-all duration-200
                 "
               >
                 상담 신청하기
-                <span className="transition-transform duration-200 group-hover:translate-x-0.5">
+                <span className="text-xs transition-transform duration-200 group-hover:translate-x-0.5">
                   →
                 </span>
               </button>
@@ -105,7 +106,7 @@ export default function HeroSection() {
         </div>
 
         {/* 이미지 섹션 */}
-        <div className="flex-1 relative flex justify-center">
+        <div className="w-full md:flex-1 relative flex justify-center">
           {/* 이미지 뒤 소프트 블롭 — 어색한 타원 대신 정돈된 배경 */}
           <div
             aria-hidden

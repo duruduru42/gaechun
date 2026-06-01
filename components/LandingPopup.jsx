@@ -1,81 +1,100 @@
-// 'use client' 지시자를 포함하여 클라이언트 컴포넌트임을 명시합니다.
 'use client';
 
-// React의 useEffect와 useState 훅을 가져옵니다.
 import { useEffect, useState } from 'react';
-// Next.js의 Image 컴포넌트를 가져옵니다. 이미지 최적화와 올바른 경로 처리에 사용됩니다.
-import Image from 'next/image';
-
 import { useRouter } from 'next/navigation';
-// 팝업 이미지를 가져옵니다.
-import popImageSrc from '@/components/POP.svg';
 
 export default function LandingPopup() {
-  // 팝업의 열림/닫힘 상태를 관리하는 state를 정의합니다.
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
-  // 컴포넌트 마운트 시 팝업을 즉시 엽니다.
+
   useEffect(() => {
     const timer = setTimeout(() => setIsOpen(true), 0);
     return () => clearTimeout(timer);
   }, []);
 
-  const handleImageClick = () => {
-    // 팝업을 닫고
-    setIsOpen(false); 
-    // '/checkout' 페이지로 이동
-    router.push('/checkout'); 
+  if (!isOpen) return null;
+
+  const apply = () => {
+    setIsOpen(false);
+    router.push('/program');
   };
 
-  if (!isOpen) {
-    return null;
-  }
-  if (!isOpen) {
-    return null;
-  }
-
   return (
-    // 전체 화면 오버레이
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      {/* 1. 팝업 콘텐츠 컨테이너: 최대 너비를 max-w-6xl로 확대하고 배경을 흰색으로 변경합니다. */}
-      <div className="relative w-full max-w-sm bg-white shadow-2xl rounded-lg overflow-hidden">
-        
-        {/* 2. 제목 (Header) 영역: x 버튼 포함 */}
-        <div className="flex justify-between items-center p-4 bg-gray-100 border-b border-gray-300">
-          <h2 className="text-xl font-bold text-gray-800">
-            공지사항
+    <div
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4"
+      onClick={() => setIsOpen(false)} // 바깥(딤) 클릭 시 닫기
+    >
+      <div
+        className="relative w-full max-w-[320px]"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* 닫기 버튼 */}
+        <button
+          type="button"
+          onClick={() => setIsOpen(false)}
+          aria-label="팝업 닫기"
+          className="absolute -top-3 -right-3 z-10 w-9 h-9 flex items-center justify-center rounded-full bg-white text-gray-800 text-xl shadow-lg hover:bg-gray-100"
+        >
+          ×
+        </button>
+
+        {/* 배너 (CSS — 모든 해상도에서 선명) */}
+        <div className="relative overflow-hidden rounded-3xl bg-[#0d0d0d] border border-white/10 px-7 py-9 text-center shadow-2xl">
+          {/* 배경 글로우 */}
+          <div className="pointer-events-none absolute -top-12 -left-12 w-36 h-36 rounded-full bg-orange-600/20 blur-2xl" />
+          <div className="pointer-events-none absolute -bottom-12 -right-12 w-36 h-36 rounded-full bg-red-600/20 blur-2xl" />
+
+          {/* 번개 액센트 */}
+          <span className="pointer-events-none absolute top-7 left-4 text-red-500/80 text-xl rotate-12 select-none">⚡</span>
+          <span className="pointer-events-none absolute top-12 right-4 text-orange-500/80 text-xl -rotate-12 select-none">⚡</span>
+
+          {/* 타이틀 */}
+          <h2 className="relative font-black italic leading-[1.05] tracking-tight">
+            <span className="block text-3xl bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent">
+              수시 컨설팅
+            </span>
+            <span className="block text-5xl mt-1 bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent">
+              OPEN
+            </span>
           </h2>
-          {/* 닫기 버튼을 제목 영역 안에 배치 */}
+
+          {/* 가격 카드 */}
+          <div className="relative mt-7 space-y-3">
+            <PriceCard label="수시 컨설팅" price="450,000원" />
+            <PriceCard label="파이널 점검 컨설팅" price="950,000원" />
+          </div>
+
+          {/* 신청 기간 */}
+          <p className="relative mt-5 text-xs font-semibold text-gray-400">
+            신청 기간 : 6/1 ~ 8/31
+          </p>
+
+          {/* CTA */}
           <button
             type="button"
-            onClick={() => setIsOpen(false)}
-            // 닫기 버튼 스타일을 제목 영역에 맞게 단순화했습니다.
-            className="text-2xl text-gray-700 hover:text-gray-900 leading-none p-1"
-            aria-label="팝업 닫기"
+            onClick={apply}
+            className="
+              relative mt-5 w-full rounded-xl
+              bg-gradient-to-r from-orange-500 to-red-500
+              py-3.5 text-base font-black text-white
+              shadow-lg shadow-red-500/30
+              hover:brightness-110 active:scale-[0.98]
+              transition
+            "
           >
-            ×
+            신청하기
           </button>
         </div>
-
-        {/* 이미지 내용 영역 */}
-<div className="p-0">
-          {/* 팝업 이미지 컨테이너: 높이를 600px로 확대 */}
-          {/* ⭐️ 수정: onClick 이벤트 핸들러를 추가하고, 커서 스타일을 pointer로 변경하여 클릭 가능함을 시각적으로 알립니다. */}
-          <div 
-            style={{ position: 'relative', width: '100%', height: '600px' }}
-            onClick={handleImageClick}
-            className="cursor-pointer" // 클릭 가능함을 시각적으로 표시
-          >
-            <Image
-              src={popImageSrc}
-              alt="공지 팝업, 클릭 시 /check 페이지로 이동"
-              fill
-              // 이미지 비율을 유지하면서 컨테이너 안에 최대한 크게 표시
-              style={{ objectFit: 'contain' }} 
-            />
-          </div>
-        </div>
       </div>
+    </div>
+  );
+}
+
+function PriceCard({ label, price }) {
+  return (
+    <div className="rounded-2xl bg-black/50 border border-white/10 py-3.5">
+      <p className="text-[13px] font-bold text-orange-400 mb-1">{label}</p>
+      <p className="text-2xl font-black text-white tracking-tight">{price}</p>
     </div>
   );
 }
