@@ -45,16 +45,16 @@ const Fourth = () => {
 
   return (
     
-    <div className="container mx-auto px-4 py-28">
+    <div className="container mx-auto px-4 py-20 sm:py-28">
 
         <div className="text-center mb-14 ">
-        <h1 className="text-4xl font-bold text-gray-800 leading-normal tracking-tight mb-6">고른기회 전형으로 선발하는,<br/> <span className="underline underline-offset-4 decoration-4 decoration-orange-500">모든 대학 및 모집단위</span>를 다룹니다.</h1>
+        <h1 className="text-2xl sm:text-4xl font-bold text-gray-800 leading-normal tracking-tight mb-6 break-keep">고른기회 전형으로 선발하는,<br/> <span className="underline underline-offset-4 decoration-4 decoration-orange-500">모든 대학 및 모집단위</span>를 다룹니다.</h1>
           <p className="text-lg text-gray-600 font-semibold">
             기회균형전형 23개 대학, 농어촌전형 28개 대학, 특성화고전형 22개 대학<br /> 총 1130개의 모집단위를 다룹니다.
           </p>
         </div>
 
-      <div className="bg-white shadow-xl rounded my-6 w-2/3 mx-auto overflow-hidden">
+      <div className="bg-white shadow-xl rounded my-6 w-full sm:w-2/3 mx-auto overflow-hidden">
         <div className="flex flex-col items-start p-4">
           <div className="flex space-x-2 mb-4">
             {['기회균형전형', '농어촌전형', '특성화고전형'].map((type) => (

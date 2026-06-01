@@ -98,6 +98,15 @@ export default function ReviewSection() {
           coverflowEffect={{ rotate: 0, stretch: 50, depth: 200, modifier: 1, slideShadows: false }}
           navigation={true}
           loop={true}
+          // 초기 폭 계산 어긋남 방지: DOM/부모 변화 감지 + 마운트 후 강제 재계산
+          observer={true}
+          observeParents={true}
+          updateOnWindowResize={true}
+          onSwiper={(swiper) => {
+            requestAnimationFrame(() => swiper.update());
+            setTimeout(() => swiper.update(), 300);
+          }}
+          onImagesReady={(swiper) => swiper.update()}
           modules={[Navigation, EffectCoverflow]}
           className={styles.reviewSwiper}
         >

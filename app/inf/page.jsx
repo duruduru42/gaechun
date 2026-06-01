@@ -31,30 +31,14 @@ export default async function Index() {
 
   return (
     <>
-      <div className="block md:hidden flex flex-col items-center justify-center h-screen bg-black text-white px-6">
-      <h2 className="text-2xl font-bold mb-4">⚠️ PC로 접속해주세요</h2>
-      <p className="text-gray-400 mb-6 text-center">
-        이 페이지는 PC 환경에서 최적화되어 있습니다.<br />
-        더 나은 사용을 위해 PC에서 다시 접속해주세요.
-      </p>
-      <a
-        href="/"
-        className="px-6 py-3 bg-orange-500 rounded-lg text-white font-semibold hover:bg-orange-600 transition"
-      >
-        홈으로 이동
-      </a>
-    </div>
-
-      {/* 🖥️ PC(>= md)에서만 보이는 본문 */}
-      <div className="hidden md:block">
-        <First />
-        <Second />
-        <Third />
-        <Fourth />
-        <Sixth />
-        <Seventh />
-        <Footer />
-      </div>
+      {/* 모바일 차단 화면 제거 — 모든 화면에서 본문 노출 (모바일 최적화 완료) */}
+      <First />
+      <Second />
+      <Third />
+      <Fourth />
+      <Sixth />
+      <Seventh />
+      <Footer />
     </>
   );
 }

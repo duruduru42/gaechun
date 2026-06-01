@@ -50,12 +50,22 @@ export default function Example() {
                   <span className="text-5xl font-bold tracking-tight text-gray-900">₩ 89,000</span>
                   <span className="text-sm font-semibold leading-6 tracking-wide text-gray-600">원</span>
                 </p>
+                {/* 모의지원 서비스 미운영 — 비활성화 (오픈 시 아래 a 복구)
                 <a
                   href="/checkout"
                    className="mt-10 block w-full rounded-md bg-orange-500 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-orange-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                 >
                   지금 시작하기
                 </a>
+                */}
+                <button
+                  type="button"
+                  disabled
+                  aria-disabled="true"
+                  className="mt-10 block w-full rounded-md bg-gray-200 px-3 py-2 text-center text-sm font-semibold text-gray-400 cursor-not-allowed"
+                >
+                  11/22 오픈 예정
+                </button>
 
               </div>
             </div>
