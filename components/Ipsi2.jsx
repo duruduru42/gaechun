@@ -64,7 +64,7 @@ export default function Ipsi2() {
             <span className="text-sm md:text-xl font-bold">파이널 점검 컨설팅 : 950,000원</span>
           </div>
           <a
-            href="https://forms.gle/oDq33PsyYyrbZ6e67"
+            href="https://forms.gle/kfAjLECprf9hG6wQ8"
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -260,7 +260,7 @@ export default function Ipsi2() {
             고른기회, <br />
             <span className="text-orange-500">정보가 곧 점수</span>입니다.
           </div>
-          <a href="https://forms.gle/oDq33PsyYyrbZ6e67" target="_blank" rel="noopener noreferrer">
+          <a href="https://forms.gle/kfAjLECprf9hG6wQ8" target="_blank" rel="noopener noreferrer">
             <button className="mt-2 px-6 md:px-8 py-2 md:py-3 bg-blue-600 hover:bg-blue-700 text-white text-base md:text-lg font-bold rounded transition md:ml-8">
               상담 신청하기
             </button>
