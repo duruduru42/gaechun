@@ -12,6 +12,7 @@ export default function Navbar() {
   const navItems = [
     { label: "모의지원", href: "/inf" },
     { label: "컨설팅 신청", href: "/program" },
+    { label: "입시 자료", href: "/data" },
     { label: "회사소개", href: "https://blog.naver.com/gaechun-dragon/222558713706" },
   ];
 
